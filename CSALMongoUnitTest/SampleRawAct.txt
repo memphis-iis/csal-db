@@ -1,0 +1,82 @@
+﻿{
+"LessonID":"Lesson1Activity",
+"UserID":"TorontoDavid",
+"TurnID":4,
+"Duration":2215.2039,
+"Transitions": [
+        {
+        "StateID":"GetTutorHint",
+        "RuleID":"TutorHint",
+        "Actions":[
+            {"Agent":"Tutor","Act":"Speak","Data":"Let's try this together."},
+            {"Agent":"System","Act":"Display","Data":"Tutor:Let's try this together."},
+            {"Agent":"Tutor","Act":"Speak","Data":"In which direction is the velocity of the packet , at the point of release?"},
+            {"Agent":"System","Act":"Display","Data":"Tutor:In which direction is the velocity of the packet , at the point of release?"},
+            {"Agent":"System","Act":"WaitForInput","Data":"20"}]
+        },
+    {
+    "StateID":"GetStudentHint",
+    "RuleID":"NoMoreStudentHint",
+    "Actions":[
+        {"Agent":"Tutor","Act":"Speak","Data":"Let's try this together."},
+        {"Agent":"System","Act":"Display","Data":"Tutor:Let's try this together."},
+        {"Agent":"Tutor","Act":"Speak","Data":"In which direction is the velocity of the packet , at the point of release?"},
+        {"Agent":"System","Act":"Display","Data":"Tutor:In which direction is the velocity of the packet , at the point of release?"},
+        {"Agent":"System","Act":"WaitForInput","Data":"20"}]
+      },
+    {
+    "StateID":"Hint",
+    "RuleID":"TryAnotherHint",
+    "Actions":[
+        {"Agent":"Tutor","Act":"Speak","Data":"Let's try this together."},
+        {"Agent":"System","Act":"Display","Data":"Tutor:Let's try this together."},
+        {"Agent":"Tutor","Act":"Speak","Data":"In which direction is the velocity of the packet , at the point of release?"},
+        {"Agent":"System","Act":"Display","Data":"Tutor:In which direction is the velocity of the packet , at the point of release?"},
+        {"Agent":"System","Act":"WaitForInput","Data":"20"}]
+       }
+    ],
+"Input":{
+    "AllText":"I don't know.# So what? # # # # # # # # # I think it is horizontal dircection.#",
+    "CurrentText":"I think it is horizontal direction.",
+    "Event":""},
+"Assessments":[
+    {
+    "TargetID":"Expectation 1",
+    "AnswerType":"Expectation-Good",
+    "Threshold":0,
+    "RegExMatch":0,
+    "LSAMatch":0,
+    "Match":0,
+    "Pass":false
+        },
+    {
+    "TargetID":"Hint 2",
+    "AnswerType":"Hint-Bad",
+    "Threshold":1,
+    "RegExMatch":0,
+    "LSAMatch":0,
+    "Match":0,
+    "Pass":false
+        },
+    {
+    "TargetID":"Hint 2",
+    "AnswerType":"Hint-Good",
+    "Threshold":0.75,
+    "RegExMatch":0,
+    "LSAMatch":0,
+    "Match":0,
+    "Pass":false
+        },
+    {
+    "TargetID":"TutoringPack TP1",
+    "AnswerType":"Main-Good",
+    "Threshold":0.9,
+    "RegExMatch":0,
+    "LSAMatch":0,
+    "Match":0,
+    "Pass":false
+        }
+    ],
+"ErrorMessage":null,
+"WarningMessage":null
+}

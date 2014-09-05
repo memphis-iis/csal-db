@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+<title>CSAL Database Web Application</title>
+
+<meta charset="ISO-8859-1" http-equiv="Access-Control-Allow-Origin">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- optional Bootstrap theme just for now-->
+<link href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/sandstone/bootstrap.min.css" rel="stylesheet">
+
+<link href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+    
+<!-- HEADER/NAVBAR -->
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">CSAL DB</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="lessons.html">Lessons</a></li>
+                <li><a href="classes.html">Classes</a></li>
+                <li><a href="students.html">Students</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Logout Teacher Name Here</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="page-header" style="padding-left: 2em;">
+    <h1>
+        CSAL Database Application
+        <small>Main Page</small>
+    </h1>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            Perhaps some controls here?
+            <ul>
+                <li>Or</li>
+                <li>A</li>
+                <li>List of things?</li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            Some main content or:
+            <table class="apply-data-table">
+                <thead>
+                    <tr>
+                        <th>Column 1</th>
+                        <th>Column 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>You might</td>
+                        <td>need...</td>
+                    </tr>
+                    <tr>
+                        <td>A table</td>
+                        <td>as an example</td>
+                    </tr>
+                    <tr>
+                        <td>Formatting from Bootstrap</td>
+                        <td>Filter/Sort from jquery datatables</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> <!-- /container -->
+
+
+<!-- FOOTER -->
+<div class="container-fluid" style="margin-top: 2in;">
+    <div class="row">
+        <div class="col-md-12">
+        </div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT RESOURCES -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js" type="text/javascript"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.js" type="text/javascript"></script>
+<script src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js" type="text/javascript"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
+
+<script>
+    $(document).ready(function(){
+        $('.apply-data-table').dataTable();
+    });
+</script>
+    
+</body>
+</html>

@@ -1,0 +1,55 @@
+﻿using System;
+using System.IO;
+using System.Diagnostics;
+using System.Linq;
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
+using MongoDB.Bson;
+
+using CSALMongo;
+
+namespace CSALMongoUnitTest {
+    // Base test class with setup code to read sample instance and clear
+    // previous DB contents.
+    public class CSALDatabaseBase {
+        public const string DB_URL = "mongodb://localhost:27017/csaltest";
+
+        protected MongoDatabase testDB = null;
+
+        protected string SAMPLE_RAW_USER = "";
+        protected string SAMPLE_RAW_LESSON = "";
+
+        [TestInitialize]
+        public void setUp() {
+            var url = new MongoUrl(DB_URL);
+            testDB = new MongoClient(url).GetServer().GetDatabase(url.DatabaseName);
+            testDB.Drop();
+
+            var sampleRaw = BsonDocument.Parse(Properties.Resources.SampleRawAct);
+            SAMPLE_RAW_USER = sampleRaw["UserID"].AsString;
+            SAMPLE_RAW_LESSON = sampleRaw["LessonID"].AsString;
+
+            if (String.IsNullOrWhiteSpace(SAMPLE_RAW_USER)) {
+                throw new InvalidDataException("Could not find Sample Raw Act Student");
+            }
+            if (String.IsNullOrWhiteSpace(SAMPLE_RAW_LESSON)) {
+                throw new InvalidDataException("Could not find Sample Raw Act Lesson");
+            }
+        }
+
+        [TestCleanup]
+        public void tearDown() {
+            testDB = null;
+        }
+
+        protected string getJSON(object obj) {
+            string ret = obj.ToBsonDocument().ToJson();
+            Debug.Print(ret);  //Nice to see if test fails
+            return ret;
+        }
+    }
+}

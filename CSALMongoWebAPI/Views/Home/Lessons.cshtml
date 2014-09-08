@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Lessons";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            Perhaps some controls here?
+            <ul>
+                <li>Or</li>
+                <li>A</li>
+                <li>List of things?</li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            Some main content or:
+            <table class="apply-data-table">
+                <thead>
+                    <tr>
+                        <th>Column 1</th>
+                        <th>Column 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>You might</td>
+                        <td>need...</td>
+                    </tr>
+                    <tr>
+                        <td>A table</td>
+                        <td>as an example</td>
+                    </tr>
+                    <tr>
+                        <td>Formatting from Bootstrap</td>
+                        <td>Filter/Sort from jquery datatables</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> <!-- /container -->
+
+@section ScriptFinal {
+<script>
+    $(document).ready(function () {
+        $('.apply-data-table').dataTable();
+    });
+</script>
+}

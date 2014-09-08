@@ -27,15 +27,15 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                @Html.ActionLink("CSAL DB", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" });
+                @Html.ActionLink("CSAL DB", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="lessons.html">Lessons</a></li>
-                    <li><a href="classes.html">Classes</a></li>
-                    <li><a href="students.html">Students</a></li>
+                    <li>@Html.ActionLink("Lessons", "Lessons", "Home", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("Classes", "Classes", "Home", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("Students", "Students", "Home", new { area = "" }, null)</li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">

@@ -11,5 +11,17 @@ namespace CSALMongoWebAPI.Controllers {
         public ActionResult Index() {
             return View();
         }
+
+        public ActionResult Classes() {
+            return View();
+        }
+
+        public ActionResult Lessons() {
+            return View();
+        }
+
+        public ActionResult Students() {
+            return View();
+        }
     }
 }

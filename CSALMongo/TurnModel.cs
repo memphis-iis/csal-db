@@ -5,7 +5,6 @@ using System.Text;
 
 
 namespace CSALMongo.TurnModel {
-    [Serializable]
     public class ConvLog {
         //MongoDB ID (_id)
         public string Id { get; set; }
@@ -21,7 +20,6 @@ namespace CSALMongo.TurnModel {
         public string WarningMessage { get; set; }
     }
 
-    [Serializable]
     public class TransitionLog {
         public string StateID { get; set; }
         public string RuleID { get; set; }
@@ -29,21 +27,18 @@ namespace CSALMongo.TurnModel {
 
     }
 
-    [Serializable]
     public class ActionLog {
         public string Agent { get; set; }
         public string Act { get; set; }
         public string Data { get; set; }
     }
 
-    [Serializable]
     public class InputLog {
         public string AllText { get; set; }
         public string CurrentText { get; set; }
         public string Event { get; set; }
     }
 
-    [Serializable]
     public class AssessmentLog {
         public string TargetID { get; set; }
         public string AnswerType { get; set; }

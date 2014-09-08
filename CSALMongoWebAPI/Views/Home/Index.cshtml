@@ -5,34 +5,27 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
-            Perhaps some controls here?
-            <ul>
-                <li>Or</li>
-                <li>A</li>
-                <li>List of things?</li>
-            </ul>
+            This isn't the real mock-up - but we wanted some testing actions
+            <hr />
+            <p><button id="listLessons" class="btn btn-primary btn-sm">List Lessons</button></p>
+            <p><button id="listClasses" class="btn btn-primary btn-sm">List Classes</button></p>
+            <p><button id="listStudents" class="btn btn-primary btn-sm">List Students</button></p>
+            <p><button id="generateStuff" class="btn btn-danger btn-sm">Generate Entities</button></p>
         </div>
         <div class="col-md-9">
-            Some main content or:
-            <table class="apply-data-table">
+            <table id="sample-data">
                 <thead>
                     <tr>
-                        <th>Column 1</th>
-                        <th>Column 2</th>
+                        <th>Type</th>
+                        <th>Id</th>
+                        <th>Other Data</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>You might</td>
-                        <td>need...</td>
-                    </tr>
-                    <tr>
-                        <td>A table</td>
-                        <td>as an example</td>
-                    </tr>
-                    <tr>
-                        <td>Formatting from Bootstrap</td>
-                        <td>Filter/Sort from jquery datatables</td>
+                        <td>Info</td>
+                        <td>N/A</td>
+                        <td>Click a button to the left to test stuff</td>
                     </tr>
                 </tbody>
             </table>
@@ -42,8 +35,117 @@
 
 @section ScriptFinal {
 <script>
+    function showRows(rows) {
+        var table = $('#sample-data').DataTable();
+        table
+            .clear()
+            .rows.add(rows)
+            .draw()
+        ;
+    }
+
+    function doServerGet(url, dataTarget) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json"
+        })
+        .done(function (data, textStatus, jqXHR) {
+            console.log("Call done [" + url + "]: " + textStatus + ", data:" + data);
+            if (textStatus != "success") {
+                //OOPS - server didn't like our request
+                var errMsg = "???";
+                try {
+                    errMsg = data.errmsg;
+                } catch (err) { }
+                alert("There was an issue [" + url + "]: " + errMsg);
+            }
+            else {
+                //SUCCESS!
+                dataTarget(data);
+            }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            console.log("Call done [" + url + "]: " + textStatus + ", error:" + errorThrown);
+            alert("There was an error [" + url + "] ==> " +
+                "[" + textStatus + ": " + errorThrown + "]"
+            );
+        });
+    }
+
     $(document).ready(function () {
-        $('.apply-data-table').dataTable();
+        $('#sample-data').dataTable();
+
+        $('#listLessons').click(function (evt) {
+            evt.preventDefault();
+
+            doServerGet("/api/lessons", function (data) {
+                var rows = []
+                $.each(data, function (index, element) {
+                    //TODO
+                    rows.push(["lesson", element["Id"], JSON.stringify(element)]);
+                });
+                showRows(rows);
+            });
+        });
+
+        $('#listClasses').click(function (evt) {
+            evt.preventDefault();
+            
+            doServerGet("/api/classes", function (data) {
+                var rows = []
+                $.each(data, function (index, element) {
+                    //TODO
+                    rows.push(["class", element["Id"], JSON.stringify(element)]);
+                });
+                showRows(rows);
+            });
+        });
+
+        $('#listStudents').click(function (evt) {
+            evt.preventDefault();
+
+            doServerGet("/api/students", function (data) {
+                var rows = []
+                $.each(data, function (index, element) {
+                    //TODO
+                    rows.push(["student", element["Id"], JSON.stringify(element)]);
+                });
+                showRows(rows);
+            });
+        });
+
+        $('#generateStuff').click(function (evt) {
+            evt.preventDefault();
+            
+            $.ajax({
+                type: "POST",
+                data: {test: 1, someList: [1,2,3]},
+                url: "/api/maker/42",
+                dataType: "json"
+            })
+            .done(function (data, textStatus, jqXHR) {
+                console.log("Call done : " + textStatus + ", data:" + data);
+                if (textStatus != "success") {
+                    //OOPS - server didn't like our request
+                    var errMsg = "???";
+                    try {
+                        errMsg = data.errmsg;
+                    } catch (err) { }
+                    alert("There was an issue: " + errMsg);
+                }
+                else {
+                    //SUCCESS!
+                    alert("Call seemed to be OK");
+                }
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log("Call done: " + textStatus + ", error:" + errorThrown);
+                alert("There was an error ==> " +
+                    "[" + textStatus + ": " + errorThrown + "]"
+                );
+            });
+        });
     });
 </script>
 }

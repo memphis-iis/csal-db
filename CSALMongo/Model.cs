@@ -8,7 +8,6 @@ using System.Text;
 // us via raw JSON.
 
 namespace CSALMongo.Model {
-    [Serializable]
     public class Student {
         //MongoDB ID (_id)
         public string Id { get; set; }
@@ -19,7 +18,6 @@ namespace CSALMongo.Model {
         public List<String> Lessons { get; set; }
     }
 
-    [Serializable]
     public class Lesson {
         //MongoDB ID
         public string Id { get; set; }
@@ -30,7 +28,6 @@ namespace CSALMongo.Model {
         public List<String> Students { get; set; }
     }
 
-    [Serializable]
     public class StudentLessonActs {
         //MongoDB ID (_id)
         public string Id { get; set; }
@@ -42,7 +39,6 @@ namespace CSALMongo.Model {
         public List<TurnModel.ConvLog> Turns { get; set; }
     }
 
-    [Serializable]
     public class Class {
         //MongoDB ID (_id)
         public string Id { get; set; }

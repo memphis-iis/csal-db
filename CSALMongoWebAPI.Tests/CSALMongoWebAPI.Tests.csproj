@@ -117,8 +117,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\LessonsControllerTest.cs" />
+    <Compile Include="Controllers\StudentsControllerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\ValuesControllerTest.cs" />
+    <Compile Include="Controllers\ClassesControllerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
@@ -130,6 +132,10 @@
     <ProjectReference Include="..\CSALMongoWebAPI\CSALMongoWebAPI.csproj">
       <Project>{5D339860-5856-4165-908E-15AF04D8D4CC}</Project>
       <Name>CSALMongoWebAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CSALMongo\CSALMongo.csproj">
+      <Project>{bc5b872c-33e0-4bde-afea-0e61591fe918}</Project>
+      <Name>CSALMongo</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

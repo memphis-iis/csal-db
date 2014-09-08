@@ -5,11 +5,14 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
+using CSALMongo;
+using CSALMongo.Model;
+
 namespace CSALMongoWebAPI.Controllers {
-    public class ClassesController : ApiController {
+    public class ClassesController : Util.CSALBaseController {
         // GET api/classes
-        public IEnumerable<string> Get() {
-            return new string[] { "value1", "value2" };
+        public IEnumerable<Class> Get() {
+            return null; //TODO
         }
 
         // GET api/classes/5

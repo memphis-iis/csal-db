@@ -5,6 +5,10 @@ using System.Net.Http;
 using System.Text;
 using System.Web.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using CSALMongo;
+using CSALMongo.Model;
+
 using CSALMongoWebAPI;
 using CSALMongoWebAPI.Controllers;
 
@@ -18,7 +22,7 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             ClassesController controller = new ClassesController();
 
             // Act
-            IEnumerable<string> result = controller.Get();
+            IEnumerable<Class> result = controller.Get();
 
             // Assert
             Assert.IsNotNull(result);

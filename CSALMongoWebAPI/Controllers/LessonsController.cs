@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 
 namespace CSALMongoWebAPI.Controllers {
-    public class LessonsController : ApiController {
+    public class LessonsController : Util.CSALBaseController {
         // GET api/lessons
         public IEnumerable<string> Get() {
             return new string[] { "value1", "value2" };

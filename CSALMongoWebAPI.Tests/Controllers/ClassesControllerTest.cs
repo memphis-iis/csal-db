@@ -8,13 +8,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CSALMongoWebAPI;
 using CSALMongoWebAPI.Controllers;
 
-//TODO: this is all horrible broken
-
 namespace CSALMongoWebAPI.Tests.Controllers {
     [TestClass]
     public class ClassesControllerTest {
         [TestMethod]
         public void Get() {
+            //TODO: actual, correct code
             // Arrange
             ClassesController controller = new ClassesController();
 
@@ -30,6 +29,7 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
         [TestMethod]
         public void GetById() {
+            //TODO: actual, correct code
             // Arrange
             ClassesController controller = new ClassesController();
 
@@ -42,6 +42,7 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
         [TestMethod]
         public void PostById() {
+            //TODO: actual, correct code
             // Arrange
             ClassesController controller = new ClassesController();
 

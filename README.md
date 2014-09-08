@@ -19,5 +19,7 @@ Current directories
    from ACE for turns in a user lesson session.  (Please see the online document
    _CSAL Data_)
  * CSALMongoUnitTest - unit tests for CSALMongo
+ * CSALMongoWebAPI - the Web API wrapper around CSALMongo _and_ the host for the
+   Teachers GUI (uses the Web API)
+ * CSALMongoWebAPI.Tests - unit tests for CSALMongoWebAPI
  * packages - the NuGet folder managing packages for these projects
-

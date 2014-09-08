@@ -17,8 +17,7 @@ namespace CSALMongoWebAPI.Tests.Controllers {
     public class ClassesControllerTest: Util.BaseControllerTest {
         [TestMethod]
         public void Get() {
-            // Arrange
-            ClassesController controller = new ClassesController();
+            var controller = new ClassesController();
             controller.AppSettings = this.AppSettings;
 
             //Initially no classes
@@ -38,8 +37,7 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
         [TestMethod]
         public void GetById() {
-            // Arrange
-            ClassesController controller = new ClassesController();
+            var controller = new ClassesController();
             controller.AppSettings = this.AppSettings;
 
             //Initially no classes

@@ -8,13 +8,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CSALMongoWebAPI;
 using CSALMongoWebAPI.Controllers;
 
+//TODO: this is all horrible broken
+
 namespace CSALMongoWebAPI.Tests.Controllers {
     [TestClass]
-    public class ValuesControllerTest {
+    public class ClassesControllerTest {
         [TestMethod]
         public void Get() {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ClassesController controller = new ClassesController();
 
             // Act
             IEnumerable<string> result = controller.Get();
@@ -29,7 +31,7 @@ namespace CSALMongoWebAPI.Tests.Controllers {
         [TestMethod]
         public void GetById() {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ClassesController controller = new ClassesController();
 
             // Act
             string result = controller.Get(5);
@@ -39,34 +41,12 @@ namespace CSALMongoWebAPI.Tests.Controllers {
         }
 
         [TestMethod]
-        public void Post() {
+        public void PostById() {
             // Arrange
-            ValuesController controller = new ValuesController();
+            ClassesController controller = new ClassesController();
 
             // Act
-            controller.Post("value");
-
-            // Assert
-        }
-
-        [TestMethod]
-        public void Put() {
-            // Arrange
-            ValuesController controller = new ValuesController();
-
-            // Act
-            controller.Put(5, "value");
-
-            // Assert
-        }
-
-        [TestMethod]
-        public void Delete() {
-            // Arrange
-            ValuesController controller = new ValuesController();
-
-            // Act
-            controller.Delete(5);
+            controller.Post(5, "value");
 
             // Assert
         }

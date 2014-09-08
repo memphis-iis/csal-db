@@ -13,7 +13,6 @@ namespace CSALMongoWebAPI.Tests.Controllers {
     public class StudentsControllerTest : Util.BaseControllerTest {
         [TestMethod]
         public void Get() {
-            //TODO
             var controller = new StudentsController();
             controller.AppSettings = this.AppSettings;
 
@@ -34,7 +33,6 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
         [TestMethod]
         public void GetById() {
-            //TODO
             var controller = new StudentsController();
             controller.AppSettings = this.AppSettings;
 

@@ -12,6 +12,9 @@ using MongoDB.Bson;
 
 using CSALMongo;
 
+//TODO: Insure documentation on all public namespaces, classes, and methods
+//TODO: top-level documentation directory with compiled help (tag version for that)
+
 namespace CSALMongoUnitTest {
     // Base test class with setup code to read sample instance and clear
     // previous DB contents.

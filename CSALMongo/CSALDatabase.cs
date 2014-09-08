@@ -160,7 +160,7 @@ namespace CSALMongo {
         /// </summary>
         /// <returns></returns>
         public List<Model.Class> findClasses() {
-            return findAll<Model.Class>(CLASS_COLLECTION); //TODO: test
+            return findAll<Model.Class>(CLASS_COLLECTION);
         }
 
         /// <summary>

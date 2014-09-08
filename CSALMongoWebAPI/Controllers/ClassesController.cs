@@ -12,16 +12,17 @@ namespace CSALMongoWebAPI.Controllers {
     public class ClassesController : Util.CSALBaseController {
         // GET api/classes
         public IEnumerable<Class> Get() {
-            return null; //TODO
+            return GetDatabase().findClasses();
         }
 
         // GET api/classes/5
-        public string Get(int id) {
-            return "value";
+        public Class Get(string id) {
+            return GetDatabase().findClass(id);
         }
 
         // POST api/classes/5
-        public void Post(int id, [FromBody]string value) {
+        public void Post(string id, [FromBody]string value) {
+            //TODO: parse JSON in to instance and call save
         }
     }
 }

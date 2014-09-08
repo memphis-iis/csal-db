@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CSALMongoWebAPI.Tests.Controllers {
     [TestClass]
-    public class StudentsControllerTest {
+    public class StudentsControllerTest : Util.BaseControllerTest {
         [TestMethod]
         public void Get() {
             //TODO

@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CSALMongoWebAPI.Tests.Controllers {
     [TestClass]
-    public class LessonsControllerTest {
+    public class LessonsControllerTest : Util.BaseControllerTest {
         [TestMethod]
         public void Get() {
             //TODO

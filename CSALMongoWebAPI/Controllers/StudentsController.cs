@@ -5,20 +5,23 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
+using CSALMongo.Model;
+
 namespace CSALMongoWebAPI.Controllers {
     public class StudentsController : Util.CSALBaseController {
         // GET api/students
-        public IEnumerable<string> Get() {
-            return new string[] { "value1", "value2" };
+        public IEnumerable<Student> Get() {
+            return GetDatabase().findStudents();
         }
 
         // GET api/students/5
-        public string Get(int id) {
-            return "value";
+        public Student Get(string id) {
+            return GetDatabase().findStudent(id);
         }
 
         // POST api/students/5
-        public void Post(int id, [FromBody]string value) {
+        public void Post(string id, [FromBody]string value) {
+            //TODO: parse JSON in to instance and call save
         }
     }
 }

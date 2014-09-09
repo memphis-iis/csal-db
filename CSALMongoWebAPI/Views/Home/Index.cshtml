@@ -41,7 +41,7 @@
         $('#listLessons').click(function (evt) {
             evt.preventDefault();
 
-            CSALCommon.doServerGet("/api/lessons", function (data) {
+            CSALCommon.doServerGet("/api/lessons", "Getting Lesson Information", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
                     //TODO
@@ -54,7 +54,7 @@
         $('#listClasses').click(function (evt) {
             evt.preventDefault();
             
-            CSALCommon.doServerGet("/api/classes", function (data) {
+            CSALCommon.doServerGet("/api/classes", "Getting Class Information", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
                     //TODO
@@ -67,7 +67,7 @@
         $('#listStudents').click(function (evt) {
             evt.preventDefault();
 
-            CSALCommon.doServerGet("/api/students", function (data) {
+            CSALCommon.doServerGet("/api/students", "Getting Student Information", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
                     //TODO

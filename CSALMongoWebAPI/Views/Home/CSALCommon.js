@@ -59,6 +59,10 @@ var CSALCommon = {
         }
     },
 
+    arrLen: function (a) {
+        return (a && a.length) ? a.length : 0;
+    },
+
     showRows: function (tableSelector, rows) {
         var table = $(tableSelector).DataTable();
         table

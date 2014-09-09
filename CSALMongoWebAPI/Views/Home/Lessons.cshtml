@@ -26,10 +26,6 @@
 
 @section ScriptFinal {
 <script>
-    function arrLen(a) {
-        return (a && a.length) ? a.length : 0;
-    }
-
     $(document).ready(function () {
         $('.apply-data-table').dataTable();
 
@@ -38,7 +34,7 @@
             var makeRow = function (lesson) {
                 return [
                     lesson["LessonID"],
-                    arrLen(lesson["Students"]),
+                    CSALCommon.arrLen(lesson["Students"]),
                     "???",
                     "???",
                     CSALCommon.trimmedStr(lesson["LastTurnTime"])

@@ -155,6 +155,7 @@
     <Compile Include="Controllers\LessonsController.cs" />
     <Compile Include="Controllers\MakerController.cs" />
     <Compile Include="Controllers\StudentsController.cs" />
+    <Compile Include="Controllers\TurnController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

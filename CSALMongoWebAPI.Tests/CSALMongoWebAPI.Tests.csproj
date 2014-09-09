@@ -119,6 +119,7 @@
   <ItemGroup>
     <Compile Include="Controllers\LessonsControllerTest.cs" />
     <Compile Include="Controllers\StudentsControllerTest.cs" />
+    <Compile Include="Controllers\TurnControllerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\ClassesControllerTest.cs" />
     <Compile Include="Util\BaseControllerTest.cs" />

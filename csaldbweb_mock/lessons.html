@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>CSAL Database Web Application</title>
+
+    <meta charset="ISO-8859-1" http-equiv="Access-Control-Allow-Origin">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- optional Bootstrap theme just for now-->
+    <link href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/sandstone/bootstrap.min.css" rel="stylesheet">
+
+    <link href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+    <!-- HEADER/NAVBAR -->
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">CSAL DB</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="lessons.html">Lessons</a></li>
+                    <li><a href="classes.html">Classes</a></li>
+                    <li><a href="students.html">Students</a></li>
+                    <li><a href="questions.html">Questionnaire</a></li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Logout Teacher Name Here</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="page-header" style="padding-left: 2em;">
+        <h1>
+            Welcome to CSAL
+            <small>Lessons Page</small>
+        </h1>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <ul>
+                    <li><a href="http://x-in-y.com/csalweb/MainPageWithInput.html"><h4>CSAL Home Page</h4></a></li>
+                    <li><a href=""><h4>Lessons Plan</h4></a></li>
+                </ul>
+            </div>
+            <div class="col-md-10">
+                <!--table class="table table-hover">-->
+                <table class="apply-data-table">
+                    <caption>List of all the lessons</caption>
+                    <thead>
+                        <tr>
+                            <th>Lesson ID</th>
+                            <th>Number of students attempted</th>
+                            <th>Number of students completed</th>
+                            <th>Date of first attempted</th>
+                            <th>Date of last attempted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="lesson1.html">Lesson 1</a></td>
+                            <td>32</td>
+                            <td>23</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson2.html">Lesson 2</a></td>
+                            <td>33</td>
+                            <td>24</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson3.html">Lesson 3</a></td>
+                            <td>31</td>
+                            <td>21</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson4.html">Lesson 4</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson5.html">Lesson 5</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson6.html">Lesson 6</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson7.html">Lesson 7</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson8.html">Lesson 8</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson9.html">Lesson 9</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson10.html">Lesson 10</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                        <tr>
+                            <td><a href="lesson11.html">Lesson 11</a></td>
+                            <td>34</td>
+                            <td>25</td>
+                            <td>2014-09-08</td>
+                            <td>2014-10-23</td>
+                        </tr>
+                    </tbody>
+                    </table>
+</div>
+        </div>
+    </div> <!-- /container -->
+    <!-- FOOTER -->
+    <div class="container-fluid" style="margin-top: 2in;">
+        <div class="row">
+            <div class="col-md-12">
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT RESOURCES -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.js" type="text/javascript"></script>
+    <script src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
+
+    <script>
+    $(document).ready(function(){
+        $('.apply-data-table').dataTable();
+    });
+    </script>
+
+</body>
+</html>

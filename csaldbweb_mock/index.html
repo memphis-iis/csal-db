@@ -37,6 +37,7 @@
                 <li><a href="lessons.html">Lessons</a></li>
                 <li><a href="classes.html">Classes</a></li>
                 <li><a href="students.html">Students</a></li>
+                <li><a href="questions.html">Questionnaire</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
@@ -48,47 +49,54 @@
 
 <div class="page-header" style="padding-left: 2em;">
     <h1>
-        CSAL Database Application
-        <small>Main Page</small>
+        Welcome to CSAL
+        <small>Login Page</small>
     </h1>
 </div>
 
 <!-- MAIN CONTENT -->
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-3">
-            Perhaps some controls here?
-            <ul>
-                <li>Or</li>
-                <li>A</li>
-                <li>List of things?</li>
-            </ul>
-        </div>
-        <div class="col-md-9">
-            Some main content or:
-            <table class="apply-data-table">
-                <thead>
-                    <tr>
-                        <th>Column 1</th>
-                        <th>Column 2</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>You might</td>
-                        <td>need...</td>
-                    </tr>
-                    <tr>
-                        <td>A table</td>
-                        <td>as an example</td>
-                    </tr>
-                    <tr>
-                        <td>Formatting from Bootstrap</td>
-                        <td>Filter/Sort from jquery datatables</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div>
+    <div class="col-md-2">
+        <ul>
+            <li><a href="http://x-in-y.com/csalweb/MainPageWithInput.html"><h4>CSAL Home Page</h4></a></li>
+            <li><a href=""><h4>Lessons Plan</h4></a></li>
+        </ul>
+    </div>
+    <div class="col-md-9">
+        <form class="form-horizontal" role="form">
+            <h2>Please Login first:</h2>
+            <br />
+            <br />
+            <div class="form-group">
+                <label for="username" class="col-md-2 control-label">Username</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="username" placeholder="Plase input your username" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="col-md-2 control-label">Password</label>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="password" placeholder="Please input your password" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" /> Remember me
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="col-md-offset-2 col-md-6 btn-group">
+                    <button type="submit" class="btn">Login</button>
+                    <button type="button" class="btn">Sign up</button>
+                    <!--Need to add a link-->
+                    <button type="button" class="btn btn-link">I am a student!</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div> <!-- /container -->
 

@@ -35,83 +35,45 @@
 
 @section ScriptFinal {
 <script>
-    function showRows(rows) {
-        var table = $('#sample-data').DataTable();
-        table
-            .clear()
-            .rows.add(rows)
-            .draw()
-        ;
-    }
-
-    function doServerGet(url, dataTarget) {
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "json"
-        })
-        .done(function (data, textStatus, jqXHR) {
-            console.log("Call done [" + url + "]: " + textStatus + ", data:" + data);
-            if (textStatus != "success") {
-                //OOPS - server didn't like our request
-                var errMsg = "???";
-                try {
-                    errMsg = data.errmsg;
-                } catch (err) { }
-                alert("There was an issue [" + url + "]: " + errMsg);
-            }
-            else {
-                //SUCCESS!
-                dataTarget(data);
-            }
-        })
-        .fail(function (jqXHR, textStatus, errorThrown) {
-            console.log("Call done [" + url + "]: " + textStatus + ", error:" + errorThrown);
-            alert("There was an error [" + url + "] ==> " +
-                "[" + textStatus + ": " + errorThrown + "]"
-            );
-        });
-    }
-
     $(document).ready(function () {
         $('#sample-data').dataTable();
 
         $('#listLessons').click(function (evt) {
             evt.preventDefault();
 
-            doServerGet("/api/lessons", function (data) {
+            CSALCommon.doServerGet("/api/lessons", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
                     //TODO
                     rows.push(["lesson", element["Id"], JSON.stringify(element)]);
                 });
-                showRows(rows);
+                CSALCommon.showRows("#sample-data", rows);
             });
         });
 
         $('#listClasses').click(function (evt) {
             evt.preventDefault();
             
-            doServerGet("/api/classes", function (data) {
+            CSALCommon.doServerGet("/api/classes", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
                     //TODO
                     rows.push(["class", element["Id"], JSON.stringify(element)]);
                 });
-                showRows(rows);
+                CSALCommon.showRows("#sample-data", rows);
             });
         });
 
         $('#listStudents').click(function (evt) {
             evt.preventDefault();
 
-            doServerGet("/api/students", function (data) {
+            CSALCommon.doServerGet("/api/students", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
                     //TODO
                     rows.push(["student", element["Id"], JSON.stringify(element)]);
                 });
-                showRows(rows);
+                CSALCommon.showRows("#sample-data", rows);
             });
         });
 

@@ -26,8 +26,8 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
             //Now add some classes
             var db = new CSALDatabase(DB_URL);
-            db.saveClass(new Class { ClassID = "c1", Location = "l1", TeacherName = "t1", Students = new List<string> { "sa", "sb" } });
-            db.saveClass(new Class { ClassID = "c2", Location = "l2", TeacherName = "t2", Students = new List<string> { "sc", "sd" } });
+            db.SaveClass(new Class { ClassID = "c1", Location = "l1", TeacherName = "t1", Students = new List<string> { "sa", "sb" } });
+            db.SaveClass(new Class { ClassID = "c2", Location = "l2", TeacherName = "t2", Students = new List<string> { "sc", "sd" } });
 
             var twoClasses = controller.Get().OrderBy(c => c.Id).ToList();
             Assert.AreEqual(2, twoClasses.Count);
@@ -45,8 +45,8 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
             //Now add some classes
             var db = new CSALDatabase(DB_URL);
-            db.saveClass(new Class { ClassID = "c1", Location = "l1", TeacherName = "t1", Students = new List<string> { "sa", "sb" } });
-            db.saveClass(new Class { ClassID = "c2", Location = "l2", TeacherName = "t2", Students = new List<string> { "sc", "sd" } });
+            db.SaveClass(new Class { ClassID = "c1", Location = "l1", TeacherName = "t1", Students = new List<string> { "sa", "sb" } });
+            db.SaveClass(new Class { ClassID = "c2", Location = "l2", TeacherName = "t2", Students = new List<string> { "sc", "sd" } });
 
             //Still missing
             Assert.IsNull(controller.Get("not-there"));

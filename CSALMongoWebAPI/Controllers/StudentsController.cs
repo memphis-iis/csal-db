@@ -11,12 +11,12 @@ namespace CSALMongoWebAPI.Controllers {
     public class StudentsController : Util.CSALBaseController {
         // GET api/students
         public IEnumerable<Student> Get() {
-            return GetDatabase().findStudents();
+            return GetDatabase().FindStudents();
         }
 
         // GET api/students/5
         public Student Get(string id) {
-            return GetDatabase().findStudent(id);
+            return GetDatabase().FindStudent(id);
         }
 
         // POST api/students/5

@@ -27,12 +27,12 @@ namespace CSALMongoUnitTest {
         protected string SAMPLE_RAW_LESSON = "";
 
         [TestInitialize]
-        public void setUp() {
+        public void SetUp() {
             var url = new MongoUrl(DB_URL);
             testDB = new MongoClient(url).GetServer().GetDatabase(url.DatabaseName);
             testDB.Drop();
 
-            var sampleRaw = BsonDocument.Parse(Properties.Resources.SampleRawAct);
+            var sampleRaw = BsonDocument.Parse(GetSampleRawAct());
             SAMPLE_RAW_USER = sampleRaw["UserID"].AsString;
             SAMPLE_RAW_LESSON = sampleRaw["LessonID"].AsString;
 
@@ -45,14 +45,18 @@ namespace CSALMongoUnitTest {
         }
 
         [TestCleanup]
-        public void tearDown() {
+        public void TearDown() {
             testDB = null;
         }
 
-        protected string getJSON(object obj) {
+        protected string GetJSON(object obj) {
             string ret = obj.ToBsonDocument().ToJson();
             Debug.Print(ret);  //Nice to see if test fails
             return ret;
+        }
+
+        protected string GetSampleRawAct() {
+            return Properties.Resources.SampleRawAct;
         }
     }
 }

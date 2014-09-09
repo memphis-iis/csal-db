@@ -22,8 +22,8 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
             //Now add some lessons
             var db = new CSALDatabase(DB_URL);
-            db.saveStudent(new Student { UserID = "u1", Lessons = new List<string> { "a" } });
-            db.saveStudent(new Student { UserID = "u2", Lessons = new List<string> { "b" } });
+            db.SaveStudent(new Student { UserID = "u1", Lessons = new List<string> { "a" } });
+            db.SaveStudent(new Student { UserID = "u2", Lessons = new List<string> { "b" } });
 
             var twoStudents = controller.Get().OrderBy(c => c.Id).ToList();
             Assert.AreEqual(2, twoStudents.Count);
@@ -41,8 +41,8 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
             //Now add some classes
             var db = new CSALDatabase(DB_URL);
-            db.saveStudent(new Student { UserID = "u1", Lessons = new List<string> { "a" } });
-            db.saveStudent(new Student { UserID = "u2", Lessons = new List<string> { "b" } });
+            db.SaveStudent(new Student { UserID = "u1", Lessons = new List<string> { "a" } });
+            db.SaveStudent(new Student { UserID = "u2", Lessons = new List<string> { "b" } });
 
             //Still missing
             Assert.IsNull(controller.Get("not-there"));

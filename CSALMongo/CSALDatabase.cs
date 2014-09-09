@@ -72,7 +72,7 @@ namespace CSALMongo {
         /// HOWEVER, the top-level fields LessonID and UserID MUST be present
         /// </summary>
         /// <param name="jsonDataRecord">Proper JSON record formatted as above.</param>
-        public void saveRawStudentLessonAct(string jsonDataRecord) {
+        public void SaveRawStudentLessonAct(string jsonDataRecord) {
             var doc = BsonDocument.Parse(jsonDataRecord);
             
             string lessonID = doc.GetValue("LessonID", "").AsString;
@@ -87,7 +87,7 @@ namespace CSALMongo {
             var now = DateTime.Now;
 
             //Need to actually save the raw data
-            doUpsert(STUDENT_ACT_COLLECTION, studentLessonID, Update
+            DoUpsert(STUDENT_ACT_COLLECTION, studentLessonID, Update
                 .Set("LastTurnTime", now)
                 .Set("LessonID", lessonID)
                 .Set("UserID", userID)
@@ -96,12 +96,12 @@ namespace CSALMongo {
 
             //Upsert stats on student and lesson - which has the intended
             //side-effect of insuring that they exist
-            doUpsert(STUDENT_COLLECTION, userID, Update
+            DoUpsert(STUDENT_COLLECTION, userID, Update
                 .Set("LastTurnTime", now)
                 .AddToSet("Lessons", lessonID)
                 .Inc("TurnCount", 1));
             
-            doUpsert(LESSON_COLLECTION, lessonID, Update
+            DoUpsert(LESSON_COLLECTION, lessonID, Update
                 .Set("LastTurnTime", now)
                 .AddToSet("Students", userID)
                 .Inc("TurnCount", 1));
@@ -111,8 +111,8 @@ namespace CSALMongo {
         /// Return all lessons in DB
         /// </summary>
         /// <returns></returns>
-        public List<Model.Lesson> findLessons() {
-            return findAll<Model.Lesson>(LESSON_COLLECTION);
+        public List<Model.Lesson> FindLessons() {
+            return FindAll<Model.Lesson>(LESSON_COLLECTION);
         }
 
         /// <summary>
@@ -120,23 +120,23 @@ namespace CSALMongo {
         /// </summary>
         /// <param name="lessonID">ID of lessong to locate</param>
         /// <returns>Instance of Model.Lesson or null if not found</returns>
-        public Model.Lesson findLesson(string lessonID) {
-            return findOne<Model.Lesson>(LESSON_COLLECTION, lessonID);
+        public Model.Lesson FindLesson(string lessonID) {
+            return FindOne<Model.Lesson>(LESSON_COLLECTION, lessonID);
         }
 
-        public void saveLesson(Model.Lesson lesson) {
+        public void SaveLesson(Model.Lesson lesson) {
             if (lesson == null || String.IsNullOrEmpty(lesson.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing lesson or lesson ID");
             }
-            saveOne<Model.Lesson>(LESSON_COLLECTION, lesson);
+            SaveOne<Model.Lesson>(LESSON_COLLECTION, lesson);
         }
 
         /// <summary>
         /// Return all students in DB
         /// </summary>
         /// <returns></returns>
-        public List<Model.Student> findStudents() {
-            return findAll<Model.Student>(STUDENT_COLLECTION);
+        public List<Model.Student> FindStudents() {
+            return FindAll<Model.Student>(STUDENT_COLLECTION);
         }
 
         /// <summary>
@@ -144,23 +144,23 @@ namespace CSALMongo {
         /// </summary>
         /// <param name="userID">ID of student to locate</param>
         /// <returns>An instance of Model.Student or null if not found</returns>
-        public Model.Student findStudent(string userID) {
-            return findOne<Model.Student>(STUDENT_COLLECTION, userID);
+        public Model.Student FindStudent(string userID) {
+            return FindOne<Model.Student>(STUDENT_COLLECTION, userID);
         }
 
-        public void saveStudent(Model.Student student) {
+        public void SaveStudent(Model.Student student) {
             if (student == null || String.IsNullOrEmpty(student.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing student or User ID");
             }
-            saveOne<Model.Student>(STUDENT_COLLECTION, student);
+            SaveOne<Model.Student>(STUDENT_COLLECTION, student);
         }
 
         /// <summary>
         /// Return all classes in DB
         /// </summary>
         /// <returns></returns>
-        public List<Model.Class> findClasses() {
-            return findAll<Model.Class>(CLASS_COLLECTION);
+        public List<Model.Class> FindClasses() {
+            return FindAll<Model.Class>(CLASS_COLLECTION);
         }
 
         /// <summary>
@@ -168,15 +168,15 @@ namespace CSALMongo {
         /// </summary>
         /// <param name="classID">ID of class to locate</param>
         /// <returns>An instance of Model.Class or null if not found</returns>
-        public Model.Class findClass(string classID) {
-            return findOne<Model.Class>(CLASS_COLLECTION, classID);
+        public Model.Class FindClass(string classID) {
+            return FindOne<Model.Class>(CLASS_COLLECTION, classID);
         }
 
-        public void saveClass(Model.Class clazz) {
+        public void SaveClass(Model.Class clazz) {
             if (clazz == null || String.IsNullOrEmpty(clazz.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing Class or Class ID");
             }
-            saveOne<Model.Class>(CLASS_COLLECTION, clazz);
+            SaveOne<Model.Class>(CLASS_COLLECTION, clazz);
         }
 
         /// <summary>
@@ -193,10 +193,10 @@ namespace CSALMongo {
         /// db.findTurns("CheckbookBalancing", null); //Returns ALL turns for lesson CheckbookBalance (all students)
         /// db.findTurns("CheckbookBalancing", "Bob"); //Returns ALL turns for student Bob in lesson CheckbookBalance
         /// </example>
-        public List<Model.StudentLessonActs> findTurns(string lessonID, string userID) {
+        public List<Model.StudentLessonActs> FindTurns(string lessonID, string userID) {
             //Simple if they want everything
             if (String.IsNullOrEmpty(lessonID) && String.IsNullOrEmpty(userID)) {
-                return findAll<Model.StudentLessonActs>(STUDENT_ACT_COLLECTION);
+                return FindAll<Model.StudentLessonActs>(STUDENT_ACT_COLLECTION);
             }
 
             var clauses = new List<IMongoQuery>();
@@ -225,7 +225,7 @@ namespace CSALMongo {
         /// <param name="collectionName">Name of MongoDB collection to target (will be created if missing)</param>
         /// <param name="docId">ID (key) of the document to upsert (will be created if missing)</param>
         /// <param name="update">Update actions to perform on specified document</param>
-        protected void doUpsert(string collectionName, string docId, IMongoUpdate update) {
+        protected void DoUpsert(string collectionName, string docId, IMongoUpdate update) {
             var collect = mongoDatabase.GetCollection(collectionName);
             collect.Update(Query.EQ("_id", docId), update, UpdateFlags.Upsert);
         }
@@ -237,7 +237,7 @@ namespace CSALMongo {
         /// <typeparam name="TDocType">Document type to use - see FindAllAs in the Mongo driver for details</typeparam>
         /// <param name="collectionName">Name of the collection to target</param>
         /// <returns>List of TDocType instances (or an empty list if nothing found)</returns>
-        protected List<TDocType> findAll<TDocType>(string collectionName) {
+        protected List<TDocType> FindAll<TDocType>(string collectionName) {
             var collect = mongoDatabase.GetCollection(collectionName);
             var found = new List<TDocType>();
 
@@ -256,7 +256,7 @@ namespace CSALMongo {
         /// <param name="collectionName">Name of collection to target</param>
         /// <param name="docId">Key (_id) of the document - note that this is a string and NOT an ObjectId</param>
         /// <returns>A TDocType instance, or null if nothing is found</returns>
-        protected TDocType findOne<TDocType>(string collectionName, string docId) {
+        protected TDocType FindOne<TDocType>(string collectionName, string docId) {
             var collect = mongoDatabase.GetCollection(collectionName);
             return collect.FindOneAs<TDocType>(Query.EQ("_id", docId));
         }
@@ -267,7 +267,7 @@ namespace CSALMongo {
         /// <typeparam name="TDocType"></typeparam>
         /// <param name="collectionName"></param>
         /// <param name="doc"></param>
-        protected void saveOne<TDocType>(string collectionName, TDocType doc) {
+        protected void SaveOne<TDocType>(string collectionName, TDocType doc) {
             var collect = mongoDatabase.GetCollection(collectionName);
             collect.Save<TDocType>(doc);
         }

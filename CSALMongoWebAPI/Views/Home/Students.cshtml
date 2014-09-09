@@ -47,7 +47,7 @@
                 studentTd.html("").append(link);
             });
 
-            $(".student-link").click(function (evt) {
+            $(".student-link").addClass("hover-restore").click(function (evt) {
                 evt.preventDefault();
                 //TODO: actual drill-down functionality
                 alert("TODO: jump/display to detail screen for " + $(this).text());

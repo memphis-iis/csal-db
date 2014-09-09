@@ -15,6 +15,12 @@
 
     <link href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css" rel="stylesheet">
 
+    <style type="text/css">
+        a.hover-restore:hover {
+            cursor: pointer;
+        }
+    </style>
+
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -61,7 +67,7 @@
 
     <!-- MAIN CONTENT -->
     @RenderBody()
-    
+
     <!-- FOOTER -->
     <div class="container-fluid" style="margin-top: 2in;">
         <div class="row">
@@ -89,7 +95,7 @@
         CSALCommon.progressDialogTextSelector = "#progressDialogText";
     </script>
 
-    @RenderSection("ScriptFinal", required:false)
+    @RenderSection("ScriptFinal", required: false)
 
 </body>
 </html>

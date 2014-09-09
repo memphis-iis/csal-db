@@ -52,7 +52,7 @@
                 classTd.html("").append(link);
             });
 
-            $(".class-link").click(function (evt) {
+            $(".class-link").addClass("hover-restore").click(function (evt) {
                 evt.preventDefault();
                 //TODO: actual drill-down functionality
                 alert("TODO: jump/display to detail screen for " + $(this).text());

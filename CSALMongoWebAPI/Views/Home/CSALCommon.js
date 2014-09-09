@@ -1,5 +1,11 @@
 ﻿//NOTE: requires jQuery to be previously imported
 
+//Just in case we're on a weird platform without a console
+if (!window.console) {
+    window.console = { log: function () { } };
+}
+
+
 //Helper for jQuery to see if a query returns anything
 $.fn.exists = function () {
     return this.length && this.length !== 0;
@@ -39,6 +45,17 @@ var CSALCommon = {
         }
         catch (e) {
             console.log(e);
+        }
+    },
+
+    //Helper to get always-valid, always-trimmed string
+    trimmedStr: function (s) {
+        var ss = "" + s;
+        if (ss && ss != "undefined" && ss != "null" && ss.length && ss.length > 0) {
+            return $.trim(ss);
+        }
+        else {
+            return "";
         }
     },
 

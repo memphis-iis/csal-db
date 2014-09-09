@@ -22,7 +22,11 @@ namespace CSALMongoWebAPI.Controllers {
 
         // POST api/classes/5
         public void Post(string id, [FromBody]string value) {
-            //TODO: parse JSON in to instance and call save
+            Class clazz = Utils.ParseJson<Class>(value);
+            if (clazz.Id != id) {
+                throw new InvalidOperationException("Attempt to save mismatched class");
+            }
+            GetDatabase().SaveClass(clazz);
         }
     }
 }

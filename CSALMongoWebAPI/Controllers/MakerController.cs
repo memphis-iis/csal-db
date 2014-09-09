@@ -22,19 +22,19 @@ namespace CSALMongoWebAPI.Controllers {
 
             var db = GetDatabase();
 
-            db.SaveClass(new Class { ClassID = "c1", Location = "loc1", Students = new List<string> { "s1", "s2", "s3" } });
-            db.SaveClass(new Class { ClassID = "c2", Location = "loc2", Students = new List<string> { "s1", "s2", "s3" } });
-            db.SaveClass(new Class { ClassID = "c3", Location = "loc3", Students = new List<string> { "s1", "s2", "s3" } });
+            db.SaveClass(new Class { ClassID = "c1", Location = "loc1", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" } });
+            db.SaveClass(new Class { ClassID = "c2", Location = "loc2", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" } });
+            db.SaveClass(new Class { ClassID = "c3", Location = "loc3", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" } });
 
             db.SaveLesson(new Lesson { LessonID = "l1", Students = new List<string> { "s1", "s2", "s2" } });
             db.SaveLesson(new Lesson { LessonID = "l2", Students = new List<string> { "s1", "s2", "s2" } });
             db.SaveLesson(new Lesson { LessonID = "l3", Students = new List<string> { "s1", "s2", "s2" } });
 
-            db.SaveStudent(new Student { UserID = "s1", Lessons = new List<string> { "l1", "l2", "l3" } });
-            db.SaveStudent(new Student { UserID = "s2", Lessons = new List<string> { "l1", "l2", "l3" } });
-            db.SaveStudent(new Student { UserID = "s3", Lessons = new List<string> { "l1", "l2", "l3" } });
+            db.SaveStudent(new Student { UserID = "s1" });
+            db.SaveStudent(new Student { UserID = "s2" });
+            db.SaveStudent(new Student { UserID = "s3" });
 
-            return new Dictionary<string, string> { {"val", "woo hoo"}, {"success", "true"}  };
+            return new Dictionary<string, string> { { "val", "woo hoo" }, { "success", "true" } };
         }
     }
 }

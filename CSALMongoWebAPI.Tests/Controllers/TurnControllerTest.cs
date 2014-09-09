@@ -34,7 +34,10 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             Assert.AreEqual(1, students.Count);
             Assert.AreEqual(ITS, students[0].TurnCount);
             Assert.AreEqual(SAMPLE_RAW_USER, students[0].UserID);
-            CollectionAssert.AreEquivalent(new string[] { SAMPLE_RAW_LESSON }, students[0].Lessons);
+
+            //Raw has "simple" user ID, so no class/location information
+            var classes = db.FindClasses();
+            Assert.AreEqual(0, classes.Count);
 
             var turns = db.FindTurns(null, null);
             Assert.AreEqual(1, turns.Count);

@@ -7,8 +7,14 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 
-//TODO: List of stats we'll need to calculate from turn data
-//TODO: List of stats we CAN'T current calculate
+//TODO: first turn on a lesson changes attempts from 0 to 1
+//TODO: when see act triple of system/end/*, we know lesson is completed
+//TODO: test new user ID with class/location
+
+//TODO: how count attempts for a student on a lesson?
+//TODO: calc time on lesson
+//TODO: calc reading time
+//TODO: correct items (and total or incorrect items)
 
 namespace CSALMongo {
     /// <summary>
@@ -76,16 +82,30 @@ namespace CSALMongo {
             var doc = BsonDocument.Parse(jsonDataRecord);
             
             string lessonID = doc.GetValue("LessonID", "").AsString;
-            string userID = doc.GetValue("UserID", "").AsString;
+            string fullUserID = doc.GetValue("UserID", "").AsString;
 
             if (String.IsNullOrWhiteSpace(lessonID))
                 throw new CSALDatabaseException("No lesson ID specified for Student-Lesson Act");
-            if (String.IsNullOrWhiteSpace(userID))
+            if (String.IsNullOrWhiteSpace(fullUserID))
                 throw new CSALDatabaseException("No lesson ID specified for Student-Lesson Act");
+
+            string locationID = "";
+            string classID = "";
+            string userID = fullUserID;
+
+            //Note that if there are at least 2 dashes, we have a "complex"
+            //user ID of the form locationid-classid-userid
+            string[] userFlds = fullUserID.Split('-');
+            if (userFlds.Length >= 2) {
+                locationID = userFlds[0].Trim();
+                classID = userFlds[1].Trim();
+                //Note that we could have a dash in the user name
+                userID = String.Join("-", userFlds.Skip(2));
+            }
 
             string studentLessonID = userID + ":" + lessonID;
             var now = DateTime.Now;
-
+            
             //Need to actually save the raw data
             DoUpsert(STUDENT_ACT_COLLECTION, studentLessonID, Update
                 .Set("LastTurnTime", now)
@@ -98,13 +118,21 @@ namespace CSALMongo {
             //side-effect of insuring that they exist
             DoUpsert(STUDENT_COLLECTION, userID, Update
                 .Set("LastTurnTime", now)
-                .AddToSet("Lessons", lessonID)
                 .Inc("TurnCount", 1));
             
             DoUpsert(LESSON_COLLECTION, lessonID, Update
                 .Set("LastTurnTime", now)
                 .AddToSet("Students", userID)
                 .Inc("TurnCount", 1));
+            
+            //Try and upsert stats on the class - but we don't always get a class ID
+            if (!String.IsNullOrWhiteSpace(classID)) {
+                DoUpsert(CLASS_COLLECTION, classID, Update
+                    .Set("Location", locationID)
+                    .AddToSet("Lessons", lessonID)
+                    .AddToSet("Students", userID));
+            }
+            
         }
 
         /// <summary>

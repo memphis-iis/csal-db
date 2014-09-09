@@ -55,7 +55,26 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
         [TestMethod]
         public void PostById() {
-            //TODO: test when implemented
+            var controller = new LessonsController();
+            controller.AppSettings = this.AppSettings;
+
+            Assert.IsNull(controller.Get("single-id"));
+
+            controller.Post("single-id", @"{
+                _id: 'single-id', 
+                LessonID: 'single-id', 
+                LastTurnTime: ISODate('2012-05-02T13:07:17.000Z'), 
+                TurnCount: 42, 
+                Students: ['s1', 's2']
+            }");
+
+            Lesson lesson = controller.Get("single-id");
+
+            Assert.AreEqual("single-id", lesson.Id);
+            Assert.AreEqual("single-id", lesson.LessonID);
+            Assert.AreEqual(new DateTime(2012, 5, 2, 13, 7, 17), lesson.LastTurnTime);
+            Assert.AreEqual(42, lesson.TurnCount);
+            CollectionAssert.AreEquivalent(new string[] { "s1", "s2" }, lesson.Students);
         }
     }
 }

@@ -66,7 +66,10 @@ namespace CSALMongoUnitTest {
             Assert.AreEqual(1, students.Count);
             Assert.AreEqual(ITS, students[0].TurnCount);
             Assert.AreEqual(SAMPLE_RAW_USER, students[0].UserID);
-            CollectionAssert.AreEquivalent(new string[] { SAMPLE_RAW_LESSON }, students[0].Lessons);
+
+            //Raw has "simple" user ID, so no class/location information
+            var classes = db.FindClasses();
+            Assert.AreEqual(0, classes.Count);
 
             var turns = db.FindTurns(null, null);
             Assert.AreEqual(1, turns.Count);
@@ -81,28 +84,35 @@ namespace CSALMongoUnitTest {
 
         [TestMethod]
         public void TestMinimalRawAct() {
+            //Note our use of the "extended" user id
             var db = new CSALDatabase(DB_URL);
-            db.SaveRawStudentLessonAct("{'LessonID': 'lesson', 'UserID': 'user'}");
+            db.SaveRawStudentLessonAct("{'LessonID': 'lesson', 'UserID': 'memphis-semiotics-fozzy-bear'}");
 
             var lessons = db.FindLessons();
             Assert.AreEqual(1, lessons.Count);
             Assert.AreEqual(1, lessons[0].TurnCount);
             Assert.AreEqual("lesson", lessons[0].LessonID);
-            CollectionAssert.AreEquivalent(new string[] { "user" }, lessons[0].Students);
+            CollectionAssert.AreEquivalent(new string[] { "fozzy-bear" }, lessons[0].Students);
 
             var students = db.FindStudents();
             Assert.AreEqual(1, students.Count);
             Assert.AreEqual(1, students[0].TurnCount);
-            Assert.AreEqual("user", students[0].UserID);
-            CollectionAssert.AreEquivalent(new string[] { "lesson" }, students[0].Lessons);
+            Assert.AreEqual("fozzy-bear", students[0].UserID);
+
+            var classes = db.FindClasses();
+            Assert.AreEqual(1, classes.Count);
+            Assert.AreEqual("semiotics", classes[0].ClassID);
+            Assert.AreEqual("memphis", classes[0].Location);
+            CollectionAssert.AreEquivalent(new string[] { "fozzy-bear" }, classes[0].Students);
+            CollectionAssert.AreEquivalent(new string[] { "lesson" }, classes[0].Lessons);
 
             var turns = db.FindTurns(null, null);
             Assert.AreEqual(1, turns.Count);
             Assert.AreEqual(1, db.FindTurns("lesson", null).Count);
-            Assert.AreEqual(1, db.FindTurns(null, "user").Count);
-            Assert.AreEqual(1, db.FindTurns("lesson", "user").Count);
+            Assert.AreEqual(1, db.FindTurns(null, "fozzy-bear").Count);
+            Assert.AreEqual(1, db.FindTurns("lesson", "fozzy-bear").Count);
 
-            Assert.AreEqual("user", turns[0].UserID);
+            Assert.AreEqual("fozzy-bear", turns[0].UserID);
             Assert.AreEqual("lesson", turns[0].LessonID);
             Assert.AreEqual(1, turns[0].Turns.Count);
         }
@@ -176,7 +186,7 @@ namespace CSALMongoUnitTest {
             Assert.IsNull(db.FindStudent(""));
             Assert.IsNull(db.FindStudent("key"));
 
-            var student = new CSALMongo.Model.Student { UserID = "key", TurnCount = 42, Lessons = new List<String> { "a", "b" } };
+            var student = new CSALMongo.Model.Student { UserID = "key", TurnCount = 42 };
 
             db.SaveStudent(student);
             var student2 = db.FindStudent("key");

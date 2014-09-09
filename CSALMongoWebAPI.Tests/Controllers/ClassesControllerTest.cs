@@ -59,7 +59,28 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
         [TestMethod]
         public void PostById() {
-            //TODO: test when implemented
+            var controller = new ClassesController();
+            controller.AppSettings = this.AppSettings;
+
+            Assert.IsNull(controller.Get("single-id"));
+
+            controller.Post("single-id", @"{
+                _id: 'single-id', 
+                ClassID: 'single-id', 
+                TeacherName: 'teach',
+                Location: 'someloc',
+                Students: ['s1', 's2'],
+                Lessons: ['l1', 'l2']
+            }");
+
+            Class clazz = controller.Get("single-id");
+
+            Assert.AreEqual("single-id", clazz.Id);
+            Assert.AreEqual("single-id", clazz.ClassID);
+            Assert.AreEqual("teach", clazz.TeacherName);
+            Assert.AreEqual("someloc", clazz.Location);
+            CollectionAssert.AreEquivalent(new string[] { "s1", "s2" }, clazz.Students);
+            CollectionAssert.AreEquivalent(new string[] { "l1", "l2" }, clazz.Lessons);
         }
     }
 }

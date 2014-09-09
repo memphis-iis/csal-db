@@ -22,8 +22,8 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
             //Now add some lessons
             var db = new CSALDatabase(DB_URL);
-            db.SaveStudent(new Student { UserID = "u1", Lessons = new List<string> { "a" } });
-            db.SaveStudent(new Student { UserID = "u2", Lessons = new List<string> { "b" } });
+            db.SaveStudent(new Student { UserID = "u1" });
+            db.SaveStudent(new Student { UserID = "u2" });
 
             var twoStudents = controller.Get().OrderBy(c => c.Id).ToList();
             Assert.AreEqual(2, twoStudents.Count);
@@ -41,8 +41,8 @@ namespace CSALMongoWebAPI.Tests.Controllers {
 
             //Now add some classes
             var db = new CSALDatabase(DB_URL);
-            db.SaveStudent(new Student { UserID = "u1", Lessons = new List<string> { "a" } });
-            db.SaveStudent(new Student { UserID = "u2", Lessons = new List<string> { "b" } });
+            db.SaveStudent(new Student { UserID = "u1" });
+            db.SaveStudent(new Student { UserID = "u2" });
 
             //Still missing
             Assert.IsNull(controller.Get("not-there"));
@@ -50,12 +50,32 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             //Find what we inserted
             var oneStudent = controller.Get("u2");
             Assert.AreEqual("u2", oneStudent.Id);
-            CollectionAssert.AreEquivalent(new List<string> { "b" }, oneStudent.Lessons);
         }
 
         [TestMethod]
         public void PostById() {
-            //TODO: test when implemented
+            var controller = new StudentsController();
+            controller.AppSettings = this.AppSettings;
+
+            Assert.IsNull(controller.Get("single-id"));
+
+            controller.Post("single-id", @"{
+                _id: 'single-id', 
+                UserID: 'single-id', 
+                LastTurnTime: ISODate('2012-05-02T13:07:17.000Z'), 
+                TurnCount: 42, 
+                FirstName: 'Fozzy',
+                LastName: 'Bear'
+            }");
+
+            Student student = controller.Get("single-id");
+
+            Assert.AreEqual("single-id", student.Id);
+            Assert.AreEqual("single-id", student.UserID);
+            Assert.AreEqual(new DateTime(2012, 5, 2, 13, 7, 17), student.LastTurnTime);
+            Assert.AreEqual(42, student.TurnCount);
+            Assert.AreEqual("Fozzy", student.FirstName);
+            Assert.AreEqual("Bear", student.LastName);
         }
     }
 }

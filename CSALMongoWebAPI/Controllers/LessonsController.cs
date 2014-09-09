@@ -21,7 +21,11 @@ namespace CSALMongoWebAPI.Controllers {
 
         // POST api/lessons/5
         public void Post(string id, [FromBody]string value) {
-            //TODO: parse JSON in to instance and call save (and unit test)
+            Lesson lesson = Utils.ParseJson<Lesson>(value);
+            if (lesson.Id != id) {
+                throw new InvalidOperationException("Attempt to save mismatched Lesson");
+            }
+            GetDatabase().SaveLesson(lesson);
         }
     }
 }

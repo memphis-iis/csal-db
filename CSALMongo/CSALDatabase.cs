@@ -7,11 +7,6 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 
-//TODO: first turn on a lesson changes attempts from 0 to 1
-//TODO: when see act triple of system/end/*, we know lesson is completed
-//TODO: test new user ID with class/location
-
-//TODO: how count attempts for a student on a lesson?
 //TODO: calc time on lesson
 //TODO: calc reading time
 //TODO: correct items (and total or incorrect items)
@@ -105,14 +100,20 @@ namespace CSALMongo {
 
             string studentLessonID = userID + ":" + lessonID;
             var now = DateTime.Now;
-            
-            //Need to actually save the raw data
-            DoUpsert(STUDENT_ACT_COLLECTION, studentLessonID, Update
+
+            //Set up our update for the student/lesson act collection.  We
+            //will also examine the raw data to see if there is anything we
+            //can infer
+            var mainUpdate = Update
                 .Set("LastTurnTime", now)
                 .Set("LessonID", lessonID)
                 .Set("UserID", userID)
                 .Inc("TurnCount", 1)
-                .Push("Turns", doc));
+                .Push("Turns", doc);
+            mainUpdate = additionalUpdates(doc, mainUpdate);
+
+            //Need to actually save the raw data
+            DoUpsert(STUDENT_ACT_COLLECTION, studentLessonID, mainUpdate);
 
             //Upsert stats on student and lesson - which has the intended
             //side-effect of insuring that they exist
@@ -131,8 +132,57 @@ namespace CSALMongo {
                     .Set("Location", locationID)
                     .AddToSet("Lessons", lessonID)
                     .AddToSet("Students", userID));
+            }    
+        }
+
+        //TODO: Test attempts and completions
+        
+        /// <summary>
+        /// Handle the variety of updates for our raw data save
+        /// </summary>
+        /// <param name="doc">BsonDocument representation of the data passed to SaveRawStudentLessonAct</param>
+        /// <param name="update">The MongoDB update builder used to update the Student Act record</param>
+        /// <returns>The modified update builder</returns>
+        protected UpdateBuilder additionalUpdates(BsonDocument doc, UpdateBuilder update) {
+            //Turn ID of 1 means they just started an attempt
+            if (doc.GetValue("TurnID", -1) == 1) {
+                update = update.Inc("Attempts", 1);
             }
-            
+
+            //We may get an action telling us that this is a completion
+            bool completed = false;
+            var transitions = Util.ExtractArray(doc, "Transitions");
+            foreach (var trans in transitions) {
+                if (!trans.IsBsonDocument) {
+                    continue;
+                }
+
+                var actions = Util.ExtractArray(trans.AsBsonDocument, "Actions");
+                foreach (var action in actions) {
+                    if (!action.IsBsonDocument) {
+                        continue;
+                    }
+                    var actionDoc = action.AsBsonDocument;
+                    string agent = actionDoc.GetValue("Agent", "").AsString.Trim().ToLower();
+                    string act = actionDoc.GetValue("Act", "").AsString.Trim().ToLower();
+
+                    if (agent == "system" && act == "end") {
+                        completed = true;
+                        break;
+                    }
+                }
+
+                if (completed) {
+                    break;
+                }
+            }
+
+            if (completed) {
+                update = update.Inc("Completions", 1);
+            }
+
+            //All done
+            return update;
         }
 
         /// <summary>

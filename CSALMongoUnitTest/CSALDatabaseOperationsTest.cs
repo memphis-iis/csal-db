@@ -80,13 +80,17 @@ namespace CSALMongoUnitTest {
             Assert.AreEqual(SAMPLE_RAW_USER, turns[0].UserID);
             Assert.AreEqual(SAMPLE_RAW_LESSON, turns[0].LessonID);
             Assert.AreEqual(ITS, turns[0].Turns.Count);
+
+            //The sample act has no completion action and is turn ID 4 - so no attempts and no completions
+            Assert.AreEqual(0, turns[0].Attempts);
+            Assert.AreEqual(0, turns[0].Completions);
         }
 
         [TestMethod]
         public void TestMinimalRawAct() {
             //Note our use of the "extended" user id
             var db = new CSALDatabase(DB_URL);
-            db.SaveRawStudentLessonAct("{'LessonID': 'lesson', 'UserID': 'memphis-semiotics-fozzy-bear'}");
+            db.SaveRawStudentLessonAct("{'LessonID': 'lesson', 'UserID': 'memphis-semiotics-fozzy-bear', 'TurnID': 1}");
 
             var lessons = db.FindLessons();
             Assert.AreEqual(1, lessons.Count);
@@ -115,6 +119,70 @@ namespace CSALMongoUnitTest {
             Assert.AreEqual("fozzy-bear", turns[0].UserID);
             Assert.AreEqual("lesson", turns[0].LessonID);
             Assert.AreEqual(1, turns[0].Turns.Count);
+            //Turn ID of 1 - we should show one attempt and 0 completions
+            Assert.AreEqual(1, turns[0].Attempts);
+            Assert.AreEqual(0, turns[0].Completions);
+        }
+
+        [TestMethod]
+        public void TestAttemptedRawActs() {
+            var db = new CSALDatabase(DB_URL);
+
+            var turns = db.FindTurns(null, null);
+            Assert.AreEqual(0, turns.Count);
+
+            var attempted = new CSALMongo.TurnModel.ConvLog {
+                UserID = "memphis-semiotics-fozzy-bear",
+                LessonID = "lesson",
+                TurnID = 1
+            };
+
+            var completion = new CSALMongo.TurnModel.ConvLog {
+                UserID = "memphis-semiotics-fozzy-bear",
+                LessonID = "lesson",
+                TurnID = 2,
+                Transitions = new List<CSALMongo.TurnModel.TransitionLog> {
+                    new CSALMongo.TurnModel.TransitionLog { 
+                        StateID="TestEnding", 
+                        RuleID="TestHint", 
+                        Actions=new List<CSALMongo.TurnModel.ActionLog> {
+                            new CSALMongo.TurnModel.ActionLog { Agent="System", Act="End", Data="Doesn't Matter"}
+                        }
+                    }
+                }
+            };
+
+            db.SaveRawStudentLessonAct(attempted.ToJson());
+            turns = db.FindTurns(null, null);
+            Assert.AreEqual(1, turns.Count);
+            Assert.AreEqual(1, turns[0].Attempts);
+            Assert.AreEqual(0, turns[0].Completions);
+
+            db.SaveRawStudentLessonAct(completion.ToJson());
+            turns = db.FindTurns(null, null);
+            Assert.AreEqual(1, turns.Count);
+            Assert.AreEqual(1, turns[0].Attempts);
+            Assert.AreEqual(1, turns[0].Completions);
+
+            db.SaveRawStudentLessonAct(attempted.ToJson());
+            turns = db.FindTurns(null, null);
+            Assert.AreEqual(1, turns.Count);
+            Assert.AreEqual(2, turns[0].Attempts);
+            Assert.AreEqual(1, turns[0].Completions);
+
+            completion.TurnID++;
+            db.SaveRawStudentLessonAct(completion.ToJson());
+            turns = db.FindTurns(null, null);
+            Assert.AreEqual(1, turns.Count);
+            Assert.AreEqual(2, turns[0].Attempts);
+            Assert.AreEqual(2, turns[0].Completions);
+
+            completion.TurnID = 1;
+            db.SaveRawStudentLessonAct(completion.ToJson());
+            turns = db.FindTurns(null, null);
+            Assert.AreEqual(1, turns.Count);
+            Assert.AreEqual(3, turns[0].Attempts);
+            Assert.AreEqual(3, turns[0].Completions);
         }
 
         [TestMethod]

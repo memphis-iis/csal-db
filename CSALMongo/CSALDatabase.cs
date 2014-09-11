@@ -6,6 +6,7 @@ using System.Text;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 //TODO: calc time on lesson
 //TODO: calc reading time
@@ -272,9 +273,28 @@ namespace CSALMongo {
         /// db.findTurns("CheckbookBalancing", "Bob"); //Returns ALL turns for student Bob in lesson CheckbookBalance
         /// </example>
         public List<Model.StudentLessonActs> FindTurns(string lessonID, string userID) {
+            var found = new List<Model.StudentLessonActs>();
+
+            foreach (var one in FindTurnsRaw(lessonID, userID)) {
+                found.Add(BsonSerializer.Deserialize<Model.StudentLessonActs>(one));
+            }
+
+            return found;
+        }
+
+        /// <summary>
+        /// Exactly like FindTurns, but returns the raw BsonDocument
+        /// representation of the data.  Since we are very liberal in what we
+        /// accept in SaveRawStudentActLesson, we might have turn data that
+        /// causes exceptions when interpreted with our Model
+        /// </summary>
+        /// <param name="lessonID">Lesson to match. Null or empty string matches nothing (so all lessons)</param>
+        /// <param name="userID">Student to match. Null or empty string matches nothing (so all students)</param>
+        /// <returns>An unordered list of BsonDocument instances representing the turns found</returns>
+        public List<BsonDocument> FindTurnsRaw(string lessonID, string userID) {
             //Simple if they want everything
             if (String.IsNullOrEmpty(lessonID) && String.IsNullOrEmpty(userID)) {
-                return FindAll<Model.StudentLessonActs>(STUDENT_ACT_COLLECTION);
+                return FindAll<BsonDocument>(STUDENT_ACT_COLLECTION);
             }
 
             var clauses = new List<IMongoQuery>();
@@ -286,9 +306,9 @@ namespace CSALMongo {
             }
 
             var collect = mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION);
-            var found = new List<Model.StudentLessonActs>();
+            var found = new List<BsonDocument>();
 
-            foreach (var one in collect.FindAs<Model.StudentLessonActs>(Query.And(clauses))) {
+            foreach (var one in collect.FindAs<BsonDocument>(Query.And(clauses))) {
                 found.Add(one);
             }
 

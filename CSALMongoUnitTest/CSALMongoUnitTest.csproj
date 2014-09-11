@@ -69,6 +69,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="UtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

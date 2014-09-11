@@ -6,7 +6,7 @@ using System.Text;
 using MongoDB.Bson;
 
 namespace CSALMongo {
-    static class Util {
+    public static class Util {
         public static BsonDocument ExtractDoc(BsonDocument src, string fldName) {
             if (src == null || String.IsNullOrWhiteSpace(fldName)) {
                 return null;

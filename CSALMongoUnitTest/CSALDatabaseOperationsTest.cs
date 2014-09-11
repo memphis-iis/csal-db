@@ -20,21 +20,18 @@ namespace CSALMongoUnitTest {
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestBadStartupNull() {
             var db = new CSALDatabase(null);
-            Assert.IsFalse(true); //Should not be here
         }
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void TestBadStartupEmpty() {
             var db = new CSALDatabase("");
-            Assert.IsFalse(true); //Should not be here
         }
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void TestBadStartupInvalid() {
             var db = new CSALDatabase("sftp://www.google.com/testdb");
-            Assert.IsFalse(true); //Should not be here
         }
 
         [TestMethod]
@@ -183,6 +180,72 @@ namespace CSALMongoUnitTest {
             Assert.AreEqual(1, turns.Count);
             Assert.AreEqual(3, turns[0].Attempts);
             Assert.AreEqual(3, turns[0].Completions);
+
+            //We have saved five turns
+            Assert.AreEqual(5, turns[0].Turns.Count);
+
+            //Final test - make sure that we don't break on poorly formed transitions/actions
+            //Note that now we need to start checking stuff with raw turn access
+
+            db.SaveRawStudentLessonAct(@"{
+                'UserID': 'memphis-semiotics-fozzy-bear',
+                'LessonID': 'lesson',
+                'TurnID': 1,
+                'Transitions': 42
+            }");
+            var rawTurns = db.FindTurnsRaw(null, null);
+            Assert.AreEqual(1, rawTurns.Count);
+            Assert.AreEqual(4, rawTurns[0].GetValue("Attempts", -1).AsInt32);
+            Assert.AreEqual(3, rawTurns[0].GetValue("Completions", -1).AsInt32);
+            Assert.AreEqual(6, rawTurns[0].GetValue("Turns").AsBsonArray.Count);
+
+            db.SaveRawStudentLessonAct(@"{
+                'UserID': 'memphis-semiotics-fozzy-bear',
+                'LessonID': 'lesson',
+                'TurnID': 2,
+                'Transitions': [42]
+            }");
+            rawTurns = db.FindTurnsRaw(null, null);
+            Assert.AreEqual(1, rawTurns.Count);
+            Assert.AreEqual(4, rawTurns[0].GetValue("Attempts", -1).AsInt32);
+            Assert.AreEqual(3, rawTurns[0].GetValue("Completions", -1).AsInt32);
+            Assert.AreEqual(7, rawTurns[0].GetValue("Turns").AsBsonArray.Count);
+
+            db.SaveRawStudentLessonAct(@"{
+                'UserID': 'memphis-semiotics-fozzy-bear',
+                'LessonID': 'lesson',
+                'TurnID': 2,
+                'Transitions': [{'Actions': 42}]
+            }");
+            rawTurns = db.FindTurnsRaw(null, null);
+            Assert.AreEqual(1, rawTurns.Count);
+            Assert.AreEqual(4, rawTurns[0].GetValue("Attempts", -1).AsInt32);
+            Assert.AreEqual(3, rawTurns[0].GetValue("Completions", -1).AsInt32);
+            Assert.AreEqual(8, rawTurns[0].GetValue("Turns").AsBsonArray.Count);
+
+            db.SaveRawStudentLessonAct(@"{
+                'UserID': 'memphis-semiotics-fozzy-bear',
+                'LessonID': 'lesson',
+                'TurnID': 2,
+                'Transitions': [{'Actions': [42]}]
+            }");
+            rawTurns = db.FindTurnsRaw(null, null);
+            Assert.AreEqual(1, rawTurns.Count);
+            Assert.AreEqual(4, rawTurns[0].GetValue("Attempts", -1).AsInt32);
+            Assert.AreEqual(3, rawTurns[0].GetValue("Completions", -1).AsInt32);
+            Assert.AreEqual(9, rawTurns[0].GetValue("Turns").AsBsonArray.Count);
+
+            db.SaveRawStudentLessonAct(@"{
+                'UserID': 'memphis-semiotics-fozzy-bear',
+                'LessonID': 'lesson',
+                'TurnID': 3,
+                'Transitions': [{'Actions': [{'Agent':'system', 'Act':'end'}]}]
+            }");
+            rawTurns = db.FindTurnsRaw(null, null);
+            Assert.AreEqual(1, rawTurns.Count);
+            Assert.AreEqual(4, rawTurns[0].GetValue("Attempts", -1).AsInt32);
+            Assert.AreEqual(4, rawTurns[0].GetValue("Completions", -1).AsInt32);
+            Assert.AreEqual(10, rawTurns[0].GetValue("Turns").AsBsonArray.Count);
         }
 
         [TestMethod]
@@ -190,7 +253,6 @@ namespace CSALMongoUnitTest {
         public void TestBadRawActNull() {
             var db = new CSALDatabase(DB_URL);
             db.SaveRawStudentLessonAct(null);
-            Assert.IsFalse(true); //Should not be here
         }
 
         [TestMethod]
@@ -198,7 +260,6 @@ namespace CSALMongoUnitTest {
         public void TestBadRawActEmpty() {
             var db = new CSALDatabase(DB_URL);
             db.SaveRawStudentLessonAct("");
-            Assert.IsFalse(true); //Should not be here
         }
 
         [TestMethod]
@@ -206,7 +267,6 @@ namespace CSALMongoUnitTest {
         public void TestBadRawActMissingUserID() {
             var db = new CSALDatabase(DB_URL);
             db.SaveRawStudentLessonAct("{'LessonID': 'lesson', 'UserID': ''}");
-            Assert.IsFalse(true); //Should not be here
         }
 
         [TestMethod]
@@ -214,7 +274,6 @@ namespace CSALMongoUnitTest {
         public void TestBadTurnMissingLessonID() {
             var db = new CSALDatabase(DB_URL);
             db.SaveRawStudentLessonAct("{'LessonID': '', 'UserID': 'user'}");
-            Assert.IsFalse(true); //Should not be here
         }
 
         [TestMethod]
@@ -237,7 +296,6 @@ namespace CSALMongoUnitTest {
         public void TestBadSingleLessonSaveNull() {
             var db = new CSALDatabase(DB_URL);
             db.SaveLesson(null);
-            Assert.IsFalse(true); //shouldn't be here
         }
 
         [TestMethod]
@@ -245,7 +303,6 @@ namespace CSALMongoUnitTest {
         public void TestBadSingleLessonSaveNoID() {
             var db = new CSALDatabase(DB_URL);
             db.SaveLesson(new CSALMongo.Model.Lesson { LessonID = "", TurnCount = 6 });
-            Assert.IsFalse(true); //shouldn't be here
         }
 
         [TestMethod]
@@ -268,7 +325,6 @@ namespace CSALMongoUnitTest {
         public void TestBadSingleStudentSaveNull() {
             var db = new CSALDatabase(DB_URL);
             db.SaveStudent(null);
-            Assert.IsFalse(true); //shouldn't be here
         }
 
         [TestMethod]
@@ -276,7 +332,6 @@ namespace CSALMongoUnitTest {
         public void TestBadSingleStudentSaveNoID() {
             var db = new CSALDatabase(DB_URL);
             db.SaveStudent(new CSALMongo.Model.Student { UserID = "" });
-            Assert.IsFalse(true); //shouldn't be here
         }
 
         // Classes aren't (currently) involved in raw act saving, so we don't
@@ -333,7 +388,6 @@ namespace CSALMongoUnitTest {
         public void TestBadSingleClassSaveNull() {
             var db = new CSALDatabase(DB_URL);
             db.SaveClass(null);
-            Assert.IsFalse(true); //shouldn't be here
         }
 
         [TestMethod]
@@ -341,7 +395,6 @@ namespace CSALMongoUnitTest {
         public void TestBadSingleClassSaveNoID() {
             var db = new CSALDatabase(DB_URL);
             db.SaveClass(new CSALMongo.Model.Class{ ClassID = "" });
-            Assert.IsFalse(true); //shouldn't be here
         }
     }
 }

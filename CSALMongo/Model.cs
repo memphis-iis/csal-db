@@ -49,6 +49,20 @@ namespace CSALMongo.Model {
         public List<TurnModel.ConvLog> Turns { get; set; }
         public int Attempts { get; set; }
         public int Completions { get; set; }
+
+        public double TotalDuration() {
+            double tot = 0.0;
+            if (Turns != null) {
+                foreach (var turn in Turns) {
+                    tot += turn.Duration;
+                }
+            }
+            return tot;
+        }
+
+        public double MeanDuration() {
+            return TotalDuration() / Turns.Count;
+        }
     }
 
     public class Class {

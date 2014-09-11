@@ -11,12 +11,12 @@ namespace CSALMongoWebAPI.Controllers {
     public class StudentsController : Util.CSALBaseController {
         // GET api/students
         public IEnumerable<Student> Get() {
-            return GetDatabase().FindStudents();
+            return DBConn().FindStudents();
         }
 
         // GET api/students/5
         public Student Get(string id) {
-            return GetDatabase().FindStudent(id);
+            return DBConn().FindStudent(id);
         }
 
         // POST api/students/5
@@ -25,7 +25,7 @@ namespace CSALMongoWebAPI.Controllers {
             if (student.Id != id) {
                 throw new InvalidOperationException("Attempt to save mismatched student");
             }
-            GetDatabase().SaveStudent(student);
+            DBConn().SaveStudent(student);
         }
     }
 }

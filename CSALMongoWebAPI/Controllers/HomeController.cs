@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Dynamic;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,11 +17,11 @@ namespace CSALMongoWebAPI.Controllers {
     /// </summary>
     public class HomeController : Controller {
         public ActionResult Index() {
-            return View();
+            return View("Index");
         }
 
         public ActionResult Classes() {
-            return View();
+            return View("Classes");
         }
 
         public ActionResult ClassDetails(string id) {
@@ -28,7 +29,7 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         public ActionResult Lessons() {
-            return View();
+            return View("Lessons");
         }
 
         public ActionResult LessonDetails(string id) {
@@ -37,11 +38,21 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         public ActionResult Students() {
-            return View();
+            return View("Students", new StudentsController().Get());
         }
 
         public ActionResult StudentDetails(string id) {
-            return View("StudentDetail", new StudentsController().Get(id));
+            var controller = new StudentsController();
+            var student = controller.Get(id);
+
+            var studentTurns = controller.DBConn().FindTurns(null, student.UserID);
+
+            var modelObj = new ExpandoObject();
+            var modelDict = (IDictionary<string, object>)modelObj;
+            modelDict["Student"] = student;
+            modelDict["Turns"] = studentTurns;
+
+            return View("StudentDetail", modelObj);
         }
     }
 }

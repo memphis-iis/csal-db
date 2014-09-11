@@ -14,7 +14,14 @@
                         <th>Last Interaction</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                    @foreach (var student in Model) {
+                        <tr>
+                            <td><a href="/home/studentdetails/@student.UserID" class="student-link">@student.UserID</a></td>
+                            <td>@student.LastTurnTime</td>
+                        </tr>
+                    }
+                </tbody>
             </table>
         </div>
     </div>
@@ -24,32 +31,7 @@
 <script>
     $(document).ready(function () {
         $('.apply-data-table').dataTable();
-
-        CSALCommon.doServerGet("/api/students", "Getting Student Information", function (data) {
-            var makeRow = function (student) {
-                return [
-                    student["UserID"],
-                    CSALCommon.trimmedStr(student["LastTurnTime"])
-                ];
-            };
-
-            var rows = [];
-            $.each(data, function (index, element) {
-                rows.push(makeRow(element));
-            });
-
-            CSALCommon.showRows("#all-students", rows);
-
-            var tableRows = $("#all-students").find("tbody").children();
-            $.each(tableRows, function (index, element) {
-                var studentTd = $(element).find("td").first();
-                var userID = studentTd.text();
-                var link = $("<a href='/home/studentdetails/" + userID + "' class='student-link'></a>").text(userID);
-                studentTd.html("").append(link);
-            });
-
-            $(".student-link").addClass("hover-restore");
-        });
+        $(".student-link").addClass("hover-restore");
     });
 </script>
 }

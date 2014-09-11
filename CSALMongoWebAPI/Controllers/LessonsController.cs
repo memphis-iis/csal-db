@@ -11,12 +11,12 @@ namespace CSALMongoWebAPI.Controllers {
     public class LessonsController : Util.CSALBaseController {
         // GET api/lessons
         public IEnumerable<Lesson> Get() {
-            return GetDatabase().FindLessons();
+            return DBConn().FindLessons();
         }
 
         // GET api/lessons/5
         public Lesson Get(string id) {
-            return GetDatabase().FindLesson(id);
+            return DBConn().FindLesson(id);
         }
 
         // POST api/lessons/5
@@ -25,7 +25,7 @@ namespace CSALMongoWebAPI.Controllers {
             if (lesson.Id != id) {
                 throw new InvalidOperationException("Attempt to save mismatched Lesson");
             }
-            GetDatabase().SaveLesson(lesson);
+            DBConn().SaveLesson(lesson);
         }
     }
 }

@@ -12,12 +12,12 @@ namespace CSALMongoWebAPI.Controllers {
     public class ClassesController : Util.CSALBaseController {
         // GET api/classes
         public IEnumerable<Class> Get() {
-            return GetDatabase().FindClasses();
+            return DBConn().FindClasses();
         }
 
         // GET api/classes/5
         public Class Get(string id) {
-            return GetDatabase().FindClass(id);
+            return DBConn().FindClass(id);
         }
 
         // POST api/classes/5
@@ -26,7 +26,7 @@ namespace CSALMongoWebAPI.Controllers {
             if (clazz.Id != id) {
                 throw new InvalidOperationException("Attempt to save mismatched class");
             }
-            GetDatabase().SaveClass(clazz);
+            DBConn().SaveClass(clazz);
         }
     }
 }

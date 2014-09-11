@@ -34,7 +34,7 @@ namespace CSALMongoWebAPI.Util {
             }
         }
 
-        protected CSALDatabase GetDatabase() {
+        public CSALDatabase DBConn() {
             return new CSALDatabase(AppSettings["MongoURL"]);
         }
     }

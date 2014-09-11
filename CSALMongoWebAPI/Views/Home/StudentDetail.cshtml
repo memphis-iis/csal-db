@@ -1,12 +1,52 @@
 ﻿@{
-    ViewBag.Title = "Student " + Model.UserID;
+    ViewBag.Title = "Student " + Model.Student.UserID;
 }
 
 <!-- MAIN CONTENT -->
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            TODO
+            @{
+                var completedCount = 0;
+                foreach (var lesson in Model.Turns) {
+                    if (lesson.Attempts > 0 && lesson.Completions >= lesson.Attempts) {
+                        completedCount++;
+                    }
+                }
+            }
+            
+            Completed <strong>@completedCount</strong> of <strong>@Model.Turns.Count</strong> lessons attempted
+            <br />
+
+            <table class="table table-striped">
+                <caption>Lesson Information</caption>
+                <thead>
+                    <tr>
+                        <th>Lesson Id</th>
+                        <th>Last Activity</th>
+                        <th>Times Attempted</th>
+                        <th>Times Completed</th>
+                        <th>Correct response rate</th>
+                        <th>Total time spent on the lesson</th>
+                        <th>Average response time</th>
+                        <th>Reading time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var lesson in Model.Turns) {
+                        <tr>
+                            <td>@lesson.LessonID</td>
+                            <td>@lesson.LastTurnTime</td>
+                            <td>@lesson.Attempts</td>
+                            <td>@lesson.Completions</td>
+                            <td>???</td>
+                            <td>@String.Format("{0:F1} sec", lesson.TotalDuration() / 1000.0)</td>
+                            <td>@String.Format("{0:F1} sec", lesson.MeanDuration() / 1000.0)</td>
+                            <td>???</td>
+                        </tr>                        
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div> <!-- /container -->
@@ -15,7 +55,6 @@
     <script>
         $(document).ready(function () {
             $('.apply-data-table').dataTable();
-            //TODO
         });
     </script>
 }

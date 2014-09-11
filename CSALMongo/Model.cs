@@ -36,6 +36,9 @@ namespace CSALMongo.Model {
         public DateTime? LastTurnTime { get; set; }
         public int? TurnCount { get; set; }
         public List<String> Students { get; set; }
+        public List<DateTime> AttemptTimes { get; set; }
+        public List<String> StudentsAttempted { get; set; }
+        public List<String> StudentsCompleted { get; set; }
     }
 
     public class StudentLessonActs {

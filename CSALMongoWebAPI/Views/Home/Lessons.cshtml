@@ -18,6 +18,25 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @foreach (var lesson in Model) {
+                        string firstAttempt = "N/A";
+                        string lastAttempt = "N/A";
+                        if (lesson.AttemptTimes != null) {
+                            var cnt = lesson.AttemptTimes.Count;
+                            if (cnt > 0) {
+                                firstAttempt = lesson.AttemptTimes[0].ToString();
+                                lastAttempt = lesson.AttemptTimes[cnt-1].ToString();
+                            }
+                        }
+                        
+                        <tr>
+                            <td><a href="/home/lessondetails/@lesson.LessonID" class="lesson-link">@lesson.LessonID</a></td>
+                            <td>@lesson.StudentsAttempted.Count</td>
+                            <td>@lesson.StudentsCompleted.Count</td>
+                            <td>@firstAttempt</td>
+                            <td>@lastAttempt</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -28,36 +47,7 @@
 <script>
     $(document).ready(function () {
         $('.apply-data-table').dataTable();
-
-        CSALCommon.doServerGet("/api/lessons", "Getting Lesson Information", function (data) {
-            //TODO: need to be able to show this information
-            var makeRow = function (lesson) {
-                return [
-                    lesson["LessonID"],
-                    CSALCommon.arrLen(lesson["Students"]),
-                    "???",
-                    "???",
-                    CSALCommon.trimmedStr(lesson["LastTurnTime"])
-                ];
-            };
-
-            var rows = [];
-            $.each(data, function (index, element) {
-                rows.push(makeRow(element));
-            });
-
-            CSALCommon.showRows("#all-lessons", rows);
-
-            var tableRows = $("#all-lessons").find("tbody").children();
-            $.each(tableRows, function (index, element) {
-                var lessonTd = $(element).find("td").first();
-                var lessonID = lessonTd.text();
-                var link = $("<a href='/home/lessondetails/" + lessonID + "' class='lesson-link'></a>").text(lessonID);
-                lessonTd.html("").append(link);
-            });
-
-            $(".lesson-link").addClass("hover-restore");
-        });
+        $(".lesson-link").addClass("hover-restore");
     });
 </script>
 }

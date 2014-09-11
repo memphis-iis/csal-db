@@ -101,6 +101,8 @@ namespace CSALMongo {
 
             string studentLessonID = userID + ":" + lessonID;
             var now = DateTime.Now;
+            bool isAttempt = RawContainsAttempt(doc);
+            bool isCompletion = RawContainsComplete(doc);
 
             //Set up our update for the student/lesson act collection.  We
             //will also examine the raw data to see if there is anything we
@@ -111,7 +113,13 @@ namespace CSALMongo {
                 .Set("UserID", userID)
                 .Inc("TurnCount", 1)
                 .Push("Turns", doc);
-            mainUpdate = additionalUpdates(doc, mainUpdate);
+
+            if (isAttempt) {
+                mainUpdate = mainUpdate.Inc("Attempts", 1);
+            }
+            if (isCompletion) {
+                mainUpdate = mainUpdate.Inc("Completions", 1);
+            }
 
             //Need to actually save the raw data
             DoUpsert(STUDENT_ACT_COLLECTION, studentLessonID, mainUpdate);
@@ -121,11 +129,21 @@ namespace CSALMongo {
             DoUpsert(STUDENT_COLLECTION, userID, Update
                 .Set("LastTurnTime", now)
                 .Inc("TurnCount", 1));
-            
-            DoUpsert(LESSON_COLLECTION, lessonID, Update
+
+            //Note that we track lesson starts (attempts)
+            var lessonUpdate = Update
                 .Set("LastTurnTime", now)
                 .AddToSet("Students", userID)
-                .Inc("TurnCount", 1));
+                .Inc("TurnCount", 1);
+            if (isAttempt) {
+                lessonUpdate = lessonUpdate
+                    .AddToSet("StudentsAttempted", userID)
+                    .Push("AttemptTimes", now);
+            }
+            if (isCompletion) {
+                lessonUpdate = lessonUpdate.AddToSet("StudentsCompleted", userID);
+            }
+            DoUpsert(LESSON_COLLECTION, lessonID, lessonUpdate);
             
             //Try and upsert stats on the class - but we don't always get a class ID
             if (!String.IsNullOrWhiteSpace(classID)) {
@@ -136,22 +154,12 @@ namespace CSALMongo {
             }    
         }
 
-        //TODO: Test attempts and completions
-        
-        /// <summary>
-        /// Handle the variety of updates for our raw data save
-        /// </summary>
-        /// <param name="doc">BsonDocument representation of the data passed to SaveRawStudentLessonAct</param>
-        /// <param name="update">The MongoDB update builder used to update the Student Act record</param>
-        /// <returns>The modified update builder</returns>
-        protected UpdateBuilder additionalUpdates(BsonDocument doc, UpdateBuilder update) {
-            //Turn ID of 1 means they just started an attempt
-            if (doc.GetValue("TurnID", -1) == 1) {
-                update = update.Inc("Attempts", 1);
-            }
+        protected bool RawContainsAttempt(BsonDocument doc) {
+            return doc.GetValue("TurnID", -1).AsInt32 == 1;
+        }
 
+        protected bool RawContainsComplete(BsonDocument doc) {
             //We may get an action telling us that this is a completion
-            bool completed = false;
             var transitions = Util.ExtractArray(doc, "Transitions");
             foreach (var trans in transitions) {
                 if (!trans.IsBsonDocument) {
@@ -168,22 +176,12 @@ namespace CSALMongo {
                     string act = actionDoc.GetValue("Act", "").AsString.Trim().ToLower();
 
                     if (agent == "system" && act == "end") {
-                        completed = true;
-                        break;
+                        return true; //AH-HA!
                     }
                 }
-
-                if (completed) {
-                    break;
-                }
             }
 
-            if (completed) {
-                update = update.Inc("Completions", 1);
-            }
-
-            //All done
-            return update;
+            return false;
         }
 
         /// <summary>

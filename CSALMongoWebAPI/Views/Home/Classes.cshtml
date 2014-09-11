@@ -17,6 +17,14 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @foreach (var clazz in Model) {
+                        <tr>
+                            <td><a href="/home/classdetails/@clazz.ClassID" class="class-link">@clazz.ClassID</a></td>
+                            <td>@clazz.Location</td>
+                            <td>@clazz.TeacherName</td>
+                            <td>@clazz.Students.Count</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -27,34 +35,7 @@
 <script>
     $(document).ready(function () {
         $('.apply-data-table').dataTable();
-
-        CSALCommon.doServerGet("/api/classes", "Getting Class Information", function (data) {
-            var makeRow = function (clazz) {
-                return [
-                    clazz["ClassID"],
-                    CSALCommon.trimmedStr(clazz["Location"]),
-                    CSALCommon.trimmedStr(clazz["TeacherName"]),
-                    CSALCommon.arrLen(clazz["Students"])
-                ];
-            };
-
-            var rows = [];
-            $.each(data, function (index, element) {
-                rows.push(makeRow(element));
-            });
-
-            CSALCommon.showRows("#all-classes", rows);
-
-            var tableRows = $("#all-classes").find("tbody").children();
-            $.each(tableRows, function (index, element) {
-                var classTd = $(element).find("td").first();
-                var classID = classTd.text();
-                var link = $("<a href='/home/classdetails/" + classID + "' class='class-link'></a>").text(classID);
-                classTd.html("").append(link);
-            });
-
-            $(".class-link").addClass("hover-restore");
-        });
+        $(".class-link").addClass("hover-restore");
     });
 </script>
 }

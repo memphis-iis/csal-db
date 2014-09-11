@@ -21,7 +21,7 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         public ActionResult Classes() {
-            return View("Classes");
+            return View("Classes", new ClassesController().Get());
         }
 
         public ActionResult ClassDetails(string id) {
@@ -29,7 +29,7 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         public ActionResult Lessons() {
-            return View("Lessons");
+            return View("Lessons", new LessonsController().Get());
         }
 
         public ActionResult LessonDetails(string id) {

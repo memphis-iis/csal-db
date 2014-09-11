@@ -28,9 +28,9 @@ namespace CSALMongoWebAPI.Controllers {
             db.SaveClass(new Class { ClassID = "c2", Location = "loc2", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
             db.SaveClass(new Class { ClassID = "c3", Location = "loc3", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
 
-            db.SaveLesson(new Lesson { LessonID = "l1", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0 });
-            db.SaveLesson(new Lesson { LessonID = "l2", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0 });
-            db.SaveLesson(new Lesson { LessonID = "l3", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0 });
+            db.SaveLesson(new Lesson { LessonID = "l1", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted =new List<string>(), StudentsCompleted = new List<string>() });
+            db.SaveLesson(new Lesson { LessonID = "l2", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted = new List<string>(), StudentsCompleted = new List<string>() });
+            db.SaveLesson(new Lesson { LessonID = "l3", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted = new List<string>(), StudentsCompleted = new List<string>() });
 
             db.SaveStudent(new Student { UserID = "s1", FirstName = "First", LastName = "Student", TurnCount = 0 });
             db.SaveStudent(new Student { UserID = "s2", FirstName = "Middle", LastName = "Student", TurnCount = 0 });

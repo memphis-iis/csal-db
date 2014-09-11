@@ -51,15 +51,12 @@
             var tableRows = $("#all-lessons").find("tbody").children();
             $.each(tableRows, function (index, element) {
                 var lessonTd = $(element).find("td").first();
-                var link = $("<a class='lesson-link'></a>").text(lessonTd.text());
+                var lessonID = lessonTd.text();
+                var link = $("<a href='/home/lessondetails/" + lessonID + "' class='lesson-link'></a>").text(lessonID);
                 lessonTd.html("").append(link);
             });
 
-            $(".lesson-link").addClass("hover-restore").click(function (evt) {
-                evt.preventDefault();
-                //TODO: actual drill-down functionality
-                alert("TODO: jump/display to detail screen for " + $(this).text());
-            });
+            $(".lesson-link").addClass("hover-restore");
         });
     });
 </script>

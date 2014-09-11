@@ -48,15 +48,12 @@
             var tableRows = $("#all-classes").find("tbody").children();
             $.each(tableRows, function (index, element) {
                 var classTd = $(element).find("td").first();
-                var link = $("<a class='class-link'></a>").text(classTd.text());
+                var classID = classTd.text();
+                var link = $("<a href='/home/classdetails/" + classID + "' class='class-link'></a>").text(classID);
                 classTd.html("").append(link);
             });
 
-            $(".class-link").addClass("hover-restore").click(function (evt) {
-                evt.preventDefault();
-                //TODO: actual drill-down functionality
-                alert("TODO: jump/display to detail screen for " + $(this).text());
-            });
+            $(".class-link").addClass("hover-restore");
         });
     });
 </script>

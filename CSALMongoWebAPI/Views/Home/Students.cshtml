@@ -43,15 +43,12 @@
             var tableRows = $("#all-students").find("tbody").children();
             $.each(tableRows, function (index, element) {
                 var studentTd = $(element).find("td").first();
-                var link = $("<a class='student-link'></a>").text(studentTd.text());
+                var userID = studentTd.text();
+                var link = $("<a href='/home/studentdetails/" + userID + "' class='student-link'></a>").text(userID);
                 studentTd.html("").append(link);
             });
 
-            $(".student-link").addClass("hover-restore").click(function (evt) {
-                evt.preventDefault();
-                //TODO: actual drill-down functionality
-                alert("TODO: jump/display to detail screen for " + $(this).text());
-            });
+            $(".student-link").addClass("hover-restore");
         });
     });
 </script>

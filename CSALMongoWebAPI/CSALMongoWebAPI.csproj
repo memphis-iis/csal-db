@@ -198,6 +198,11 @@
     <Content Include="Views\Home\Lessons.cshtml" />
     <Content Include="Views\Home\Students.cshtml" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Home\ClassDetail.cshtml" />
+    <Content Include="Views\Home\LessonDetail.cshtml" />
+    <Content Include="Views\Home\StudentDetail.cshtml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

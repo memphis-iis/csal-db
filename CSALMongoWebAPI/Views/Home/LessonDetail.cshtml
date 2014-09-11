@@ -1,12 +1,75 @@
 ﻿@{
-    ViewBag.Title = "Lesson " + Model.LessonID;
+    ViewBag.Title = "Lesson " + Model.Lesson.LessonID;
 }
 
 <!-- MAIN CONTENT -->
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            TODO
+            <h3>Summary Information</h3>
+
+            @if (Model.Lesson.LastTurnTime != null) {
+                <p>Last lesson activity was @Model.Lesson.LastTurnTime.ToString()</p>
+            }
+            
+            @{
+                var studentsAssigned = 0;
+                if (Model.Lesson.Students != null) {
+                    studentsAssigned = Model.Lesson.Students.Count;
+                }
+                var studentsAttempted = 0;
+                if (Model.Lesson.StudentsAttempted != null) { 
+                    studentsAttempted = Model.Lesson.StudentsAttempted.Count;
+                }
+                
+                var studentsCompleted = 0;
+                if (Model.Lesson.StudentsCompleted != null) {
+                    studentsCompleted = Model.Lesson.StudentsCompleted.Count;
+                }
+            }
+
+            @if (studentsAssigned > 0 || studentsAttempted > 0 || studentsCompleted > 0) {
+                <p>This lesson has been assigned to <strong>@studentsAssigned student(s)</strong>.
+                    <strong>@studentsAttempted</strong> have attempted the lesson, and
+                    <strong>@studentsCompleted</strong> have completed it.
+                </p>
+            }
+            
+            @if (Model.Lesson.AttemptTimes != null && Model.Lesson.AttemptTimes.Count > 0) {
+                <p>The first attempt was @Model.Lesson.AttemptTimes[0].
+                The last attempt was @Model.Lesson.AttemptTimes[Model.Lesson.AttemptTimes.Count - 1].
+                </p>
+            }
+            <br />
+
+            <table class="table table-striped">
+                <caption>Lesson Information</caption>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Last Activity</th>
+                        <th>Times Attempted</th>
+                        <th>Times Completed</th>
+                        <th>Total time spent on the lesson</th>
+                        <th>Average response time</th>
+                        <th>Reading time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var lesson in Model.Turns) {
+                        <tr>
+                            <td>@lesson.UserID</td>
+                            <td>@lesson.LastTurnTime</td>
+                            <td>@lesson.Attempts</td>
+                            <td>@lesson.Completions</td>
+                            <td>???</td>
+                            <td>@String.Format("{0:F1} sec", lesson.TotalDuration() / 1000.0)</td>
+                            <td>@String.Format("{0:F1} sec", lesson.MeanDuration() / 1000.0)</td>
+                            <td>???</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div> <!-- /container -->

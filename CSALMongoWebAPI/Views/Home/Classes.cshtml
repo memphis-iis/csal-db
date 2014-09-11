@@ -19,7 +19,8 @@
                 <tbody>
                     @foreach (var clazz in Model) {
                         <tr>
-                            <td><a href="/home/classdetails/@clazz.ClassID" class="class-link">@clazz.ClassID</a></td>
+                            <td>@clazz.ClassID</td>
+                            <!--Add back in <a href="/home/classdetails/clazz.ClassID" when detail screen is know-->
                             <td>@clazz.Location</td>
                             <td>@clazz.TeacherName</td>
                             <td>@clazz.Students.Count</td>

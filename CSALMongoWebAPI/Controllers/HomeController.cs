@@ -33,8 +33,17 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         public ActionResult LessonDetails(string id) {
-            var lesson = new CSALMongo.Model.Lesson();
-            return View("LessonDetail", new LessonsController().Get(id));
+            var controller = new LessonsController();
+            var lesson = controller.Get(id);
+
+            var lessonTurns = controller.DBConn().FindTurns(lesson.LessonID, null);
+
+            var modelObj = new ExpandoObject();
+            var modelDict = (IDictionary<string, object>)modelObj;
+            modelDict["Lesson"] = lesson;
+            modelDict["Turns"] = lessonTurns;
+            
+            return View("LessonDetail", modelObj);
         }
 
         public ActionResult Students() {

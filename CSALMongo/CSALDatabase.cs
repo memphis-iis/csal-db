@@ -8,7 +8,11 @@ using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
-//TODO: calc time on lesson
+//TODO: get student info by location
+//TODO: Change index page to have instructions, move current index to a test page
+//TODO: class detail is list of lessons?
+//TODO: finish up test coverage
+
 //TODO: calc reading time
 //TODO: correct items (and total or incorrect items)
 

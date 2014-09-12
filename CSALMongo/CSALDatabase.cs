@@ -9,7 +9,6 @@ using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
-//TODO: get student info by location
 //TODO: Change index page to have instructions, move current index to a test page
 //TODO: class detail is list of lessons?
 

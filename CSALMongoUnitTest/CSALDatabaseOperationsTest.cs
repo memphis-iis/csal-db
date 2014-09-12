@@ -246,6 +246,16 @@ namespace CSALMongoUnitTest {
             Assert.AreEqual(4, rawTurns[0].GetValue("Attempts", -1).AsInt32);
             Assert.AreEqual(4, rawTurns[0].GetValue("Completions", -1).AsInt32);
             Assert.AreEqual(10, rawTurns[0].GetValue("Turns").AsBsonArray.Count);
+
+            //Make sure fozzy bear is in memphis
+            bool foundFozzy = false;
+            foreach (var student in db.FindStudentsByLocation("memphis")) {
+                if (student.UserID == "fozzy-bear") {
+                    foundFozzy = true;
+                    break;
+                }
+            }
+            Assert.IsTrue(foundFozzy);
         }
 
         [TestMethod]
@@ -332,6 +342,40 @@ namespace CSALMongoUnitTest {
         public void TestBadSingleStudentSaveNoID() {
             var db = new CSALDatabase(DB_URL);
             db.SaveStudent(new CSALMongo.Model.Student { UserID = "" });
+        }
+
+        [TestMethod]
+        public void TestStudentByLocation() {
+            var db = new CSALDatabase(DB_URL);
+
+            var students = db.FindStudentsByLocation("no-where");
+            Assert.AreEqual(0, students.Count);
+
+            var evenStudents = new List<string>();
+            var oddStudents = new List<string>();
+
+            for (int i = 1; i < 2048; ++i) {
+                string key = "Student" + i.ToString();
+                if (i % 2 == 0) evenStudents.Add(key);
+                else            oddStudents.Add(key);
+
+                db.SaveStudent(new CSALMongo.Model.Student { UserID = key, FirstName = "Test", LastName = key, TurnCount = 0 });
+            }
+
+            db.SaveClass(new CSALMongo.Model.Class { ClassID = "a", Students = new List<string> { }, Location = "no-where" });
+            db.SaveClass(new CSALMongo.Model.Class { ClassID = "b", Students = oddStudents, Location = "odd" });
+            db.SaveClass(new CSALMongo.Model.Class { ClassID = "c", Students = evenStudents, Location = "even" });
+
+            students = db.FindStudentsByLocation("no-where");
+            Assert.AreEqual(0, students.Count);
+
+            students = db.FindStudentsByLocation("odd");
+            var foundKeys = (from s in students.AsQueryable() select s.Id).ToList<string>();
+            CollectionAssert.AreEquivalent(oddStudents, foundKeys);
+
+            students = db.FindStudentsByLocation("even");
+            foundKeys = (from s in students.AsQueryable() select s.Id).ToList<string>();
+            CollectionAssert.AreEquivalent(evenStudents, foundKeys);
         }
 
         // Classes aren't (currently) involved in raw act saving, so we don't

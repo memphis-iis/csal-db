@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -11,7 +12,9 @@ using MongoDB.Bson.Serialization;
 //TODO: get student info by location
 //TODO: Change index page to have instructions, move current index to a test page
 //TODO: class detail is list of lessons?
+
 //TODO: finish up test coverage
+//TODO: startup logic - DB InsureIndexes
 
 //TODO: calc reading time
 //TODO: correct items (and total or incorrect items)
@@ -218,6 +221,48 @@ namespace CSALMongo {
         /// <returns></returns>
         public List<Model.Student> FindStudents() {
             return FindAll<Model.Student>(STUDENT_COLLECTION);
+        }
+
+        /// <summary>
+        /// Return a list of students that are at the given location
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public List<Model.Student> FindStudentsByLocation(string location) {
+            var studentKeys = new HashSet<string>();
+
+            //Note that we don't use a projection because that is done
+            //client-side - since we don't get any server-side speedup
+            //we just use the whole instance
+            var classesFound = 
+                from cls in mongoDatabase.GetCollection(CLASS_COLLECTION).AsQueryable<Model.Class>()
+                where cls.Location == location
+                select cls;
+
+            foreach (var clazz in classesFound) {
+                if (clazz.Students != null) {
+                    foreach (string student in clazz.Students) {
+                        if (!String.IsNullOrWhiteSpace(student)) {
+                            studentKeys.Add(student);
+                        }
+                    }
+                }
+            }
+
+            var students = new List<Model.Student>();
+            if (studentKeys.Count < 1)
+                return students;
+
+            var studentsFound =
+                from std in mongoDatabase.GetCollection(STUDENT_COLLECTION).AsQueryable<Model.Student>()
+                where studentKeys.Contains(std.Id)
+                select std;
+
+            foreach (var student in studentsFound) {
+                students.Add(student);
+            }
+
+            return students;
         }
 
         /// <summary>

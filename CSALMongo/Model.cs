@@ -17,15 +17,15 @@ namespace CSALMongo.Model {
         }
     }
 
-    public class Student {
+    public class Class {
         //MongoDB ID (_id)
         public string Id { get; set; }
-        
-        public string UserID { get {return Id;} set {Id = value;} }
-        public DateTime? LastTurnTime { get; set; }
-        public int? TurnCount { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+
+        public string ClassID { get { return Id; } set { Id = value; } }
+        public string TeacherName { get; set; }
+        public string Location { get; set; }
+        public List<string> Students { get; set; }
+        public List<string> Lessons { get; set; }
     }
 
     public class Lesson {
@@ -39,6 +39,17 @@ namespace CSALMongo.Model {
         public List<DateTime> AttemptTimes { get; set; }
         public List<String> StudentsAttempted { get; set; }
         public List<String> StudentsCompleted { get; set; }
+    }
+
+    public class Student {
+        //MongoDB ID (_id)
+        public string Id { get; set; }
+        
+        public string UserID { get {return Id;} set {Id = value;} }
+        public DateTime? LastTurnTime { get; set; }
+        public int? TurnCount { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 
     public class StudentLessonActs {
@@ -66,16 +77,5 @@ namespace CSALMongo.Model {
         public double MeanDuration() {
             return TotalDuration() / Turns.Count;
         }
-    }
-
-    public class Class {
-        //MongoDB ID (_id)
-        public string Id { get; set; }
-
-        public string ClassID { get { return Id; } set { Id = value; } }
-        public string TeacherName { get; set; }
-        public string Location { get; set; }
-        public List<string> Students { get; set; }
-        public List<string> Lessons { get; set; }
     }
 }

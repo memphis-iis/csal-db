@@ -20,6 +20,11 @@ namespace CSALMongoWebAPI.Controllers {
             return View("Index");
         }
 
+        //This brings a very silly test page that should be removed sometime after integration
+        public ActionResult Testing() {
+            return View("Testing");
+        }
+
         public ActionResult Classes() {
             return View("Classes", new ClassesController().Get());
         }

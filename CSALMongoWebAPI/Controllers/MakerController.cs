@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 using CSALMongo.Model;
 
-//TODO: remove this silly class
+//TODO: remove this silly class, the Testing action in Home, and the Testing view
 
 namespace CSALMongoWebAPI.Controllers {
     public class MakerController : Util.CSALBaseController {

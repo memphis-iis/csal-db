@@ -1,113 +1,22 @@
 ﻿@{
-    ViewBag.Title = "Main Page";
+    ViewBag.Title = "Welcome";
 }
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3">
-            This isn't the real mock-up - but we wanted some testing actions
-            <hr />
-            <p><button id="listLessons" class="btn btn-primary btn-sm">List Lessons</button></p>
-            <p><button id="listClasses" class="btn btn-primary btn-sm">List Classes</button></p>
-            <p><button id="listStudents" class="btn btn-primary btn-sm">List Students</button></p>
-            <p><button id="generateStuff" class="btn btn-danger btn-sm">Generate Entities</button></p>
+        <div class="col-md-6">
+            <p>Welcome to the CSAL Teacher's View</p>
+
+            <p>Please use one of the links at the top of the page to choose
+            a view.</p>
         </div>
-        <div class="col-md-9">
-            <table id="sample-data">
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Id</th>
-                        <th>Other Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Info</td>
-                        <td>N/A</td>
-                        <td>Click a button to the left to test stuff</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="col-md-6">
+            &nbsp;
         </div>
     </div>
 </div> <!-- /container -->
 
 @section ScriptFinal {
 <script>
-    $(document).ready(function () {
-        $('#sample-data').dataTable();
-
-        $('#listLessons').click(function (evt) {
-            evt.preventDefault();
-
-            CSALCommon.doServerGet("/api/lessons", "Getting Lesson Information", function (data) {
-                var rows = []
-                $.each(data, function (index, element) {
-                    //TODO
-                    rows.push(["lesson", element["Id"], JSON.stringify(element)]);
-                });
-                CSALCommon.showRows("#sample-data", rows);
-            });
-        });
-
-        $('#listClasses').click(function (evt) {
-            evt.preventDefault();
-            
-            CSALCommon.doServerGet("/api/classes", "Getting Class Information", function (data) {
-                var rows = []
-                $.each(data, function (index, element) {
-                    //TODO
-                    rows.push(["class", element["Id"], JSON.stringify(element)]);
-                });
-                CSALCommon.showRows("#sample-data", rows);
-            });
-        });
-
-        $('#listStudents').click(function (evt) {
-            evt.preventDefault();
-
-            CSALCommon.doServerGet("/api/students", "Getting Student Information", function (data) {
-                var rows = []
-                $.each(data, function (index, element) {
-                    //TODO
-                    rows.push(["student", element["Id"], JSON.stringify(element)]);
-                });
-                CSALCommon.showRows("#sample-data", rows);
-            });
-        });
-
-        $('#generateStuff').click(function (evt) {
-            evt.preventDefault();
-            
-            $.ajax({
-                type: "POST",
-                data: {test: 1, someList: [1,2,3]},
-                url: "/api/maker/42",
-                dataType: "json"
-            })
-            .done(function (data, textStatus, jqXHR) {
-                console.log("Call done : " + textStatus + ", data:" + data);
-                if (textStatus != "success") {
-                    //OOPS - server didn't like our request
-                    var errMsg = "???";
-                    try {
-                        errMsg = data.errmsg;
-                    } catch (err) { }
-                    alert("There was an issue: " + errMsg);
-                }
-                else {
-                    //SUCCESS!
-                    alert("Call seemed to be OK");
-                }
-            })
-            .fail(function (jqXHR, textStatus, errorThrown) {
-                console.log("Call done: " + textStatus + ", error:" + errorThrown);
-                alert("There was an error ==> " +
-                    "[" + textStatus + ": " + errorThrown + "]"
-                );
-            });
-        });
-    });
 </script>
 }

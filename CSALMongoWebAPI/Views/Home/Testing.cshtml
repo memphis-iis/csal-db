@@ -41,10 +41,11 @@
         $('#listLessons').click(function (evt) {
             evt.preventDefault();
 
-            CSALCommon.doServerGet("/api/lessons", "Getting Lesson Information", function (data) {
+            var url = '@Url.Content("~/api/lessons")';
+
+            CSALCommon.doServerGet(url, "Getting Lesson Information", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
-                    //TODO
                     rows.push(["lesson", element["Id"], JSON.stringify(element)]);
                 });
                 CSALCommon.showRows("#sample-data", rows);
@@ -54,10 +55,11 @@
         $('#listClasses').click(function (evt) {
             evt.preventDefault();
             
-            CSALCommon.doServerGet("/api/classes", "Getting Class Information", function (data) {
+            var url = '@Url.Content("~/api/classes")';
+
+            CSALCommon.doServerGet(url, "Getting Class Information", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
-                    //TODO
                     rows.push(["class", element["Id"], JSON.stringify(element)]);
                 });
                 CSALCommon.showRows("#sample-data", rows);
@@ -67,10 +69,11 @@
         $('#listStudents').click(function (evt) {
             evt.preventDefault();
 
-            CSALCommon.doServerGet("/api/students", "Getting Student Information", function (data) {
+            var url = '@Url.Content("~/api/students")';
+
+            CSALCommon.doServerGet(url, "Getting Student Information", function (data) {
                 var rows = []
                 $.each(data, function (index, element) {
-                    //TODO
                     rows.push(["student", element["Id"], JSON.stringify(element)]);
                 });
                 CSALCommon.showRows("#sample-data", rows);
@@ -80,10 +83,12 @@
         $('#generateStuff').click(function (evt) {
             evt.preventDefault();
             
+            var url = '@Url.Content("~/api/maker/42")';
+
             $.ajax({
                 type: "POST",
                 data: {test: 1, someList: [1,2,3]},
-                url: "/api/maker/42",
+                url: url,
                 dataType: "json"
             })
             .done(function (data, textStatus, jqXHR) {

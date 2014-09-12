@@ -88,7 +88,7 @@ namespace CSALMongo {
             if (String.IsNullOrWhiteSpace(lessonID))
                 throw new CSALDatabaseException("No lesson ID specified for Student-Lesson Act");
             if (String.IsNullOrWhiteSpace(fullUserID))
-                throw new CSALDatabaseException("No lesson ID specified for Student-Lesson Act");
+                throw new CSALDatabaseException("No user ID specified for Student-Lesson Act");
 
             string locationID = "";
             string classID = "";

@@ -17,7 +17,7 @@
                 <tbody>
                     @foreach (var student in Model) {
                         <tr>
-                            <td><a href="/home/studentdetails/@student.UserID" class="student-link">@student.UserID</a></td>
+                            <td><a href="~/home/studentdetails/@student.UserID" class="student-link">@student.UserID</a></td>
                             <td>@student.LastTurnTime</td>
                         </tr>
                     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -75,6 +76,25 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             Assert.AreEqual("someloc", clazz.Location);
             CollectionAssert.AreEquivalent(new string[] { "s1", "s2" }, clazz.Students);
             CollectionAssert.AreEquivalent(new string[] { "l1", "l2" }, clazz.Lessons);
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void BadPostById() {
+            var controller = new ClassesController();
+            controller.AppSettings = this.AppSettings;
+
+            Assert.IsNull(controller.Get("single-id"));
+
+            //Post to the wrong ID for the save
+            controller.Post("wrong-id", @"{
+                _id: 'single-id', 
+                ClassID: 'single-id', 
+                TeacherName: 'teach',
+                Location: 'someloc',
+                Students: ['s1', 's2'],
+                Lessons: ['l1', 'l2']
+            }");
         }
     }
 }

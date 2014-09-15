@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using CSALMongoWebAPI.Controllers;
@@ -74,6 +75,25 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             Assert.AreEqual(42, student.TurnCount);
             Assert.AreEqual("Fozzy", student.FirstName);
             Assert.AreEqual("Bear", student.LastName);
+        }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void BadPostById() {
+            var controller = new StudentsController();
+            controller.AppSettings = this.AppSettings;
+
+            Assert.IsNull(controller.Get("single-id"));
+
+            //Try to save to wrong ID
+            controller.Post("wrong-id", @"{
+                _id: 'single-id', 
+                UserID: 'single-id', 
+                LastTurnTime: ISODate('2012-05-02T13:07:17.000Z'), 
+                TurnCount: 42, 
+                FirstName: 'Fozzy',
+                LastName: 'Bear'
+            }");
         }
     }
 }

@@ -74,5 +74,23 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             Assert.AreEqual(42, lesson.TurnCount);
             CollectionAssert.AreEquivalent(new string[] { "s1", "s2" }, lesson.Students);
         }
+
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
+        public void BadPostById() {
+            var controller = new LessonsController();
+            controller.AppSettings = this.AppSettings;
+
+            Assert.IsNull(controller.Get("single-id"));
+
+            //Try to save to wrong ID
+            controller.Post("wrong-id", @"{
+                _id: 'single-id', 
+                LessonID: 'single-id', 
+                LastTurnTime: ISODate('2012-05-02T13:07:17.000Z'), 
+                TurnCount: 42, 
+                Students: ['s1', 's2']
+            }");
+        }
     }
 }

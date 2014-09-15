@@ -159,7 +159,7 @@ namespace CSALMongo {
         }
 
         protected bool RawContainsAttempt(BsonDocument doc) {
-            return doc.GetValue("TurnID", -1).AsInt32 == 1;
+            return doc.GetValue("TurnID", -1).AsInt32 == 0;
         }
 
         protected bool RawContainsComplete(BsonDocument doc) {

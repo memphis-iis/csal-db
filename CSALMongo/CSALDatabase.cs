@@ -8,9 +8,9 @@ using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
+//TODO: lesson list - be able to click on students
 //TODO: class detail is list of lessons?
 
-//TODO: finish up test coverage
 //TODO: startup logic - DB InsureIndexes
 
 //TODO: calc reading time

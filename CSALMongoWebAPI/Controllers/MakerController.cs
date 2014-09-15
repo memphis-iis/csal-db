@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Web.Http;
 using System.Diagnostics;
 
+using System.Diagnostics.CodeAnalysis;
+
 using CSALMongo.Model;
 
 //TODO: remove this silly class, the Testing action in Home, and the Testing view
 
 namespace CSALMongoWebAPI.Controllers {
+    [ExcludeFromCodeCoverage]
     public class MakerController : Util.CSALBaseController {
         // POST api/maketestdata/42
         public Dictionary<string, string> Post(int id, [FromBody]string value) {

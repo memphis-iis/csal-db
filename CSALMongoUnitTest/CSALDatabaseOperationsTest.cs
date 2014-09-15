@@ -1,13 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using MongoDB.Bson;
 
 using CSALMongo;

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Dynamic;
+﻿using System.Dynamic;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
-using CSALMongo;
 
 namespace CSALMongoWebAPI.Controllers {
     /// <summary>

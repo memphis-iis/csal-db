@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using CSALMongoWebAPI;
 using CSALMongoWebAPI.Controllers;
-using CSALMongo;
-using CSALMongo.Model;
 
 namespace CSALMongoWebAPI.Tests.Util {
     [TestClass]

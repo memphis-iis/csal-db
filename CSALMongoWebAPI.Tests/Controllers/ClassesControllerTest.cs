@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using CSALMongo;
 using CSALMongo.Model;
-
 using CSALMongoWebAPI.Controllers;
 
 namespace CSALMongoWebAPI.Tests.Controllers {

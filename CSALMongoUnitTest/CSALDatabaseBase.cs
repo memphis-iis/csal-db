@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-
 //TODO: Insure documentation on all public namespaces, classes, and methods
 //     (ALSO top-level documentation directory with compiled help - tag version for that)
 

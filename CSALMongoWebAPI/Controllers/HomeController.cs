@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 
-
 namespace CSALMongoWebAPI.Controllers {
     /// <summary>
     /// Our Home controller is actually where we render the active HTML5 web

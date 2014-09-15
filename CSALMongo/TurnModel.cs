@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 
-
 namespace CSALMongo.TurnModel {
     public class ConvLog {
         //MongoDB ID (_id)

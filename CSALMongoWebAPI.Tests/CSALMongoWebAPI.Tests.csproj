@@ -121,6 +121,7 @@
     <Compile Include="Controllers\StudentsControllerTest.cs" />
     <Compile Include="Controllers\TurnControllerTest.cs" />
     <Compile Include="Controllers\StudentsAtLocationControllerTest.cs" />
+    <Compile Include="Controllers\HomeControllerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\ClassesControllerTest.cs" />
     <Compile Include="Util\BaseControllerTest.cs" />

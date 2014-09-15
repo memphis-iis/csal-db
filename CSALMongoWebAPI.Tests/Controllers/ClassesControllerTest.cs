@@ -9,7 +9,7 @@ using CSALMongoWebAPI.Controllers;
 
 namespace CSALMongoWebAPI.Tests.Controllers {
     [TestClass]
-    public class ClassesControllerTest: Util.BaseControllerTest {
+    public class ClassesControllerTest : Util.BaseControllerTest {
         [TestMethod]
         public void Get() {
             var controller = new ClassesController();

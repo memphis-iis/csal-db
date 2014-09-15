@@ -11,6 +11,43 @@ namespace CSALMongoWebAPI.Controllers {
     /// JSON at /api/lessons.
     /// </summary>
     public class HomeController : Controller {
+        protected ClassesController classesCtrl;
+        protected LessonsController lessonsCtrl;
+        protected StudentsController studentsCtrl;
+
+        public ClassesController ClassesCtrl {
+            set {
+                classesCtrl = value;
+            }
+            get {
+                if (classesCtrl == null)
+                    classesCtrl = new ClassesController();
+                return classesCtrl;
+            }
+        }
+
+        public LessonsController LessonsCtrl {
+            set {
+                lessonsCtrl = value;
+            }
+            get {
+                if (lessonsCtrl == null)
+                    lessonsCtrl = new LessonsController();
+                return lessonsCtrl;
+            }
+        }
+
+        public StudentsController StudentsCtrl {
+            set {
+                studentsCtrl = value;
+            }
+            get {
+                if (studentsCtrl == null)
+                    studentsCtrl = new StudentsController();
+                return studentsCtrl;
+            }
+        }
+
         public ActionResult Index() {
             return View("Index");
         }
@@ -21,22 +58,28 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         public ActionResult Classes() {
-            return View("Classes", new ClassesController().Get());
+            return View("Classes", ClassesCtrl.Get());
         }
 
         public ActionResult ClassDetails(string id) {
-            return View("ClassDetail", new ClassesController().Get(id));
+            var clazz = ClassesCtrl.Get(id);
+            if (clazz == null) {
+                return new HttpNotFoundResult();
+            }
+            return View("ClassDetail", clazz);
         }
 
         public ActionResult Lessons() {
-            return View("Lessons", new LessonsController().Get());
+            return View("Lessons", LessonsCtrl.Get());
         }
 
         public ActionResult LessonDetails(string id) {
-            var controller = new LessonsController();
-            var lesson = controller.Get(id);
+            var lesson = LessonsCtrl.Get(id);
+            if (lesson == null) {
+                return new HttpNotFoundResult();
+            }
 
-            var lessonTurns = controller.DBConn().FindTurns(lesson.LessonID, null);
+            var lessonTurns = LessonsCtrl.DBConn().FindTurns(lesson.LessonID, null);
 
             var modelObj = new ExpandoObject();
             var modelDict = (IDictionary<string, object>)modelObj;
@@ -47,14 +90,16 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         public ActionResult Students() {
-            return View("Students", new StudentsController().Get());
+            return View("Students", StudentsCtrl.Get());
         }
 
         public ActionResult StudentDetails(string id) {
-            var controller = new StudentsController();
-            var student = controller.Get(id);
+            var student = StudentsCtrl.Get(id);
+            if (student == null) {
+                return new HttpNotFoundResult();
+            }
 
-            var studentTurns = controller.DBConn().FindTurns(null, student.UserID);
+            var studentTurns = StudentsCtrl.DBConn().FindTurns(null, student.UserID);
 
             var modelObj = new ExpandoObject();
             var modelDict = (IDictionary<string, object>)modelObj;

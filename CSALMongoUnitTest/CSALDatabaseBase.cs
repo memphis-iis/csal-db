@@ -31,12 +31,8 @@ namespace CSALMongoUnitTest {
             SAMPLE_RAW_USER = sampleRaw["UserID"].AsString;
             SAMPLE_RAW_LESSON = sampleRaw["LessonID"].AsString;
 
-            if (String.IsNullOrWhiteSpace(SAMPLE_RAW_USER)) {
-                throw new InvalidDataException("Could not find Sample Raw Act Student");
-            }
-            if (String.IsNullOrWhiteSpace(SAMPLE_RAW_LESSON)) {
-                throw new InvalidDataException("Could not find Sample Raw Act Lesson");
-            }
+            Assert.IsFalse(String.IsNullOrWhiteSpace(SAMPLE_RAW_USER));
+            Assert.IsFalse(String.IsNullOrWhiteSpace(SAMPLE_RAW_LESSON));
         }
 
         [TestCleanup]

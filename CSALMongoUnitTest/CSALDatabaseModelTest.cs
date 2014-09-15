@@ -90,5 +90,45 @@ namespace CSALMongoUnitTest {
             Assert.AreEqual("TestClass2", clazz.Id);
             Assert.AreEqual("TestClass2", clazz.ClassID);
         }
+
+        [TestMethod]
+        public void TestStudentActTotalDuration() {
+            var turns = new CSALMongo.Model.StudentLessonActs();
+            Assert.AreEqual(0.0, turns.TotalDuration());
+
+            turns.Turns = new List<CSALMongo.TurnModel.ConvLog>();
+
+            turns.Turns.Add(new CSALMongo.TurnModel.ConvLog());
+            Assert.AreEqual(0.0, turns.TotalDuration());
+
+            turns.Turns[0].Duration = 1.0;
+            Assert.AreEqual(1.0, turns.TotalDuration());
+
+            turns.Turns.Add(new CSALMongo.TurnModel.ConvLog { Duration = 2.0 });
+            Assert.AreEqual(3.0, turns.TotalDuration());
+
+            turns.Turns.Add(new CSALMongo.TurnModel.ConvLog());
+            Assert.AreEqual(3.0, turns.TotalDuration());
+        }
+
+        [TestMethod]
+        public void TestStudentActMeanDuration() {
+            var turns = new CSALMongo.Model.StudentLessonActs();
+            Assert.AreEqual(0.0, turns.MeanDuration());
+
+            turns.Turns = new List<CSALMongo.TurnModel.ConvLog>();
+
+            turns.Turns.Add(new CSALMongo.TurnModel.ConvLog());
+            Assert.AreEqual(0.0, turns.MeanDuration());
+
+            turns.Turns[0].Duration = 1.0;
+            Assert.AreEqual(1.0, turns.MeanDuration());
+
+            turns.Turns.Add(new CSALMongo.TurnModel.ConvLog { Duration = 2.0 });
+            Assert.AreEqual(1.5, turns.MeanDuration());
+
+            turns.Turns.Add(new CSALMongo.TurnModel.ConvLog());
+            Assert.AreEqual(1.0, turns.MeanDuration());
+        }
     }
 }

@@ -75,6 +75,8 @@ namespace CSALMongo.Model {
         }
 
         public double MeanDuration() {
+            if (Turns == null || Turns.Count < 1)
+                return 0.0;
             return TotalDuration() / Turns.Count;
         }
     }

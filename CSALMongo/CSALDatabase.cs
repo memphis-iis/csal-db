@@ -96,7 +96,7 @@ namespace CSALMongo {
             //Note that if there are at least 2 dashes, we have a "complex"
             //user ID of the form locationid-classid-userid
             string[] userFlds = fullUserID.Split('-');
-            if (userFlds.Length >= 2) {
+            if (userFlds.Length > 2) {
                 locationID = userFlds[0].Trim();
                 classID = userFlds[1].Trim();
                 //Note that we could have a dash in the user name
@@ -134,28 +134,40 @@ namespace CSALMongo {
                 .Set("LastTurnTime", now)
                 .Inc("TurnCount", 1));
 
-            //Note that we track lesson starts (attempts)
-            var lessonUpdate = Update
-                .Set("LastTurnTime", now)
-                .AddToSet("Students", userID)
-                .Inc("TurnCount", 1);
-            if (isAttempt) {
-                lessonUpdate = lessonUpdate
-                    .AddToSet("StudentsAttempted", userID)
-                    .Push("AttemptTimes", now);
-            }
-            if (isCompletion) {
-                lessonUpdate = lessonUpdate.AddToSet("StudentsCompleted", userID);
-            }
-            DoUpsert(LESSON_COLLECTION, lessonID, lessonUpdate);
-            
             //Try and upsert stats on the class - but we don't always get a class ID
             if (!String.IsNullOrWhiteSpace(classID)) {
                 DoUpsert(CLASS_COLLECTION, classID, Update
                     .Set("Location", locationID)
                     .AddToSet("Lessons", lessonID)
                     .AddToSet("Students", userID));
-            }    
+            }
+
+            //Note that we make sure to give a default value to lists if we're
+            //inserting and don't have any values for them
+            var lessonUpdate = Update
+                .Set("LastTurnTime", now)
+                .AddToSet("Students", userID)
+                .Inc("TurnCount", 1);
+
+            if (isAttempt) {
+                lessonUpdate = lessonUpdate
+                    .AddToSet("StudentsAttempted", userID)
+                    .Push("AttemptTimes", now);
+            }
+            else {
+                lessonUpdate = lessonUpdate
+                    .SetOnInsert("StudentsAttempted", new BsonArray())
+                    .SetOnInsert("AttemptTimes", new BsonArray());
+            }
+
+            if (isCompletion) {
+                lessonUpdate = lessonUpdate.AddToSet("StudentsCompleted", userID);
+            }
+            else {
+                lessonUpdate = lessonUpdate.SetOnInsert("StudentsCompleted", new BsonArray());
+            }
+
+            DoUpsert(LESSON_COLLECTION, lessonID, lessonUpdate);
         }
 
         protected bool RawContainsAttempt(BsonDocument doc) {

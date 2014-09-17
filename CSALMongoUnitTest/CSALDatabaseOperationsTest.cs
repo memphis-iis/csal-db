@@ -256,6 +256,89 @@ namespace CSALMongoUnitTest {
         }
 
         [TestMethod]
+        public void TestRawActComplexUserDefaultValsForMissing() {
+            var db = new CSALDatabase(DB_URL);
+
+            var turns = db.FindTurns(null, null);
+            Assert.AreEqual(0, turns.Count);
+
+            var attempted = new CSALMongo.TurnModel.ConvLog {
+                UserID = "memphis-semiotics-fozzy-bear",
+                LessonID = "lesson",
+                TurnID = 0
+            };
+
+            db.SaveRawStudentLessonAct(attempted.ToJson());
+            attempted.TurnID++;
+            db.SaveRawStudentLessonAct(attempted.ToJson());
+
+            //Make sure DB looks correct
+            Assert.IsNull(db.FindClass("semiotics-miss"));
+            Assert.IsNull(db.FindLesson("lesson-miss"));
+            Assert.IsNull(db.FindStudent("fozzy-bear-miss"));
+
+            Assert.IsNotNull(db.FindClass("semiotics"));
+            Assert.IsNotNull(db.FindLesson("lesson"));
+            Assert.IsNotNull(db.FindStudent("fozzy-bear"));
+
+            Assert.AreEqual(1, db.FindTurns(null, null).Count);
+
+            //Class defaults
+            var clazz = db.FindClass("semiotics");
+            Assert.AreEqual(1, clazz.Lessons.Count);
+            Assert.AreEqual(1, clazz.Students.Count);
+
+            //Lesson defaults
+            var lesson = db.FindLesson("lesson");
+            Assert.AreEqual(1, lesson.AttemptTimes.Count);
+            Assert.AreEqual(1, lesson.Students.Count);
+            Assert.AreEqual(1, lesson.StudentsAttempted.Count);
+            Assert.AreEqual(0, lesson.StudentsCompleted.Count);
+
+            //Student defaults
+            var student = db.FindStudent("fozzy-bear");
+            Assert.AreEqual(2, student.TurnCount);
+        }
+
+        [TestMethod]
+        public void TestRawActSimpleUserDefaultValsForMissing() {
+            var db = new CSALDatabase(DB_URL);
+
+            Assert.AreEqual(0, db.FindTurns(null, null).Count);
+
+            var attempted = new CSALMongo.TurnModel.ConvLog {
+                UserID = "fozzy-bear",
+                LessonID = "lesson",
+                TurnID = 0
+            };
+
+            db.SaveRawStudentLessonAct(attempted.ToJson());
+            attempted.TurnID++;
+            db.SaveRawStudentLessonAct(attempted.ToJson());
+
+            //Make sure DB looks correct
+            Assert.AreEqual(0, db.FindClasses().Count);
+            Assert.IsNull(db.FindLesson("lesson-miss"));
+            Assert.IsNull(db.FindStudent("fozzy-bear-miss"));
+
+            Assert.IsNotNull(db.FindLesson("lesson"));
+            Assert.IsNotNull(db.FindStudent("fozzy-bear"));
+
+            Assert.AreEqual(1, db.FindTurns(null, null).Count);
+
+            //Lesson defaults
+            var lesson = db.FindLesson("lesson");
+            Assert.AreEqual(1, lesson.AttemptTimes.Count);
+            Assert.AreEqual(1, lesson.Students.Count);
+            Assert.AreEqual(1, lesson.StudentsAttempted.Count);
+            Assert.AreEqual(0, lesson.StudentsCompleted.Count);
+
+            //Student defaults
+            var student = db.FindStudent("fozzy-bear");
+            Assert.AreEqual(2, student.TurnCount);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(NullReferenceException))]
         public void TestBadRawActNull() {
             var db = new CSALDatabase(DB_URL);

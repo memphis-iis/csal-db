@@ -36,10 +36,14 @@ namespace CSALMongoWebAPI.Controllers {
             db.SaveStudent(new Student { UserID = "s2", FirstName = "Middle", LastName = "Student", TurnCount = 0 });
             db.SaveStudent(new Student { UserID = "s3", FirstName = "Last", LastName = "Student", TurnCount = 0 });
 
-            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l1").Replace("$USERID$", "s1").Replace("$TURNID$", "1"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l1").Replace("$USERID$", "s1").Replace("$TURNID$", "0"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l2").Replace("$USERID$", "s1").Replace("$TURNID$", "0"));
             db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l2").Replace("$USERID$", "s1").Replace("$TURNID$", "1"));
-            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l2").Replace("$USERID$", "s1").Replace("$TURNID$", "2"));
-            db.SaveRawStudentLessonAct(SAMPLE_RAW_COMPLETE.Replace("$LESSONID$", "l1").Replace("$USERID$", "s1").Replace("$TURNID$", "3"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW_COMPLETE.Replace("$LESSONID$", "l1").Replace("$USERID$", "s1").Replace("$TURNID$", "1"));
+
+            //Turn saved with no matching class, student, or lesson
+            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "LMISS").Replace("$USERID$", "LOCMISS-CMISS-SMISS").Replace("$TURNID$", "0"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "LMISS").Replace("$USERID$", "LOCMISS-CMISS-SMISS").Replace("$TURNID$", "1"));
 
             return new Dictionary<string, string> { { "val", "woo hoo" }, { "success", "true" } };
         }

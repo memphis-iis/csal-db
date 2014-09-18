@@ -1,4 +1,6 @@
-﻿@{
+﻿@using CSALMongoWebAPI.Util
+
+@{
     ViewBag.Title = "Classes";
 }
 
@@ -20,7 +22,7 @@
                     @foreach (var clazz in Model) {
                         <tr>
                             <td>@clazz.ClassID</td>
-                            <!--Add back in <a href="/home/classdetails/clazz.ClassID" when detail screen is know-->
+                            <!--Add back in <a href="/home/classdetails/@RenderHelp.URIEncode(clazz.ClassID)" when detail screen is know-->
                             <td>@clazz.Location</td>
                             <td>@clazz.TeacherName</td>
                             <td>@clazz.Students.Count</td>

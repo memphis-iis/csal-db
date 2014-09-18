@@ -24,22 +24,22 @@ namespace CSALMongoWebAPI.Controllers {
 
             var db = DBConn();
 
-            db.SaveClass(new Class { ClassID = "c1", Location = "loc1", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
-            db.SaveClass(new Class { ClassID = "c2", Location = "loc2", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
-            db.SaveClass(new Class { ClassID = "c3", Location = "loc3", Students = new List<string> { "s1", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
+            db.SaveClass(new Class { ClassID = "funky/class!", Location = "loc1", Students = new List<string> { "good/student*", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
+            db.SaveClass(new Class { ClassID = "c2", Location = "loc2", Students = new List<string> { "good/student*", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
+            db.SaveClass(new Class { ClassID = "c3", Location = "loc3", Students = new List<string> { "good/student*", "s2", "s3" }, Lessons = new List<string> { "l1", "l2", "l3" }, TeacherName = "teach" });
 
-            db.SaveLesson(new Lesson { LessonID = "l1", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted =new List<string>(), StudentsCompleted = new List<string>() });
-            db.SaveLesson(new Lesson { LessonID = "l2", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted = new List<string>(), StudentsCompleted = new List<string>() });
-            db.SaveLesson(new Lesson { LessonID = "l3", Students = new List<string> { "s1", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted = new List<string>(), StudentsCompleted = new List<string>() });
+            db.SaveLesson(new Lesson { LessonID = "http://10.0.0.1/lesson/one", Students = new List<string> { "good/student*", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted = new List<string>(), StudentsCompleted = new List<string>() });
+            db.SaveLesson(new Lesson { LessonID = "l2", Students = new List<string> { "good/student*", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted = new List<string>(), StudentsCompleted = new List<string>() });
+            db.SaveLesson(new Lesson { LessonID = "l3", Students = new List<string> { "good/student*", "s2", "s2" }, TurnCount = 0, AttemptTimes = new List<DateTime>(), StudentsAttempted = new List<string>(), StudentsCompleted = new List<string>() });
 
-            db.SaveStudent(new Student { UserID = "s1", FirstName = "First", LastName = "Student", TurnCount = 0 });
+            db.SaveStudent(new Student { UserID = "good/student*", FirstName = "First", LastName = "Student", TurnCount = 0 });
             db.SaveStudent(new Student { UserID = "s2", FirstName = "Middle", LastName = "Student", TurnCount = 0 });
             db.SaveStudent(new Student { UserID = "s3", FirstName = "Last", LastName = "Student", TurnCount = 0 });
 
-            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l1").Replace("$USERID$", "s1").Replace("$TURNID$", "0"));
-            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l2").Replace("$USERID$", "s1").Replace("$TURNID$", "0"));
-            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l2").Replace("$USERID$", "s1").Replace("$TURNID$", "1"));
-            db.SaveRawStudentLessonAct(SAMPLE_RAW_COMPLETE.Replace("$LESSONID$", "l1").Replace("$USERID$", "s1").Replace("$TURNID$", "1"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "http://10.0.0.1/lesson/one").Replace("$USERID$", "good/student*").Replace("$TURNID$", "0"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l2").Replace("$USERID$", "good/student*").Replace("$TURNID$", "0"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "l2").Replace("$USERID$", "good/student*").Replace("$TURNID$", "1"));
+            db.SaveRawStudentLessonAct(SAMPLE_RAW_COMPLETE.Replace("$LESSONID$", "http://10.0.0.1/lesson/one").Replace("$USERID$", "good/student*").Replace("$TURNID$", "1"));
 
             //Turn saved with no matching class, student, or lesson
             db.SaveRawStudentLessonAct(SAMPLE_RAW.Replace("$LESSONID$", "LMISS").Replace("$USERID$", "LOCMISS-CMISS-SMISS").Replace("$TURNID$", "0"));

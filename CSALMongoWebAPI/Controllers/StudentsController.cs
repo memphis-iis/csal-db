@@ -13,11 +13,13 @@ namespace CSALMongoWebAPI.Controllers {
 
         // GET api/students/5
         public Student Get(string id) {
+            id = Util.RenderHelp.URIDecode(id);
             return DBConn().FindStudent(id);
         }
 
         // POST api/students/5
         public void Post(string id, [FromBody]string value) {
+            id = Util.RenderHelp.URIDecode(id);
             Student student = Utils.ParseJson<Student>(value);
             if (student.Id != id) {
                 throw new InvalidOperationException("Attempt to save mismatched student");

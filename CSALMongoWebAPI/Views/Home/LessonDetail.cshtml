@@ -1,4 +1,6 @@
-﻿@{
+﻿@using CSALMongoWebAPI.Util
+
+@{
     ViewBag.Title = "Lesson " + Model.Lesson.LessonID;
 }
 
@@ -58,7 +60,7 @@
                 <tbody>
                     @foreach (var lesson in Model.Turns) {
                         <tr>
-                            <td>@lesson.UserID</td>
+                            <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(lesson.UserID)" class="student-link">@lesson.UserID</a></td>
                             <td>@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>@lesson.Completions</td>
@@ -78,7 +80,7 @@
     <script>
         $(document).ready(function () {
             $('.apply-data-table').dataTable();
-            //TODO
+            $(".student-link").addClass("hover-restore");
         });
     </script>
 }

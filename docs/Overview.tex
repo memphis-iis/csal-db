@@ -1,0 +1,104 @@
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{fullpage}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\usepackage[underline=true,rounded corners=false]{pgf-umlsd}
+
+\title{Drawing UML sequence diagram with pgf-umlsd}
+
+\begin{document}
+
+% Force pdflatex to properly use letter as page size (instead
+% of defaulting to A4)
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\maketitle
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+TODO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Use Cases}
+
+TODO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Database}
+
+TODO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{CSALMongo DLL}
+
+TODO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{CSALMongo Web API}
+
+TODO
+
+\subsection{ReST API}
+
+TODO
+
+\subsection{User Interface}
+
+TODO
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Sequence Diagrams}
+
+\subsection{Example of User Interaction}
+
+\begin{sequencediagram}
+    \newthread{web}{GUI User}
+    \newinst[1]{api}{Web API}
+    \newinst[1]{dll}{CSALMongo DLL}
+    \newinst[1]{mongo}{MongoDB}
+    
+    \begin{call}{web}{View Lessons}{api}{render view}
+        \begin{call}{api}{findLessons()}{dll}{return list}
+            \begin{call}{dll}{find()}{mongo}{query response}
+            \end{call}
+        \end{call}
+    \end{call}
+\end{sequencediagram}
+
+\subsection{Example of ReST API Call}
+
+TODO
+
+\begin{sequencediagram}
+\end{sequencediagram}
+
+\subsection{Example of Direct DLL Use}
+
+TODO
+
+\begin{sequencediagram}
+\end{sequencediagram}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

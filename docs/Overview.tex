@@ -5,10 +5,12 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{nameref}
 
 \usepackage[underline=true,rounded corners=false]{pgf-umlsd}
 
-\title{Drawing UML sequence diagram with pgf-umlsd}
+\title{CSAL Database Project Introduction}
+\author{Craig Kelly}
 
 \begin{document}
 
@@ -30,11 +32,20 @@
 
 \section{Introduction}
 
-TODO
+This repository contains code for storing and displaying data stored as
+part of the CSAL project.  The use cases and the code produced are described
+below.  The short version is that the data is stored in a MongoDB instance,
+there is a C\# library for accessing the database, and there is a Web API
+wrapping the DLL.  In addition, the Web API server provides a very simple
+ASP.NET MVC application for viewing the data.  Because of the dependence
+of the Web API on the "core" library, the only deployment information is below
+in section \ref{subsec:deploy} \nameref{subsec:deploy}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Use Cases}
+
+TODO: diagram of all of the below
 
 TODO: direct DLL use for storing JSON records of student interaction
 
@@ -48,19 +59,22 @@ TODO: data admin (pre-population of the database for new locations)
 
 \section{Database}
 
-TODO
+TODO: "raw" JSON format and storage
+
+TODO: other entities and how inferred
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{CSALMongo DLL}
 
-TODO
+TODO: overall design
+
+TODO: brief intro to test project
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{CSALMongo Web API}
-
-TODO
+\label{sec:webapi}
 
 \subsection{ReST API}
 
@@ -68,6 +82,10 @@ TODO
 
 \subsection{User Interface}
 
+TODO
+
+\subsection{Deployment}
+\label{subsec:deploy}
 TODO
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

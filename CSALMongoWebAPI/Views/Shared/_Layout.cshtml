@@ -52,7 +52,7 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Logout Teacher Name Here</a></li>
+                    <li>@Html.ActionLink(Session["UserEmail"].ToString(), "Index", "Home", new { area = "" }, null)</li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->

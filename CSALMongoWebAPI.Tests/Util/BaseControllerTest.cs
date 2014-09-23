@@ -8,7 +8,14 @@ namespace CSALMongoWebAPI.Tests.Util {
     public class BaseControllerTest : CSALDatabaseBase {
         public BaseControllerTest() {
             var settings = new NameValueCollection();
+            
+            //Inherit from the testing base for the CSAL db DLL
             settings.Add("MongoURL", DB_URL);
+            
+            //Just make up the google settings we need
+            settings.Add("GoogleClientID", "Google Client ID for Testing");
+            settings.Add("GoogleClientSecret", "very secret string");
+            
             AppSettings = settings;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Web.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +22,17 @@ using CSALMongoWebAPI.Controllers;
 namespace CSALMongoWebAPI.Tests.Controllers {
     [TestClass]
     public class HomeControllerTest : Util.BaseControllerTest {
+        class TestHomeController : HomeController {
+            protected override string CurrentUserEmail() {
+                return "AlwayLoggedIn@test.com";
+            }
+        }
+
         protected HomeController controller;
 
         [TestInitialize]
         public void LocalSetUp() {
-            controller = new HomeController();
+            controller = new TestHomeController();
 
             //Our unusual pattern here is to insure the HomeController's lazy
             //create fires and that a set operation doesn't break anything

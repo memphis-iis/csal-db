@@ -218,11 +218,36 @@ namespace CSALMongo {
             }
 
             try {
-                return fullLessonID; //TODO: actual parse
+                //We parse and check the full lesson ID as a URI -if it doesn't
+                //meet our criteria then we assume that we can't parse it 
+                var formal = new Uri(fullLessonID);
+
+                if (!formal.Scheme.StartsWith("http"))
+                    return fullLessonID;
+
+                if (!formal.AbsolutePath.ToLower().Contains("/lesson"))
+                    return fullLessonID;
+
+                //We always assume that the Lesson ID isn't the first or last
+                //element of the path (thus the skip in the for loop below) -
+                //so if there aren't at least 3 ele's this can't be correct.
+                string[] pathComponents = formal.AbsolutePath.Split('/');
+                if (pathComponents == null || pathComponents.Length < 3)
+                    return fullLessonID;
+
+                for (int i = 1; i < pathComponents.Length - 1; ++i) {
+                    string one = pathComponents[i];
+                    if (one.ToLower().StartsWith("lesson")) {
+                        return one;
+                    }
+                }
             }
             catch (Exception) {
-                return fullLessonID;
+                //Nothing we can do... just continue so that we return the original
             }
+
+            //Wasn't able to find and return a parsed Lesson ID
+            return fullLessonID;
         }
 
         /// <summary>

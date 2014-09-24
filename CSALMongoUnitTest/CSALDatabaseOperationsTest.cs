@@ -382,6 +382,40 @@ namespace CSALMongoUnitTest {
         }
 
         [TestMethod]
+        public void TestSingleLessonComplexID() {
+            
+            var db = new CSALDatabase(DB_URL);
+            Assert.IsNull(db.FindLesson(""));
+            Assert.IsNull(db.FindLesson("key"));
+
+            string simpleId = "Lesson25";
+            Assert.IsNull(db.FindLesson(simpleId));
+
+            var idList = new List<string> { 
+                simpleId, 
+                "http://somewhere/good/scripts/Lesson25/activity", 
+                "http://elsewhere/bad/scripts/Lesson25/activity/doh"
+            };
+
+            foreach (var lessonId in idList) {
+                var attempted = new CSALMongo.TurnModel.ConvLog {
+                    UserID = "memphis-semiotics-fozzy-bear",
+                    LessonID = lessonId,
+                    TurnID = 0
+                };
+
+                db.SaveRawStudentLessonAct(attempted.ToJson());
+            }
+
+            Assert.AreEqual(1, db.FindLessons().Count);
+
+            var lesson2 = db.FindLesson(simpleId);
+            Assert.IsNotNull(lesson2);
+
+            Assert.AreEqual(GetJSON(lesson2), GetJSON(lesson2));
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(CSALDatabaseException))]
         public void TestBadSingleLessonSaveNull() {
             var db = new CSALDatabase(DB_URL);

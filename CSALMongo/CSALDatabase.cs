@@ -81,13 +81,19 @@ namespace CSALMongo {
         public void SaveRawStudentLessonAct(string jsonDataRecord) {
             var doc = BsonDocument.Parse(jsonDataRecord);
             
-            string lessonID = doc.GetValue("LessonID", "").AsString;
+            string fullLessonID = doc.GetValue("LessonID", "").AsString;
             string fullUserID = doc.GetValue("UserID", "").AsString;
 
-            if (String.IsNullOrWhiteSpace(lessonID))
+            if (String.IsNullOrWhiteSpace(fullLessonID))
                 throw new CSALDatabaseException("No lesson ID specified for Student-Lesson Act");
             if (String.IsNullOrWhiteSpace(fullUserID))
                 throw new CSALDatabaseException("No user ID specified for Student-Lesson Act");
+
+            //TODO: add to url set for lessons if diff
+            //TODO: unit test new lesson id stuff
+            //TODO: import lesson names
+            //TODO: check table cols on GUI???
+            string lessonID = ExtractLessonID(fullLessonID);
 
             string locationID = "";
             string classID = "";
@@ -198,6 +204,25 @@ namespace CSALMongo {
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Given a "full" lesson ID, attempt to extract a "real" lesson ID.
+        /// Note that this is based upon Lesson ID's being transmitted as URL's.
+        /// </summary>
+        /// <param name="fullLessonID"></param>
+        /// <returns></returns>
+        protected string ExtractLessonID(string fullLessonID) {
+            if (String.IsNullOrWhiteSpace(fullLessonID)) {
+                return fullLessonID;
+            }
+
+            try {
+                return fullLessonID; //TODO: actual parse
+            }
+            catch (Exception) {
+                return fullLessonID;
+            }
         }
 
         /// <summary>

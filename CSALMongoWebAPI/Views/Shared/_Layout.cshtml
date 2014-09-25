@@ -52,7 +52,13 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li>@Html.ActionLink(Session["UserEmail"].ToString(), "Index", "Home", new { area = "" }, null)</li>
+                    @{
+                        var dispEmail = Session["UserEmail"].ToString();
+                        if ((bool)Session["IsAdmin"]) { 
+                            dispEmail += " (ADMIN)";
+                        }
+                    }
+                    <li>@Html.ActionLink(dispEmail, "Index", "Home", new { area = "" }, null)</li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->

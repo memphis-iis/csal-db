@@ -12,11 +12,9 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: update layout with login/logout info/links
 //TODO: filter all responses by login(teacher)
-//TODO: logging of actions, esp login, queries, and errors?
 
-//TODO: if OAuth2 stuff gets too big, move to Auth controller
+//TODO: logging of actions, esp login, queries, and errors?
 
 namespace CSALMongoWebAPI.Controllers {
     /// <summary>
@@ -30,6 +28,7 @@ namespace CSALMongoWebAPI.Controllers {
         protected ClassesController classesCtrl;
         protected LessonsController lessonsCtrl;
         protected StudentsController studentsCtrl;
+        protected List<String> adminEmails;
 
         public ClassesController ClassesCtrl {
             set {
@@ -74,6 +73,35 @@ namespace CSALMongoWebAPI.Controllers {
             return String.IsNullOrWhiteSpace(CurrentUserEmail());
         }
 
+        protected bool IsAdmin() {
+            //There must be a logged in email to be admin
+            var email = CurrentUserEmail();
+            if (String.IsNullOrWhiteSpace(email)) {
+                return false;
+            }
+
+            //Lazy admin email get
+            if (adminEmails == null) {
+                adminEmails = new List<string>();
+            }
+            if (adminEmails.Count < 1) {
+                string allAdmins = ClassesCtrl.AppSettings["AdminEmails"];
+                if (!String.IsNullOrWhiteSpace(allAdmins)) {
+                    foreach (string one in allAdmins.Split(',')) {
+                        adminEmails.Add(one.Trim().ToLower());
+                    }
+                }
+            }
+
+            //Check for match
+            email = email.Trim().ToLower();
+            foreach(string check in adminEmails) {
+                if (check.ToLower() == email)
+                    return true;
+            }
+            return false;
+        }
+
         protected ActionResult LoginRedir() {
             string redir = Request.Url.AbsoluteUri;
             string login = Url.Action("login", "home", null, Request.Url.Scheme);
@@ -90,6 +118,13 @@ namespace CSALMongoWebAPI.Controllers {
             var modelDict = (IDictionary<string, object>)modelObj;
             modelDict["ErrorMessage"] = errorMsg;
             return View("Error", modelObj);
+        }
+
+        public ActionResult Logout() {
+            Session["UserEmail"] = "";
+            Session["UserName"] = "";
+            Session["IsAdmin"] = false;
+            return RedirectToAction("Index");
         }
 
         public ActionResult Login() {
@@ -113,9 +148,9 @@ namespace CSALMongoWebAPI.Controllers {
 
             url.Query = query.ToString();
 
-            //Before redirecting, we clear the current session
-            Session["UserEmail"] = null;
-            Session["UserName"] = null;
+            //Before redirecting, we clear the current session - we just
+            //ignore whatever the action wants us to do
+            Logout();
 
             //Now we redirect them to google - which should eventually
             //redirect back to our OAuth2Callback
@@ -223,6 +258,7 @@ namespace CSALMongoWebAPI.Controllers {
             //Made it! Set up the session and redirect to where we started
             Session["UserEmail"] = userEmail;
             Session["UserName"] = userName;
+            Session["IsAdmin"] = IsAdmin();
             return Redirect(redir);
         }
 

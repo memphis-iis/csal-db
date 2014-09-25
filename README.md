@@ -23,3 +23,5 @@ Current directories
    Teachers GUI (uses the Web API)
  * CSALMongoWebAPI.Tests - unit tests for CSALMongoWebAPI
  * packages - the NuGet folder managing packages for these projects
+ * scripts - scripts that are useful for dealing with this project, especially
+   the database.  Generally in Python.

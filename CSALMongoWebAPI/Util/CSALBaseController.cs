@@ -33,6 +33,7 @@ namespace CSALMongoWebAPI.Util {
             }
         }
 
+        [NonAction]
         public CSALDatabase DBConn() {
             return new CSALDatabase(AppSettings["MongoURL"]);
         }

@@ -30,7 +30,6 @@
                         <th>Times Completed</th>
                         <th>Correct response rate</th>
                         <th>Total time spent on the lesson</th>
-                        <th>Average response time</th>
                         <th>Reading time</th>
                     </tr>
                 </thead>
@@ -42,8 +41,7 @@
                             <td>@lesson.Attempts</td>
                             <td>@lesson.Completions</td>
                             <td>???</td>
-                            <td>@String.Format("{0:F1} sec", lesson.TotalDuration() / 1000.0)</td>
-                            <td>@String.Format("{0:F1} sec", lesson.MeanDuration() / 1000.0)</td>
+                            <td>@RenderHelp.HumanDuration(lesson.TotalDuration())</td>
                             <td>???</td>
                         </tr>                        
                     }

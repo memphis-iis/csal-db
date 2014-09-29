@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Web.Http;
 
+using Newtonsoft.Json.Linq;
+
 using CSALMongo.Model;
 
 namespace CSALMongoWebAPI.Controllers {
@@ -18,9 +20,9 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         // POST api/lessons/5
-        public void Post(string id, [FromBody]string value) {
+        public void Post(string id, [FromBody]JToken value) {
             id = Util.RenderHelp.URIDecode(id);
-            Lesson lesson = Utils.ParseJson<Lesson>(value);
+            Lesson lesson = Utils.ParseJson<Lesson>(value.ToString());
             if (lesson.Id != id) {
                 throw new InvalidOperationException("Attempt to save mismatched Lesson");
             }

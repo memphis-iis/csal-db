@@ -126,6 +126,7 @@
     <Compile Include="Controllers\ClassesControllerTest.cs" />
     <Compile Include="Util\BaseControllerTest.cs" />
     <Compile Include="Util\ConfigTest.cs" />
+    <Compile Include="Util\UtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />

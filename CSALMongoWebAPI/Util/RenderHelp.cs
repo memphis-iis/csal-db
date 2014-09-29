@@ -17,6 +17,8 @@ namespace CSALMongoWebAPI.Util {
         /// <seealso cref="URIDecode"/>
         public static string URIEncode(string s) {
             //Currently we just double escape
+            if (String.IsNullOrEmpty(s))
+                return s;
             return Uri.EscapeDataString(Uri.EscapeDataString(s));
         }
 
@@ -28,7 +30,35 @@ namespace CSALMongoWebAPI.Util {
         /// <returns>decoded value</returns>
         /// <seealso cref="URIEncode"/>
         public static string URIDecode(string s) {
+            if (String.IsNullOrEmpty(s))
+                return s;
             return HttpUtility.UrlDecode(HttpUtility.UrlDecode(s));
+        }
+
+        /// <summary>
+        /// Create a human-readable version of the given number of milliseconds.
+        /// For instance, the TotalDuration and MeanDuration methods from the
+        /// CSAL Mongo model
+        /// </summary>
+        /// <param name="dur">Number of milliseconds to translate</param>
+        /// <returns></returns>
+        public static string HumanDuration(double dur) {
+            dur /= 1000.0; //First xlate to secs
+
+            if (dur < 60.0) {
+                return "< 1 min";
+            }
+
+            string units = "mins";
+            dur /= 60.0;
+            
+            //This is probably test data, but make it readable
+            if (dur > 180.0) {
+                units = "hrs";
+                dur /= 60.0;
+            }
+
+            return String.Format("{0:N0} {1}", Math.Floor(dur), units);
         }
     }
 }

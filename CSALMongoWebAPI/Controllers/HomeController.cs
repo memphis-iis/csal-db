@@ -14,6 +14,43 @@ using Newtonsoft.Json.Linq;
 
 //TODO: filter all responses by login(teacher)
 
+//TODO: class - add field for meet time and display on summ/details
+
+//TODO: default sort orders for all summary/detail pages
+
+//TODO: red/green for fail/pass - cut score should probably be configured (default to 67%)
+
+//TODO: need to do something to make all test data part of memphis class (on re-post from script)
+
+//TODO: Need to show students struggling - default sort by correct %
+//      Also on a lesson detail in the summary area:
+//      "Some students are struggling: n didn't complete and m failed.
+//      Click here to see just those students"
+
+//TODO: Path column - look at input event: Easy, Medium, Difficult
+//      event add to string. Difficult becomes Hard, default (nothing
+//      found) is medium. Build string up (e.g. EMHME on lesson 4)
+//      - Need to examine events for labels
+
+//TODO: Correct item in turn => 'Turns.Input.Event':'Correct'/'Incorrect' ***trim.lower.startswith***
+
+//TODO: student/lesson score matrix (pass/fail/in progress/not started) - this is the CLASS DETAIL
+
+//TODO: Lesson short name - once the lesson ID is in, add short names to DB from sheet Whitney put out
+
+//TODO: Lesson summary page - class % correct
+
+//TODO: Lesson detail - % correct per student - also need easy way to show students that have completed but didn't pass
+
+//TODO: Need debug view showing histo for event above and sys field looked at for completion
+
+//TODO: For any (lesson,student) tuple, we need list of questions with
+//      correct, correct 2 tries, incorrect. Use for the Andrew Graph,
+//      questions vexing many students, etc, etc.  See above for question
+//      location
+
+//TODO: On app deploy, check that we are still in our own app pool
+
 //TODO: logging of actions, esp login, queries, and errors?
 
 namespace CSALMongoWebAPI.Controllers {
@@ -347,6 +384,10 @@ namespace CSALMongoWebAPI.Controllers {
             modelDict["Turns"] = studentTurns;
 
             return View("StudentDetail", modelObj);
+        }
+
+        public ActionResult Materials() {
+            return View("Materials");
         }
     }
 }

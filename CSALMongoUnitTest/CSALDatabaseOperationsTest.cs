@@ -53,13 +53,13 @@ namespace CSALMongoUnitTest {
             var lessons = db.FindLessons();
             Assert.AreEqual(1, lessons.Count);
             Assert.AreEqual(ITS, lessons[0].TurnCount);
-            Assert.AreEqual(SAMPLE_RAW_LESSON, lessons[0].LessonID);
-            CollectionAssert.AreEquivalent(new string[] { SAMPLE_RAW_USER }, lessons[0].Students);
+            Assert.AreEqual(SAMPLE_RAW_LESSON.ToLowerInvariant(), lessons[0].LessonID);
+            CollectionAssert.AreEquivalent(new string[] { SAMPLE_RAW_USER.ToLowerInvariant() }, lessons[0].Students);
 
             var students = db.FindStudents();
             Assert.AreEqual(1, students.Count);
             Assert.AreEqual(ITS, students[0].TurnCount);
-            Assert.AreEqual(SAMPLE_RAW_USER, students[0].UserID);
+            Assert.AreEqual(SAMPLE_RAW_USER.ToLowerInvariant(), students[0].UserID);
 
             //Raw has "simple" user ID, so no class/location information
             var classes = db.FindClasses();
@@ -388,7 +388,7 @@ namespace CSALMongoUnitTest {
             Assert.IsNull(db.FindLesson(""));
             Assert.IsNull(db.FindLesson("key"));
 
-            string simpleId = "Lesson25";
+            string simpleId = "lesson25";
             Assert.IsNull(db.FindLesson(simpleId));
 
             var idList = new List<string> { 
@@ -469,7 +469,7 @@ namespace CSALMongoUnitTest {
             var oddStudents = new List<string>();
 
             for (int i = 1; i < 2048; ++i) {
-                string key = "Student" + i.ToString();
+                string key = "student" + i.ToString();
                 if (i % 2 == 0) evenStudents.Add(key);
                 else            oddStudents.Add(key);
 

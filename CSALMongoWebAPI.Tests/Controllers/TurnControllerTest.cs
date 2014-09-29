@@ -28,7 +28,7 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             var students = db.FindStudents();
             Assert.AreEqual(1, students.Count);
             Assert.AreEqual(ITS, students[0].TurnCount);
-            Assert.AreEqual(SAMPLE_RAW_USER, students[0].UserID);
+            Assert.AreEqual(SAMPLE_RAW_USER.ToLowerInvariant(), students[0].UserID.ToLowerInvariant());
 
             //Raw has "simple" user ID, so no class/location information
             var classes = db.FindClasses();
@@ -40,8 +40,8 @@ namespace CSALMongoWebAPI.Tests.Controllers {
             Assert.AreEqual(1, db.FindTurns(null, SAMPLE_RAW_USER).Count);
             Assert.AreEqual(1, db.FindTurns(SAMPLE_RAW_LESSON, SAMPLE_RAW_USER).Count);
 
-            Assert.AreEqual(SAMPLE_RAW_USER, turns[0].UserID);
-            Assert.AreEqual(SAMPLE_RAW_LESSON, turns[0].LessonID);
+            Assert.AreEqual(SAMPLE_RAW_USER.ToLowerInvariant(), turns[0].UserID.ToLowerInvariant());
+            Assert.AreEqual(SAMPLE_RAW_LESSON.ToLowerInvariant(), turns[0].LessonID.ToLowerInvariant());
             Assert.AreEqual(ITS, turns[0].Turns.Count);
         }
     }

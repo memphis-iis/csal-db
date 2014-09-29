@@ -28,8 +28,8 @@ namespace CSALMongoUnitTest {
             testDB.Drop();
 
             var sampleRaw = BsonDocument.Parse(GetSampleRawAct());
-            SAMPLE_RAW_USER = sampleRaw["UserID"].AsString;
-            SAMPLE_RAW_LESSON = sampleRaw["LessonID"].AsString;
+            SAMPLE_RAW_USER = sampleRaw["UserID"].AsString.ToLowerInvariant();
+            SAMPLE_RAW_LESSON = sampleRaw["LessonID"].AsString.ToLowerInvariant();
 
             Assert.IsFalse(String.IsNullOrWhiteSpace(SAMPLE_RAW_USER));
             Assert.IsFalse(String.IsNullOrWhiteSpace(SAMPLE_RAW_LESSON));

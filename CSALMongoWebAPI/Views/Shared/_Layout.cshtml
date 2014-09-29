@@ -43,12 +43,14 @@
                 string lessonActive = action.Contains("lesson") ? "active" : "";
                 string studentActive = action.Contains("student") ? "active" : "";
                 string classActive = action.Contains("class") ? "active" : "";
+                string materialsActive = action.Contains("materials") ? "active" : "";
             }
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li class="@lessonActive">@Html.ActionLink("Lessons", "Lessons", "Home", new { area = "" }, null)</li>
                     <li class="@classActive">@Html.ActionLink("Classes", "Classes", "Home", new { area = "" }, null)</li>
                     <li class="@studentActive">@Html.ActionLink("Students", "Students", "Home", new { area = "" }, null)</li>
+                    <li class="@materialsActive">@Html.ActionLink("Teaching Materials", "Materials", "Home", new { area = "" }, null)</li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">

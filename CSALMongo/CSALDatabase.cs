@@ -8,12 +8,9 @@ using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
-//TODO: lesson list - be able to click on students
-//TODO: class detail is list of lessons?
-
 //TODO: startup logic - DB InsureIndexes
-
-//TODO: calc reading time
+//TODO: import lesson names
+//TODO: calc reading time (total reading time - ruleID StartReading, DoneReading)
 //TODO: correct items (and total or incorrect items)
 
 namespace CSALMongo {
@@ -89,11 +86,16 @@ namespace CSALMongo {
             if (String.IsNullOrWhiteSpace(fullUserID))
                 throw new CSALDatabaseException("No user ID specified for Student-Lesson Act");
 
-            //TODO: add to url set for lessons if diff
-            //TODO: unit test new lesson id stuff
-            //TODO: import lesson names
-            //TODO: check table cols on GUI???
+            //Always lower case for case-insensitive lookup
+            fullLessonID = fullLessonID.ToLowerInvariant();
+            fullUserID = fullUserID.ToLowerInvariant();
+
             string lessonID = ExtractLessonID(fullLessonID);
+
+            string lessonURLSeen = null;
+            if (lessonID != fullLessonID) {
+                lessonURLSeen = fullLessonID;
+            }
 
             string locationID = "";
             string classID = "";
@@ -138,14 +140,17 @@ namespace CSALMongo {
             //side-effect of insuring that they exist
             DoUpsert(STUDENT_COLLECTION, userID, Update
                 .Set("LastTurnTime", now)
-                .Inc("TurnCount", 1));
+                .Inc("TurnCount", 1)
+                .SetOnInsert("AutoCreated", true));
 
             //Try and upsert stats on the class - but we don't always get a class ID
             if (!String.IsNullOrWhiteSpace(classID)) {
                 DoUpsert(CLASS_COLLECTION, classID, Update
                     .Set("Location", locationID)
                     .AddToSet("Lessons", lessonID)
-                    .AddToSet("Students", userID));
+                    .AddToSet("Students", userID)
+                    .SetOnInsert("MeetingTime", "")
+                    .SetOnInsert("AutoCreated", true));
             }
 
             //Note that we make sure to give a default value to lists if we're
@@ -153,7 +158,8 @@ namespace CSALMongo {
             var lessonUpdate = Update
                 .Set("LastTurnTime", now)
                 .AddToSet("Students", userID)
-                .Inc("TurnCount", 1);
+                .Inc("TurnCount", 1)
+                .SetOnInsert("AutoCreated", true);
 
             if (isAttempt) {
                 lessonUpdate = lessonUpdate
@@ -171,6 +177,14 @@ namespace CSALMongo {
             }
             else {
                 lessonUpdate = lessonUpdate.SetOnInsert("StudentsCompleted", new BsonArray());
+            }
+
+            //We keep track of URL's we've seen for lessons
+            if (String.IsNullOrEmpty(lessonURLSeen)) {
+                lessonUpdate = lessonUpdate.SetOnInsert("URLs", new BsonArray());
+            }
+            else {
+                lessonUpdate = lessonUpdate.AddToSet("URLs", lessonURLSeen);
             }
 
             DoUpsert(LESSON_COLLECTION, lessonID, lessonUpdate);
@@ -271,6 +285,7 @@ namespace CSALMongo {
             if (lesson == null || String.IsNullOrEmpty(lesson.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing lesson or lesson ID");
             }
+            lesson.Id = lesson.Id.ToLowerInvariant();
             SaveOne<Model.Lesson>(LESSON_COLLECTION, lesson);
         }
 
@@ -337,6 +352,7 @@ namespace CSALMongo {
             if (student == null || String.IsNullOrEmpty(student.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing student or User ID");
             }
+            student.Id = student.Id.ToLowerInvariant();
             SaveOne<Model.Student>(STUDENT_COLLECTION, student);
         }
 
@@ -361,6 +377,7 @@ namespace CSALMongo {
             if (clazz == null || String.IsNullOrEmpty(clazz.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing Class or Class ID");
             }
+            clazz.Id = clazz.Id.ToLowerInvariant();
             SaveOne<Model.Class>(CLASS_COLLECTION, clazz);
         }
 
@@ -405,10 +422,10 @@ namespace CSALMongo {
 
             var clauses = new List<IMongoQuery>();
             if (!String.IsNullOrEmpty(lessonID)) {
-                clauses.Add(Query.EQ("LessonID", lessonID));
+                clauses.Add(Query.EQ("LessonID", lessonID.ToLowerInvariant()));
             }
             if (!String.IsNullOrEmpty(userID)) {
-                clauses.Add(Query.EQ("UserID", userID));
+                clauses.Add(Query.EQ("UserID", userID.ToLowerInvariant()));
             }
 
             var collect = mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION);
@@ -462,6 +479,8 @@ namespace CSALMongo {
         /// <returns>A TDocType instance, or null if nothing is found</returns>
         protected TDocType FindOne<TDocType>(string collectionName, string docId) {
             var collect = mongoDatabase.GetCollection(collectionName);
+            if (!String.IsNullOrWhiteSpace(docId))
+                docId = docId.ToLowerInvariant();
             return collect.FindOneAs<TDocType>(Query.EQ("_id", docId));
         }
 

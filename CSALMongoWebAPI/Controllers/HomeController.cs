@@ -12,6 +12,10 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+//TODO: tools in create initial class/lesson/teach in DB
+
+//TODO: use python scripts to export data, re-init db, rechange all loc/cls to Memphis-TestClass, and re-do posts
+
 //TODO: filter all responses by login(teacher)
 
 //TODO: class - add field for meet time and display on summ/details

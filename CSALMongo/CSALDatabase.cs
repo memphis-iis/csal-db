@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Dynamic;
 
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -9,9 +10,12 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
 //TODO: startup logic - DB InsureIndexes
-//TODO: import lesson names
-//TODO: calc reading time (total reading time - ruleID StartReading, DoneReading)
-//TODO: correct items (and total or incorrect items)
+
+//TODO: calc reading time (total reading time - ruleID Read, startswith(DoneReading))
+
+//TODO: unit tests for correct/incorrect
+
+//TODO: reset lesson stats on attempt
 
 namespace CSALMongo {
     /// <summary>
@@ -113,8 +117,11 @@ namespace CSALMongo {
 
             string studentLessonID = userID + ":" + lessonID;
             var now = DateTime.Now;
-            bool isAttempt = RawContainsAttempt(doc);
-            bool isCompletion = RawContainsComplete(doc);
+            dynamic rawInfo = RawContents(doc);
+            bool isAttempt = rawInfo.IsAttempt;
+            bool isCompletion = rawInfo.IsCompletion;
+            int correctAnswers = rawInfo.CorrectAnswers;
+            int incorrectAnswers = rawInfo.IncorrectAnswers;
 
             //Set up our update for the student/lesson act collection.  We
             //will also examine the raw data to see if there is anything we
@@ -127,8 +134,17 @@ namespace CSALMongo {
                 .Push("Turns", doc);
 
             if (isAttempt) {
-                mainUpdate = mainUpdate.Inc("Attempts", 1);
+                mainUpdate = mainUpdate
+                    .Inc("Attempts", 1)
+                    .Set("CorrectAnswers", correctAnswers)
+                    .Set("IncorrectAnswers", incorrectAnswers);
             }
+            else {
+                mainUpdate = mainUpdate
+                    .Inc("CorrectAnswers", 1)
+                    .Inc("IncorrectAnswers", 1);
+            }
+
             if (isCompletion) {
                 mainUpdate = mainUpdate.Inc("Completions", 1);
             }
@@ -191,19 +207,40 @@ namespace CSALMongo {
             DoUpsert(LESSON_COLLECTION, lessonID, lessonUpdate);
         }
 
-        protected bool RawContainsAttempt(BsonDocument doc) {
-            return doc.GetValue("TurnID", -1).AsInt32 == 0;
-        }
+        //Given the BSON document, return what we can current figure out from these turns
+        protected object RawContents(BsonDocument doc) {
+            dynamic ret = new ExpandoObject();
 
-        protected bool RawContainsComplete(BsonDocument doc) {
-            //We may get an action telling us that this is a completion
+            ret.IsAttempt = (doc.GetValue("TurnID", -1).AsInt32 == 0);
+            //We need to loop thru everything for these
+            ret.IsCompletion = false;
+            ret.CorrectAnswers = 0;
+            ret.IncorrectAnswers = 0;
+
             var transitions = Util.ExtractArray(doc, "Transitions");
             foreach (var trans in transitions) {
                 if (!trans.IsBsonDocument) {
                     continue;
                 }
+                var transDoc = trans.AsBsonDocument;
 
-                var actions = Util.ExtractArray(trans.AsBsonDocument, "Actions");
+                //RuleID has lots of info
+                BsonValue bsonRuleID;
+                string ruleID = "";
+                if (transDoc.TryGetValue("RuleID", out bsonRuleID)) {
+                    if (bsonRuleID.IsString)
+                        ruleID = bsonRuleID.AsString.Trim().ToLower();
+                }
+
+                if (ruleID == "correct") {
+                    ret.CorrectAnswers++;
+                }
+                else if (ruleID == "incorrect") {
+                    ret.IncorrectAnswers++;
+                }
+
+                //Analyze actions to see if they have completed the lesson
+                var actions = Util.ExtractArray(transDoc, "Actions");
                 foreach (var action in actions) {
                     if (!action.IsBsonDocument) {
                         continue;
@@ -213,12 +250,12 @@ namespace CSALMongo {
                     string act = actionDoc.GetValue("Act", "").AsString.Trim().ToLower();
 
                     if (agent == "system" && act == "end") {
-                        return true; //AH-HA!
+                        ret.IsCompletion = true; //AH-HA!
                     }
                 }
             }
 
-            return false;
+            return ret;
         }
 
         /// <summary>
@@ -271,6 +308,42 @@ namespace CSALMongo {
         /// <returns></returns>
         public List<Model.Lesson> FindLessons() {
             return FindAll<Model.Lesson>(LESSON_COLLECTION);
+        }
+
+        /// <summary>
+        /// Return a dictionary of Lesson ID => Lesson Short Names - note that
+        /// lessons represent human-created content, so this should be a fairly
+        /// low-effort method
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<String, String> FindLessonNames() {
+            var ret = new Dictionary<String, String>();
+
+            var collect = mongoDatabase.GetCollection(LESSON_COLLECTION);
+
+            var results = collect.FindAllAs<BsonDocument>()
+                .SetFields(Fields.Include("LessonID").Include("ShortName"));
+
+            foreach (var one in results) {
+                if (!one.Contains("LessonID")) {
+                    continue;
+                }
+                
+                string lid = one["LessonID"].AsString;
+                
+                BsonValue name;
+                if (!one.TryGetValue("ShortName", out name)) {
+                    name = lid;
+                }
+
+                if (!name.IsString || String.IsNullOrWhiteSpace(name.AsString)) {
+                    name = lid;
+                }
+                
+                ret[lid] = name.AsString;
+            }
+
+            return ret;
         }
 
         /// <summary>
@@ -337,6 +410,7 @@ namespace CSALMongo {
                 students.Add(student);
             }
 
+            students.Sort();
             return students;
         }
 
@@ -403,6 +477,7 @@ namespace CSALMongo {
                 found.Add(BsonSerializer.Deserialize<Model.StudentLessonActs>(one));
             }
 
+            found.Sort();
             return found;
         }
 

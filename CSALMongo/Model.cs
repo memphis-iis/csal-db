@@ -25,6 +25,18 @@ namespace CSALMongo.Model {
             }
             return BsonSerializer.Deserialize<TModel>(doc);
         }
+
+        public static String LessonIDSort(string lessonID) {
+            string ret = lessonID;
+            if (String.IsNullOrWhiteSpace(ret))
+                return ret;
+
+            ret = ret.Trim().ToLowerInvariant();
+            if (!ret.StartsWith("lesson"))
+                return ret;
+
+            return ret.Substring(6).PadLeft(8, '0');
+        }
     }
 
     public class Class: IComparable<Class> {
@@ -59,21 +71,8 @@ namespace CSALMongo.Model {
         public List<String> URLs { get; set; }
         public Boolean? AutoCreated { get; set; }
 
-        //Return a sortable lesson ID
-        public string LessonIDSort() {
-            string ret = LessonID;
-            if (String.IsNullOrWhiteSpace(ret))
-                return ret;
-
-            ret = ret.Trim().ToLowerInvariant();
-            if (!ret.StartsWith("lesson"))
-                return ret;
-
-            return ret.Substring(6).PadLeft(8, '0');
-        }
-
         int IComparable<Lesson>.CompareTo(Lesson other) {
-            int r = LessonIDSort().CompareTo(other.LessonIDSort());
+            int r = Utils.LessonIDSort(LessonID).CompareTo(Utils.LessonIDSort(other.LessonID));
             if (r != 0)
                 return r;
             return String.Compare(LessonID, other.LessonID, true);
@@ -107,6 +106,8 @@ namespace CSALMongo.Model {
         public List<TurnModel.ConvLog> Turns { get; set; }
         public int Attempts { get; set; }
         public int Completions { get; set; }
+        public int CorrectAnswers { get; set; }
+        public int IncorrectAnswers { get; set; }
 
         public double TotalDuration() {
             double tot = 0.0;
@@ -124,8 +125,12 @@ namespace CSALMongo.Model {
             return TotalDuration() / Turns.Count;
         }
 
+        public double CurrentReadingTime() {
+            return 0.0; //TODO: need timeline calculation
+        }
+
         int IComparable<StudentLessonActs>.CompareTo(StudentLessonActs other) {
-            int r = String.Compare(LessonID, other.LessonID, true);
+            int r = Utils.LessonIDSort(LessonID).CompareTo(Utils.LessonIDSort(other.LessonID));
             if (r != 0)
                 return r;
             return String.Compare(UserID, other.UserID, true);

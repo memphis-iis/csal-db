@@ -24,7 +24,8 @@
                 <caption>Lesson Information</caption>
                 <thead>
                     <tr>
-                        <th>Lesson Id</th>
+                        <th>Lesson ID</th>
+                        <th>Lesson Name</th>
                         <th>Last Activity</th>
                         <th>Times Attempted</th>
                         <th>Times Completed</th>
@@ -35,8 +36,15 @@
                 </thead>
                 <tbody>
                     @foreach (var lesson in Model.Turns) {
+                        string lessonID = lesson.LessonID;
+                        string lessonName;
+                        if (!Model.LessonLookup.TryGetValue(lessonID, out lessonName)) {
+                            lessonName = lessonID;
+                        }
+                        
                         <tr>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@lesson.LessonID</a></td>
+                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonID</a></td>
+                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
                             <td>@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>@lesson.Completions</td>

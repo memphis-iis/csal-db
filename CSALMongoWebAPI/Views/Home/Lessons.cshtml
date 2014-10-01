@@ -12,7 +12,8 @@
                 <caption>All Lessons</caption>
                 <thead>
                     <tr>
-                        <th>Lesson ID</th>
+                        <th>ID</th>
+                        <th>Name</th>
                         <th>Number of students attempted</th>
                         <th>Number of students completed</th>
                         <th>Date of first attempted</th>
@@ -33,6 +34,7 @@
                         
                         <tr>
                             <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@lesson.LessonID</a></td>
+                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@lesson.ShortName</a></td>
                             <td>@lesson.StudentsAttempted.Count</td>
                             <td>@lesson.StudentsCompleted.Count</td>
                             <td>@firstAttempt</td>

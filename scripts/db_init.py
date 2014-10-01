@@ -33,7 +33,7 @@ def usage():
 
 #Classes are (location, name/id, teacher, meet time)
 CLASSES = [
-    ("Memphis", "TestClass", "whitney.baer@gmail.com", "Tue 10am"),
+    ("Memphis", "testclass", "whitney.baer@gmail.com", "Tue 10am"),
 ]
 
 #Lessons are (id, shortname)

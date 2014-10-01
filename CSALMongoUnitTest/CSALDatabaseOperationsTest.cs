@@ -382,6 +382,29 @@ namespace CSALMongoUnitTest {
         }
 
         [TestMethod]
+        public void TestMultiLessonLookup() {
+            var db = new CSALDatabase(DB_URL);
+            Assert.IsNull(db.FindLesson("key1"));
+            Assert.IsNull(db.FindLesson("key2"));
+            Assert.AreEqual(0, db.FindLessonNames().Count);
+
+            var lesson1 = new CSALMongo.Model.Lesson { LessonID = "key1", TurnCount = 42, Students = new List<String> { "sa", "sb" } };
+            db.SaveLesson(lesson1);
+
+            var dict = db.FindLessonNames();
+            Assert.AreEqual(1, dict.Count);
+            Assert.AreEqual("key1", dict["key1"]);
+
+            var lesson2 = new CSALMongo.Model.Lesson { LessonID = "key2", ShortName = "Name2", TurnCount = 42, Students = new List<String> { "sa", "sb" } };
+            db.SaveLesson(lesson2);
+
+            dict = db.FindLessonNames();
+            Assert.AreEqual(2, dict.Count);
+            Assert.AreEqual("key1", dict["key1"]);
+            Assert.AreEqual("Name2", dict["key2"]);
+        }
+
+        [TestMethod]
         public void TestSingleLessonComplexID() {
             
             var db = new CSALDatabase(DB_URL);

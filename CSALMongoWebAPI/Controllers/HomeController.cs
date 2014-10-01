@@ -16,8 +16,6 @@ using Newtonsoft.Json.Linq;
 
 //TODO: filter all responses by login(teacher)
 
-//TODO: class - add field for meet time and display on summ/details
-
 //TODO: red/green for fail/pass - cut score should probably be configured (default to 67%)
 
 //TODO: Need to show students struggling - default sort by correct %
@@ -30,11 +28,7 @@ using Newtonsoft.Json.Linq;
 //      found) is medium. Build string up (e.g. EMHME on lesson 4)
 //      - Need to examine events for labels
 
-//TODO: Correct item in turn => 'Turns.Input.Event':'Correct'/'Incorrect' ***trim.lower.startswith***
-
 //TODO: student/lesson score matrix (pass/fail/in progress/not started) - this is the CLASS DETAIL
-
-//TODO: Lesson short name - once the lesson ID is in, add short names to DB from sheet Whitney put out
 
 //TODO: Lesson summary page - class % correct
 
@@ -380,6 +374,7 @@ namespace CSALMongoWebAPI.Controllers {
             var modelDict = (IDictionary<string, object>)modelObj;
             modelDict["Student"] = student;
             modelDict["Turns"] = studentTurns;
+            modelDict["LessonLookup"] = StudentsCtrl.DBConn().FindLessonNames();
 
             return View("StudentDetail", modelObj);
         }

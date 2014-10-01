@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+
 
 // This namespace is for model classes used by CSALDatabase.  Note that the
 // data for a turn is modeled via TurnModel. ALSO note that turns are sent to
@@ -10,7 +12,18 @@ using MongoDB.Bson.Serialization;
 namespace CSALMongo.Model {
     public static class Utils {
         public static TModel ParseJson<TModel>(string json) {
-            return BsonSerializer.Deserialize<TModel>(json);
+            var doc = BsonDocument.Parse(json);
+            //If they do a GET/modify/POST, then might have a field name $id
+            //which is NOT the same as _id - we remove it for them
+            if (doc.Contains("$id")) {
+                doc.Remove("$id");
+            }
+            //If they use the .NET-ism of Id instead of _id, we fix that as well
+            if (doc.Contains("Id")) {
+                doc.Add("_id", doc.GetValue("Id"));
+                doc.Remove("Id");
+            }
+            return BsonSerializer.Deserialize<TModel>(doc);
         }
     }
 
@@ -32,6 +45,7 @@ namespace CSALMongo.Model {
         public string Id { get; set; }
 
         public string LessonID { get { return Id; } set { Id = value; } }
+        public string ShortName { get; set; }
         public DateTime? LastTurnTime { get; set; }
         public int? TurnCount { get; set; }
         public List<String> Students { get; set; }

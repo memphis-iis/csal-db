@@ -21,7 +21,7 @@ namespace CSALMongoWebAPI.Controllers {
 
         // POST api/classes/5
         public void Post(string id, [FromBody]JToken value) {
-            id = Util.RenderHelp.URIDecode(id);
+            id = Util.RenderHelp.URIDecode(id).ToLower();
             Class clazz = Utils.ParseJson<Class>(value.ToString());
             if (clazz.Id != id) {
                 throw new InvalidOperationException("Attempt to save mismatched class");

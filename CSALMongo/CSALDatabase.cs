@@ -159,7 +159,8 @@ namespace CSALMongo {
                 .Set("LastTurnTime", now)
                 .AddToSet("Students", userID)
                 .Inc("TurnCount", 1)
-                .SetOnInsert("AutoCreated", true);
+                .SetOnInsert("AutoCreated", true)
+                .SetOnInsert("ShortName", lessonID);
 
             if (isAttempt) {
                 lessonUpdate = lessonUpdate

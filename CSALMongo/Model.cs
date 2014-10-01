@@ -27,7 +27,7 @@ namespace CSALMongo.Model {
         }
     }
 
-    public class Class {
+    public class Class: IComparable<Class> {
         //MongoDB ID (_id)
         public string Id { get; set; }
 
@@ -38,9 +38,13 @@ namespace CSALMongo.Model {
         public List<string> Students { get; set; }
         public List<string> Lessons { get; set; }
         public Boolean? AutoCreated { get; set; }
+
+        int IComparable<Class>.CompareTo(Class other) {
+            return String.Compare(ClassID, other.ClassID, true);
+        }
     }
 
-    public class Lesson {
+    public class Lesson : IComparable<Lesson> {
         //MongoDB ID
         public string Id { get; set; }
 
@@ -54,9 +58,29 @@ namespace CSALMongo.Model {
         public List<String> StudentsCompleted { get; set; }
         public List<String> URLs { get; set; }
         public Boolean? AutoCreated { get; set; }
+
+        //Return a sortable lesson ID
+        public string LessonIDSort() {
+            string ret = LessonID;
+            if (String.IsNullOrWhiteSpace(ret))
+                return ret;
+
+            ret = ret.Trim().ToLowerInvariant();
+            if (!ret.StartsWith("lesson"))
+                return ret;
+
+            return ret.Substring(6).PadLeft(8, '0');
+        }
+
+        int IComparable<Lesson>.CompareTo(Lesson other) {
+            int r = LessonIDSort().CompareTo(other.LessonIDSort());
+            if (r != 0)
+                return r;
+            return String.Compare(LessonID, other.LessonID, true);
+        }
     }
 
-    public class Student {
+    public class Student : IComparable<Student> {
         //MongoDB ID (_id)
         public string Id { get; set; }
         
@@ -66,9 +90,13 @@ namespace CSALMongo.Model {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Boolean? AutoCreated { get; set; }
+
+        int IComparable<Student>.CompareTo(Student other) {
+            return String.Compare(UserID, other.UserID, true);
+        }
     }
 
-    public class StudentLessonActs {
+    public class StudentLessonActs : IComparable<StudentLessonActs> {
         //MongoDB ID (_id)
         public string Id { get; set; }
 
@@ -94,6 +122,13 @@ namespace CSALMongo.Model {
             if (Turns == null || Turns.Count < 1)
                 return 0.0;
             return TotalDuration() / Turns.Count;
+        }
+
+        int IComparable<StudentLessonActs>.CompareTo(StudentLessonActs other) {
+            int r = String.Compare(LessonID, other.LessonID, true);
+            if (r != 0)
+                return r;
+            return String.Compare(UserID, other.UserID, true);
         }
     }
 }

@@ -76,7 +76,6 @@ STUDENTS = [
     ("craig", "Craig", "Kelly"),
 ]
 
-
 def do_get(url):
     #Actual post
     req = urllib2.Request(url)

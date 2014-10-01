@@ -12,19 +12,13 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: tools in create initial class/lesson/teach in DB
-
 //TODO: use python scripts to export data, re-init db, rechange all loc/cls to Memphis-TestClass, and re-do posts
 
 //TODO: filter all responses by login(teacher)
 
 //TODO: class - add field for meet time and display on summ/details
 
-//TODO: default sort orders for all summary/detail pages
-
 //TODO: red/green for fail/pass - cut score should probably be configured (default to 67%)
-
-//TODO: need to do something to make all test data part of memphis class (on re-post from script)
 
 //TODO: Need to show students struggling - default sort by correct %
 //      Also on a lesson detail in the summary area:

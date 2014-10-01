@@ -76,7 +76,9 @@
 @section ScriptFinal {
     <script>
         $(document).ready(function () {
-            $('.apply-data-table').dataTable();
+            $('.apply-data-table').dataTable({
+                "aaSorting": [] //No default sort
+            });
             $(".student-link").addClass("hover-restore");
         });
     </script>

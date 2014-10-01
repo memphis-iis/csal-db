@@ -36,7 +36,9 @@
 @section ScriptFinal {
 <script>
     $(document).ready(function () {
-        $('#sample-data').dataTable();
+        $('.apply-data-table').dataTable({
+            "aaSorting": [] //No default sort
+        });
 
         $('#listLessons').click(function (evt) {
             evt.preventDefault();

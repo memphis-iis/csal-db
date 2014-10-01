@@ -463,10 +463,11 @@ namespace CSALMongo {
             var collect = mongoDatabase.GetCollection(collectionName);
             var found = new List<TDocType>();
 
-            foreach (var student in collect.FindAllAs<TDocType>()) {
-                found.Add(student);
+            foreach (var one in collect.FindAllAs<TDocType>()) {
+                found.Add(one);
             }
 
+            found.Sort();
             return found;
         }
 

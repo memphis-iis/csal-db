@@ -32,7 +32,7 @@ using Newtonsoft.Json.Linq;
 
 //TODO: Lesson summary page - class % correct
 
-//TODO: Lesson detail - % correct per student - also need easy way to show students that have completed but didn't pass
+//TODO: Students under 67% who haven't completed should be yellow, not red.
 
 //TODO: Need debug view showing histo for event above and sys field looked at for completion
 

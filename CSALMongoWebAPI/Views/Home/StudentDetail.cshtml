@@ -41,6 +41,9 @@
                         if (!Model.LessonLookup.TryGetValue(lessonID, out lessonName)) {
                             lessonName = lessonID;
                         }
+
+                        double correctRate = lesson.CorrectAnswerRate();
+                        string correctStyle = correctRate > 0.67 ? "label-success" : "label-danger";
                         
                         <tr>
                             <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonID</a></td>
@@ -48,9 +51,9 @@
                             <td>@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>@lesson.Completions</td>
-                            <td>???</td>
+                            <td><span class="label @correctStyle" style="font-weight:normal;">@String.Format("{0:P0}", correctRate)</span></td>
                             <td>@RenderHelp.HumanDuration(lesson.TotalDuration())</td>
-                            <td>???</td>
+                            <td>@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
                         </tr>                        
                     }
                 </tbody>

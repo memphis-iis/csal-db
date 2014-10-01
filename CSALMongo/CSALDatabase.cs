@@ -13,9 +13,7 @@ using MongoDB.Bson.Serialization;
 
 //TODO: calc reading time (total reading time - ruleID Read, startswith(DoneReading))
 
-//TODO: unit tests for correct/incorrect
-
-//TODO: reset lesson stats on attempt
+//TODO: unit tests for correct/incorrect and reading time
 
 namespace CSALMongo {
     /// <summary>
@@ -117,6 +115,7 @@ namespace CSALMongo {
 
             string studentLessonID = userID + ":" + lessonID;
             var now = DateTime.Now;
+            
             dynamic rawInfo = RawContents(doc);
             bool isAttempt = rawInfo.IsAttempt;
             bool isCompletion = rawInfo.IsCompletion;
@@ -141,8 +140,8 @@ namespace CSALMongo {
             }
             else {
                 mainUpdate = mainUpdate
-                    .Inc("CorrectAnswers", 1)
-                    .Inc("IncorrectAnswers", 1);
+                    .Inc("CorrectAnswers", correctAnswers)
+                    .Inc("IncorrectAnswers", incorrectAnswers);
             }
 
             if (isCompletion) {
@@ -212,32 +211,35 @@ namespace CSALMongo {
             dynamic ret = new ExpandoObject();
 
             ret.IsAttempt = (doc.GetValue("TurnID", -1).AsInt32 == 0);
-            //We need to loop thru everything for these
             ret.IsCompletion = false;
             ret.CorrectAnswers = 0;
             ret.IncorrectAnswers = 0;
 
+            //Check event in the input section
+            var input = Util.ExtractDoc(doc, "Input");
+            if (input.IsBsonDocument) {
+                BsonValue evt;
+                string eventVal = "";
+                if (input.TryGetValue("Event", out evt)) {
+                    if (evt.IsString)
+                        eventVal = evt.AsString.Trim().ToLower();
+                }
+
+                if (eventVal == "correct") {
+                    ret.CorrectAnswers = 1;
+                }
+                else if (eventVal.StartsWith("incorrect")) {
+                    ret.IncorrectAnswers = 1;
+                }
+            }
+
+            //Check transitions for data
             var transitions = Util.ExtractArray(doc, "Transitions");
             foreach (var trans in transitions) {
                 if (!trans.IsBsonDocument) {
                     continue;
                 }
                 var transDoc = trans.AsBsonDocument;
-
-                //RuleID has lots of info
-                BsonValue bsonRuleID;
-                string ruleID = "";
-                if (transDoc.TryGetValue("RuleID", out bsonRuleID)) {
-                    if (bsonRuleID.IsString)
-                        ruleID = bsonRuleID.AsString.Trim().ToLower();
-                }
-
-                if (ruleID == "correct") {
-                    ret.CorrectAnswers++;
-                }
-                else if (ruleID == "incorrect") {
-                    ret.IncorrectAnswers++;
-                }
 
                 //Analyze actions to see if they have completed the lesson
                 var actions = Util.ExtractArray(transDoc, "Actions");

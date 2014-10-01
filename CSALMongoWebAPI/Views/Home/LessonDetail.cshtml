@@ -52,19 +52,24 @@
                         <th>Last Activity</th>
                         <th>Times Attempted</th>
                         <th>Times Completed</th>
+                        <th>Correct Response Rate</th>
                         <th>Total time spent on the lesson</th>
                         <th>Reading time</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var lesson in Model.Turns) {
+                        double correctRate = lesson.CorrectAnswerRate();
+                        string correctStyle = correctRate > 0.67 ? "label-success" : "label-danger";
+                        
                         <tr>
                             <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(lesson.UserID)" class="student-link">@lesson.UserID</a></td>
                             <td>@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>@lesson.Completions</td>
+                            <td><span class="label @correctStyle" style="font-weight:normal;">@String.Format("{0:P0}", correctRate)</span></td>
                             <td>@RenderHelp.HumanDuration(lesson.TotalDuration())</td>
-                            <td>???</td>
+                            <td>@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
                         </tr>
                     }
                 </tbody>

@@ -109,6 +109,7 @@ namespace CSALMongo.Model {
         public int CorrectAnswers { get; set; }
         public int IncorrectAnswers { get; set; }
 
+        //In millisecs
         public double TotalDuration() {
             double tot = 0.0;
             if (Turns != null) {
@@ -119,14 +120,25 @@ namespace CSALMongo.Model {
             return tot;
         }
 
+        //In millisecs
         public double MeanDuration() {
             if (Turns == null || Turns.Count < 1)
                 return 0.0;
             return TotalDuration() / Turns.Count;
         }
 
+        //In millisecs
         public double CurrentReadingTime() {
             return 0.0; //TODO: need timeline calculation
+        }
+
+        //Returns rate where 0 <= rate <= 1
+        public double CorrectAnswerRate() {
+            if (CorrectAnswers < 1)
+                return 0.0;
+
+            double tot = (double)(CorrectAnswers + IncorrectAnswers);
+            return (double)CorrectAnswers / tot;
         }
 
         int IComparable<StudentLessonActs>.CompareTo(StudentLessonActs other) {

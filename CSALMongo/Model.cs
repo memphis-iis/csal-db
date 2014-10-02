@@ -129,7 +129,36 @@ namespace CSALMongo.Model {
 
         //In millisecs
         public double CurrentReadingTime() {
-            return 0.0; //TODO: need timeline calculation
+            if (Turns.Count < 1)
+                return 0.0;
+
+            //Find find the LAST start of a lesson
+            int start = Turns.Count - 1;
+            while (start > 0 && Turns[start].TurnID != 0) {
+                start--;
+            }
+            //Whoops - these turns are messed up
+            if (start < 0)
+                return 0.0;
+
+            double currTime = 0.0;
+            double readStart = -1.0;
+            double totalRead = 0.0;
+            for (int curr = start; curr < Turns.Count; ++curr) {
+                var turn = Turns[curr];
+
+
+
+                currTime += turn.Duration;
+            }
+
+            //If our data shows them starting to read and never stopping,
+            //then they're still reading, so grab what's left
+            if (readStart >= 0.0 && readStart < currTime) {
+                totalRead += (currTime - readStart);
+            }
+
+            return totalRead;
         }
 
         //Returns rate where 0 <= rate <= 1

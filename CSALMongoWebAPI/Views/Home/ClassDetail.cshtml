@@ -1,12 +1,75 @@
-﻿@{
-    ViewBag.Title = "Class " + Model.ClassID;
+﻿@using CSALMongo.Model
+@using CSALMongoWebAPI.Util
+
+@{
+    ViewBag.Title = "Class " + Model.Class.ClassID;
 }
 
 <!-- MAIN CONTENT -->
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            TODO
+            <h3>Summary Information</h3>
+
+            <p>Location: @Model.Class.Location</p>
+            <p>Teacher: @Model.Class.TeacherName</p>
+
+            @if (!String.IsNullOrWhiteSpace(Model.Class.MeetingTime)) {
+                <p>Meeting Time: @Model.Class.MeetingTime</p>
+            }
+
+            <p>This class has <strong>@Model.Class.Students.Count</strong> students 
+            and <strong>@Model.Class.Lessons.Count</strong> lessons</p>
+
+            <br />
+
+            <table class="table table-condensed" id="classMatrix">
+                <caption>Performance Information</caption>
+                
+                <tr>
+                    <th>&nbsp;</th>
+                    @foreach (var userID in Model.Class.Students) {
+                        <th>
+                            <a href="~/home/studentdetails/@RenderHelp.URIEncode(userID)" class="student-link">@userID</a>
+                        </th>
+                    }
+                </tr>
+
+                @foreach (var lessonID in Model.Class.Lessons) {
+                    string lessonName;
+                    if (!Model.LessonNames.TryGetValue(lessonID, out lessonName)) {
+                        lessonName = null;
+                    }
+                    
+                    <tr>
+                        <th>
+                            <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonID</a>
+                            @if (lessonName != null) {
+                                <br/>
+                                <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a>
+                            }
+                        </th>
+                        
+                        @foreach (var userID in Model.Class.Students) {
+                            string correctRateDisp = "";
+                            string correctStyle = "";
+                            
+                            var key = new Tuple<string, string>(lessonID, userID);
+                            StudentLessonActs turns = null;
+                            
+                            if (Model.LUTurns.TryGetValue(key, out turns)) {
+                                double correctRate = turns.CorrectAnswerRate();
+                                correctRateDisp = String.Format("{0:P0}", correctRate);
+                                correctStyle = correctRate > 0.67 ? "label label-success" : "label label-danger";
+                            }
+                            
+                            <td>
+                                <span class="@correctStyle" style="font-weight:normal;">@correctRateDisp</span>
+                            </td>
+                        }
+                    </tr>
+                }
+            </table>
         </div>
     </div>
 </div> <!-- /container -->
@@ -14,9 +77,10 @@
 @section ScriptFinal {
 <script>
     $(document).ready(function () {
-        $('.apply-data-table').dataTable({
-            "aaSorting": [] //No default sort
-        });
+        $(".student-link").addClass("hover-restore");
+        $(".lesson-link").addClass("hover-restore");
+        $("#classMatrix th").addClass("nw").addClass("border1");
+        $("#classMatrix td").addClass("nw").addClass("border1");
     });
 </script>
 }

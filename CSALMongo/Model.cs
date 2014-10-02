@@ -147,7 +147,7 @@ namespace CSALMongo.Model {
             for (int curr = start; curr < Turns.Count; ++curr) {
                 var turn = Turns[curr];
 
-
+                //TODO: we need to actually find start/stop places and add up durations
 
                 currTime += turn.Duration;
             }
@@ -159,6 +159,35 @@ namespace CSALMongo.Model {
             }
 
             return totalRead;
+        }
+
+        /// <summary>
+        /// Return a string summarizing the student's latest path through the
+        /// lesson.  If they stayed in medium the whole time, return empty
+        /// string.  If their path was (Start/Medium)=>Hard=>Medium=>Easy return
+        /// HME
+        /// </summary>
+        /// <returns></returns>
+        public string LessonPath() {
+            if (Turns.Count < 1)
+                return "";
+
+            //Find find the LAST start of a lesson
+            int start = Turns.Count - 1;
+            while (start > 0 && Turns[start].TurnID != 0) {
+                start--;
+            }
+            //Whoops - these turns are messed up
+            if (start < 0)
+                return "";
+
+            string path = "";
+            for (int curr = start; curr < Turns.Count; ++curr) {
+                var turn = Turns[curr];
+                //TODO: add to path if there was a change
+            }
+
+            return path;
         }
 
         //Returns rate where 0 <= rate <= 1

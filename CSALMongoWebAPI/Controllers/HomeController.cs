@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Net;
+using System.Linq;
 using System.Dynamic;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -9,14 +10,14 @@ using System.Web.Mvc;
 
 using System.Diagnostics;
 
+using CSALMongo.Model;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 //TODO: use python scripts to export data, re-init db, rechange all loc/cls to Memphis-TestClass, and re-do posts
 
 //TODO: filter all responses by login(teacher)
-
-//TODO: red/green for fail/pass - cut score should probably be configured (default to 67%)
 
 //TODO: Need to show students struggling - default sort by correct %
 //      Also on a lesson detail in the summary area:
@@ -28,11 +29,9 @@ using Newtonsoft.Json.Linq;
 //      found) is medium. Build string up (e.g. EMHME on lesson 4)
 //      - Need to examine events for labels
 
-//TODO: student/lesson score matrix (pass/fail/in progress/not started) - this is the CLASS DETAIL
-
 //TODO: Lesson summary page - class % correct
 
-//TODO: Students under 67% who haven't completed should be yellow, not red.
+//TODO: class detail matrix is too big: add side-by-side lesson and students lists so that they can just jump to lesson/class detail screen
 
 //TODO: Need debug view showing histo for event above and sys field looked at for completion
 
@@ -321,7 +320,41 @@ namespace CSALMongoWebAPI.Controllers {
             if (clazz == null) {
                 return new HttpNotFoundResult();
             }
-            return View("ClassDetail", clazz);
+
+            //Don't allow null lists
+            if (clazz.Lessons == null)
+                clazz.Lessons = new List<string>();
+            if (clazz.Students == null)
+                clazz.Students = new List<string>();
+
+            //Sort info in the class for display purposes
+            //Students are easy to sort, but we need a special sort for lessons
+            clazz.Lessons = clazz.Lessons.OrderBy(x => Utils.LessonIDSort(x)).ToList();
+            clazz.Students.Sort();
+
+            var lessons = new HashSet<String>(clazz.Lessons);
+            var students = new HashSet<String>(clazz.Students);
+
+            //Make dictionary of lesson:user 
+            var lookup = new Dictionary<Tuple<string, string>, StudentLessonActs>();
+            if (lessons.Count > 0 && students.Count > 0) {
+                foreach (var turns in LessonsCtrl.DBConn().FindTurns(null, null)) {
+                    if (!students.Contains(turns.UserID) || !lessons.Contains(turns.LessonID)) {
+                        continue; //Nope
+                    }
+
+                    var key = new Tuple<string, string>(turns.LessonID, turns.UserID);
+                    lookup[key] = turns;
+                }
+            }
+
+            var modelObj = new ExpandoObject();
+            var modelDict = (IDictionary<string, object>)modelObj;
+            modelDict["Class"] = clazz;
+            modelDict["LUTurns"] = lookup;
+            modelDict["LessonNames"] = LessonsCtrl.DBConn().FindLessonNames();
+
+            return View("ClassDetail", modelObj);
         }
 
         public ActionResult Lessons() {

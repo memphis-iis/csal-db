@@ -11,8 +11,6 @@ using MongoDB.Bson.Serialization;
 
 //TODO: startup logic - DB InsureIndexes
 
-//TODO: calc reading time (total reading time - ruleID Read, startswith(DoneReading))
-
 //TODO: unit tests for correct/incorrect and reading time
 
 namespace CSALMongo {

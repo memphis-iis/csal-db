@@ -15,14 +15,14 @@ using CSALMongo.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+//TODO: document proper posting from python script
+
 //TODO: use python scripts to export data, re-init db, rechange all loc/cls to Memphis-TestClass, and re-do posts
 
 //TODO: Need to show students struggling - default sort by correct %
 //      Also on a lesson detail in the summary area:
 //      "Some students are struggling: n didn't complete and m failed.
 //      Click here to see just those students"
-
-//TODO: Lesson summary page - class % correct
 
 //TODO: For any (lesson,student) tuple, we need list of questions with
 //      correct, correct 2 tries, incorrect. Use for the Andrew Graph,
@@ -440,7 +440,12 @@ namespace CSALMongoWebAPI.Controllers {
                 }
             }
 
-            return View("Lessons", lessons);
+            var modelObj = new ExpandoObject();
+            var modelDict = (IDictionary<string, object>)modelObj;
+            modelDict["Lessons"] = lessons;
+            modelDict["AnswerTots"] = LessonsCtrl.DBConn().FindLessonAnswerTots();
+
+            return View("Lessons", modelObj);
         }
 
         public ActionResult LessonDetails(string id) {

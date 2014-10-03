@@ -11,7 +11,7 @@ using MongoDB.Bson.Serialization;
 
 //TODO: startup logic - DB InsureIndexes
 
-//TODO: unit tests for correct/incorrect, reading time, path
+//TODO: unit tests for correct/incorrect, reading time, path, lesson tots, +coverage
 
 namespace CSALMongo {
     /// <summary>
@@ -344,6 +344,59 @@ namespace CSALMongo {
             }
 
             return ret;
+        }
+
+        /// <summary>
+        /// Return a dictionary of Lesson ID => (CorrectCount, IncorrectCount)
+        /// for all lessons across all students enroller
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<String, Tuple<int, int>> FindLessonAnswerTots() {
+            var collect = mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION);
+            var results = collect.FindAllAs<BsonDocument>()
+                .SetFields(Fields
+                    .Include("LessonID")
+                    .Include("CorrectAnswers")
+                    .Include("IncorrectAnswers"));
+
+            var ret = new Dictionary<String, Tuple<int, int>>();
+
+            foreach (var one in results) {
+                if (!one.Contains("LessonID")) {
+                    continue;
+                }
+
+                string lid = one["LessonID"].AsString;
+
+                Tuple<int, int> currVals;
+                if (!ret.TryGetValue(lid, out currVals)) {
+                    currVals = new Tuple<int, int>(0, 0);
+                    ret[lid] = currVals;
+                }
+                
+                BsonValue num;
+                
+                int correct = 0;
+                if (one.TryGetValue("CorrectAnswers", out num)) {
+                    if (num.IsNumeric) {
+                        correct = num.AsInt32;
+                    }
+                }
+
+                int incorrect = 0;
+                if (one.TryGetValue("IncorrectAnswers", out num)) {
+                    if (num.IsNumeric) {
+                        incorrect = num.AsInt32;
+                    }
+                }
+
+                ret[lid] = TupleAdd(currVals, correct, incorrect);
+            }
+
+            return ret;
+        }
+        private Tuple<int, int> TupleAdd(Tuple<int, int> t, int i1, int i2) {
+            return new Tuple<int, int>(t.Item1 + i1, t.Item2 + i2);
         }
 
         /// <summary>

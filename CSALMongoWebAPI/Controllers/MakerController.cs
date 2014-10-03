@@ -7,8 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 
 using CSALMongo.Model;
 
-//TODO: remove this silly class, the Testing action in Home, and the Testing view
-
 namespace CSALMongoWebAPI.Controllers {
     [ExcludeFromCodeCoverage]
     public class MakerController : Util.CSALBaseController {

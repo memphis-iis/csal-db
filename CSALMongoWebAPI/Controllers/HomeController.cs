@@ -409,15 +409,38 @@ namespace CSALMongoWebAPI.Controllers {
             return new Tuple<int, int>(t.Item1 + i1, t.Item2 + i2);
         }
 
+        private HashSet<string> AllowedLessons(string email) {
+            var allowedLessons = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach (var cls in ClassesCtrl.Get()) {
+                if (String.Equals(email, cls.TeacherName, IC)) {
+                    allowedLessons.UnionWith(cls.Lessons);
+                }
+            }
+            return allowedLessons;
+        }
 
         public ActionResult Lessons() {
             if (NeedLogin()) {
                 return LoginRedir();
             }
 
-            //TODO: only lessons we have access to
+            var lessons = new List<Lesson>();
 
-            return View("Lessons", LessonsCtrl.Get());
+            //Only lessons we're allowed to see
+            bool admin = IsAdmin();
+            HashSet<string> allowedLessons = null;
+            if (!admin) {
+                //Only populate allowedLessons if we're not admin
+                allowedLessons = AllowedLessons(CurrentUserEmail());
+            }
+
+            foreach (Lesson le in LessonsCtrl.Get()) {
+                if (admin || allowedLessons.Contains(le.LessonID)) {
+                    lessons.Add(le);
+                }
+            }
+
+            return View("Lessons", lessons);
         }
 
         public ActionResult LessonDetails(string id) {
@@ -430,7 +453,11 @@ namespace CSALMongoWebAPI.Controllers {
                 return new HttpNotFoundResult();
             }
 
-            //TODO: check for access to lesson
+            if (!IsAdmin()) {
+                if (!AllowedLessons(CurrentUserEmail()).Contains(lesson.LessonID)) {
+                    return RedirectToAction("Lessons");
+                }
+            }
 
             var lessonTurns = LessonsCtrl.DBConn().FindTurns(lesson.LessonID, null);
 
@@ -442,14 +469,38 @@ namespace CSALMongoWebAPI.Controllers {
             return View("LessonDetail", modelObj);
         }
 
+        private HashSet<string> AllowedStudents(string email) {
+            var allowedStudents = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+            foreach (var cls in ClassesCtrl.Get()) {
+                if (String.Equals(email, cls.TeacherName, IC)) {
+                    allowedStudents.UnionWith(cls.Students);
+                }
+            }
+            return allowedStudents;
+        }
+
         public ActionResult Students() {
             if (NeedLogin()) {
                 return LoginRedir();
             }
 
-            //TODO: only students we have access to
+            var students = new List<Student>();
 
-            return View("Students", StudentsCtrl.Get());
+            //Only lessons we're allowed to see
+            bool admin = IsAdmin();
+            HashSet<string> allowedStudents = null;
+            if (!admin) {
+                //Only populate if we're not admin
+                allowedStudents = AllowedStudents(CurrentUserEmail());
+            }
+
+            foreach (Student std in StudentsCtrl.Get()) {
+                if (admin || allowedStudents.Contains(std.UserID)) {
+                    students.Add(std);
+                }
+            }
+
+            return View("Students", students);
         }
 
         public ActionResult StudentDetails(string id) {
@@ -462,7 +513,11 @@ namespace CSALMongoWebAPI.Controllers {
                 return new HttpNotFoundResult();
             }
 
-            //TODO: checked student
+            if (!IsAdmin()) {
+                if (!AllowedStudents(CurrentUserEmail()).Contains(student.UserID)) {
+                    return RedirectToAction("Students");
+                }
+            }
 
             var studentTurns = StudentsCtrl.DBConn().FindTurns(null, student.UserID);
 

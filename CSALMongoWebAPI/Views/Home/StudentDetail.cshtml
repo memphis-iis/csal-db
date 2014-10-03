@@ -32,6 +32,7 @@
                         <th>Correct response rate</th>
                         <th>Total time spent on the lesson</th>
                         <th>Reading time</th>
+                        <th>Lesson Path</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,10 +51,16 @@
                             <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
                             <td>@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
-                            <td>@lesson.Completions</td>
+                            <td>
+                                @lesson.Completions
+                                @if (lesson.LastCompleted()) {
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                }
+                            </td>
                             <td><span class="label @correctStyle" style="font-weight:normal;">@String.Format("{0:P0}", correctRate)</span></td>
                             <td>@RenderHelp.HumanDuration(lesson.TotalDuration())</td>
                             <td>@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
+                            <td class="pathCell">@lesson.LessonPath()</td>
                         </tr>                        
                     }
                 </tbody>
@@ -68,7 +75,15 @@
             $('.apply-data-table').dataTable({
                 "aaSorting": [] //No default sort
             });
+
             $(".lesson-link").addClass("hover-restore");
+
+            $(".pathCell").each(function (idx, ele) {
+                var td = $(ele);
+                var path = td.text();
+                var newPath = CSALCommon.lessonPathMarkup(path);
+                td.html("").append(newPath);
+            });
         });
     </script>
 }

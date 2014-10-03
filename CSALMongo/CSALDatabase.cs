@@ -11,7 +11,7 @@ using MongoDB.Bson.Serialization;
 
 //TODO: startup logic - DB InsureIndexes
 
-//TODO: unit tests for correct/incorrect and reading time
+//TODO: unit tests for correct/incorrect, reading time, path
 
 namespace CSALMongo {
     /// <summary>

@@ -5,24 +5,105 @@
     ViewBag.Title = "Class " + Model.Class.ClassID;
 }
 
+
 <!-- MAIN CONTENT -->
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            <h3>Summary Information</h3>
+            <div class="pull-left">
+                <p>Location: @Model.Class.Location</p>
+                <p>Teacher: @Model.Class.TeacherName</p>
+            </div>
 
-            <p>Location: @Model.Class.Location</p>
-            <p>Teacher: @Model.Class.TeacherName</p>
+            <div class="pull-left" style="margin-left: 32px;">
+                @if (!String.IsNullOrWhiteSpace(Model.Class.MeetingTime)) {
+                    <p>Meeting Time: @Model.Class.MeetingTime</p>
+                }
 
-            @if (!String.IsNullOrWhiteSpace(Model.Class.MeetingTime)) {
-                <p>Meeting Time: @Model.Class.MeetingTime</p>
-            }
+                <p>
+                    This class has <strong>@Model.Class.Students.Count</strong> students
+                    and <strong>@Model.Class.Lessons.Count</strong> lessons
+                </p>
+            </div>
 
-            <p>This class has <strong>@Model.Class.Students.Count</strong> students 
-            and <strong>@Model.Class.Lessons.Count</strong> lessons</p>
+            <div class="clearfix">
+            </div>
+        </div>
+    </div>
 
-            <br />
+    <div class="row">        
+        <div class="col-md-6">
+            <h3>Students</h3>
+            <table class="table table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>SubjID</th>
+                        <th class="nw">Lesson Avg</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var userID in Model.Class.Students) {
+                        string correctDisp = "";
+                        string correctStyle = "";
+                        
+                        Tuple<int, int> tots = Model.StudentCounts[userID];
+                        if (tots.Item1 > 0 || tots.Item2 > 0) {
+                            double all = tots.Item1 + tots.Item2;
+                            double avg = (double)tots.Item1 / all;
+                            correctDisp = String.Format("{0:P0}", avg);
+                            correctStyle = avg > 0.67 ? "label-success" : "label-danger";
+                        }
+                        
+                        <tr>
+                            <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(userID)" class="student-link">@userID</a></td>
+                            <td><span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
+        <div class="col-md-6">
+            <h3>Lessons</h3>
+            <table class="table table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th class="nw">Class Avg</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var lessonID in Model.Class.Lessons) {
+                        string lessonName;
+                        if (!Model.LessonNames.TryGetValue(lessonID, out lessonName)) {
+                            lessonName = lessonID;
+                        }
+
+                        string correctDisp = "";
+                        string correctStyle = "";
+
+                        Tuple<int, int> tots = Model.LessonCounts[lessonID];
+                        if (tots.Item1 > 0 || tots.Item2 > 0) {
+                            double all = tots.Item1 + tots.Item2;
+                            double avg = (double)tots.Item1 / all;
+                            correctDisp = String.Format("{0:P0}", avg);
+                            correctStyle = avg > 0.67 ? "label-success" : "label-danger";
+                        }
+                        
+                        <tr>
+                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonID</a></td>
+                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
+                            <td><span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
             <table class="table table-condensed" id="classMatrix">
                 <caption>Performance Information</caption>
                 
@@ -53,18 +134,23 @@
                         @foreach (var userID in Model.Class.Students) {
                             string correctRateDisp = "";
                             string correctStyle = "";
-                            
+                            bool showCompleted = false;
+                                                
                             var key = new Tuple<string, string>(lessonID, userID);
                             StudentLessonActs turns = null;
-                            
+
                             if (Model.LUTurns.TryGetValue(key, out turns)) {
                                 double correctRate = turns.CorrectAnswerRate();
                                 correctRateDisp = String.Format("{0:P0}", correctRate);
                                 correctStyle = correctRate > 0.67 ? "label label-success" : "label label-danger";
+                                showCompleted = turns.LastCompleted();
                             }
-                            
+
                             <td>
                                 <span class="@correctStyle" style="font-weight:normal;">@correctRateDisp</span>
+                                @if (showCompleted) {
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                }
                             </td>
                         }
                     </tr>

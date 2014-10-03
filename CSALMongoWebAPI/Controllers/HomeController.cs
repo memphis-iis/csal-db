@@ -17,23 +17,12 @@ using Newtonsoft.Json.Linq;
 
 //TODO: use python scripts to export data, re-init db, rechange all loc/cls to Memphis-TestClass, and re-do posts
 
-//TODO: filter all responses by login(teacher)
-
 //TODO: Need to show students struggling - default sort by correct %
 //      Also on a lesson detail in the summary area:
 //      "Some students are struggling: n didn't complete and m failed.
 //      Click here to see just those students"
 
-//TODO: Path column - look at input event: Easy, Medium, Difficult
-//      event add to string. Difficult becomes Hard, default (nothing
-//      found) is medium. Build string up (e.g. EMHME on lesson 4)
-//      - Need to examine events for labels
-
 //TODO: Lesson summary page - class % correct
-
-//TODO: class detail matrix is too big: add side-by-side lesson and students lists so that they can just jump to lesson/class detail screen
-
-//TODO: Need debug view showing histo for event above and sys field looked at for completion
 
 //TODO: For any (lesson,student) tuple, we need list of questions with
 //      correct, correct 2 tries, incorrect. Use for the Andrew Graph,
@@ -53,6 +42,9 @@ namespace CSALMongoWebAPI.Controllers {
     /// JSON at /api/lessons.
     /// </summary>
     public class HomeController : Controller {
+        //The ignore-case comparison we use
+        protected const StringComparison IC = StringComparison.InvariantCultureIgnoreCase;
+
         protected ClassesController classesCtrl;
         protected LessonsController lessonsCtrl;
         protected StudentsController studentsCtrl;
@@ -302,6 +294,10 @@ namespace CSALMongoWebAPI.Controllers {
             if (NeedLogin()) {
                 return LoginRedir();
             }
+            if (!IsAdmin()) {
+                return RedirectToAction("Index");
+            }
+
             return View("Testing");
         }
 
@@ -309,7 +305,19 @@ namespace CSALMongoWebAPI.Controllers {
             if (NeedLogin()) {
                 return LoginRedir();
             }
-            return View("Classes", ClassesCtrl.Get());
+
+            var classes = new List<Class>();
+
+            //Only classes we're allowed to see
+            bool admin = IsAdmin();
+            string email = CurrentUserEmail();
+            foreach (Class cls in ClassesCtrl.Get()) {
+                if (admin || String.Equals(email, cls.TeacherName, IC)) {
+                    classes.Add(cls);
+                }
+            }
+
+            return View("Classes", classes);
         }
 
         public ActionResult ClassDetails(string id) {
@@ -319,6 +327,13 @@ namespace CSALMongoWebAPI.Controllers {
             var clazz = ClassesCtrl.Get(id);
             if (clazz == null) {
                 return new HttpNotFoundResult();
+            }
+
+            if (!IsAdmin()) {
+                if (!String.Equals(CurrentUserEmail(), clazz.TeacherName, IC)) {
+                    //Don't have rights to this class
+                    return RedirectToAction("Classes");
+                }
             }
 
             //Don't allow null lists
@@ -348,19 +363,60 @@ namespace CSALMongoWebAPI.Controllers {
                 }
             }
 
+            //Calculate user and lessons average: first get totals and then
+            //calculate the averages. This seemingly strange method means we
+            //only need to perform lesson/student nested loop once
+            var lessonTots = new Dictionary<string, Tuple<int, int>>();
+            var userTots = new Dictionary<string, Tuple<int, int>>();
+
+            //Per-init student dict (since students are the inner loop)
+            foreach (string userID in clazz.Students) {
+                userTots[userID] = new Tuple<int, int>(0, 0);
+            }
+
+            //Find totals
+            foreach (string lessonID in clazz.Lessons) {
+                lessonTots[lessonID] = new Tuple<int, int>(0, 0);
+
+                foreach (string userID in clazz.Students) {
+                    var key = new Tuple<string, string>(lessonID, userID);
+                    StudentLessonActs turns;
+                    if (lookup.TryGetValue(key, out turns)) {
+                        int ca = turns.CorrectAnswers;
+                        int ia = turns.IncorrectAnswers;
+                        if (ca + ia > 0) {
+                            lessonTots[lessonID] = TupleAdd(lessonTots[lessonID], ca, ia);
+                            userTots[userID] = TupleAdd(userTots[userID], ca, ia);
+                        }
+                    }
+                }
+            }
+
+            //Set up model with all this data
             var modelObj = new ExpandoObject();
             var modelDict = (IDictionary<string, object>)modelObj;
             modelDict["Class"] = clazz;
             modelDict["LUTurns"] = lookup;
             modelDict["LessonNames"] = LessonsCtrl.DBConn().FindLessonNames();
+            modelDict["LessonCounts"] = lessonTots;
+            modelDict["StudentCounts"] = userTots;
 
             return View("ClassDetail", modelObj);
         }
+
+        //Simple helper for adding 2-tuples of ints for our 1-pass averaging above
+        private Tuple<int, int> TupleAdd(Tuple<int, int> t, int i1, int i2) {
+            return new Tuple<int, int>(t.Item1 + i1, t.Item2 + i2);
+        }
+
 
         public ActionResult Lessons() {
             if (NeedLogin()) {
                 return LoginRedir();
             }
+
+            //TODO: only lessons we have access to
+
             return View("Lessons", LessonsCtrl.Get());
         }
 
@@ -373,6 +429,8 @@ namespace CSALMongoWebAPI.Controllers {
             if (lesson == null) {
                 return new HttpNotFoundResult();
             }
+
+            //TODO: check for access to lesson
 
             var lessonTurns = LessonsCtrl.DBConn().FindTurns(lesson.LessonID, null);
 
@@ -388,6 +446,9 @@ namespace CSALMongoWebAPI.Controllers {
             if (NeedLogin()) {
                 return LoginRedir();
             }
+
+            //TODO: only students we have access to
+
             return View("Students", StudentsCtrl.Get());
         }
 
@@ -400,6 +461,8 @@ namespace CSALMongoWebAPI.Controllers {
             if (student == null) {
                 return new HttpNotFoundResult();
             }
+
+            //TODO: checked student
 
             var studentTurns = StudentsCtrl.DBConn().FindTurns(null, student.UserID);
 

@@ -102,5 +102,35 @@ var CSALCommon = {
                 "[" + textStatus + ": " + errorThrown + "]"
             );
         });
+    },
+
+    lessonPathMarkup: function (lessonPath) {
+        //Given the string lessonPath, return a DOM element suitable for
+        //appending for display
+        lessonPath = CSALCommon.trimmedStr(lessonPath);
+        if (lessonPath.length < 1)
+            return $("<span></span>").text(lessonPath);
+
+        var last = "M";
+        var component = $("<span></span>");
+
+        for (var i = 0; i < lessonPath.length; ++i) {
+            var c = lessonPath[i];
+            if (c != last) {
+                if (c == "E" || (c == "M" && last == "H")) {
+                    component.append($("<span class='glyphicon glyphicon-arrow-down'></span>"))
+                }
+                else if (c == "H" || (c == "M" && last == "E")) {
+                    component.append($("<span class='glyphicon glyphicon-arrow-up'></span>"))
+                }
+                else {
+                    //???
+                    component.append($("<span class='glyphicon glyphicon-question-sign'></span>"))
+                }
+            }
+            component.append($("<span></span>").text(c));
+        }
+
+        return component;
     }
 };

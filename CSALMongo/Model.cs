@@ -127,33 +127,106 @@ namespace CSALMongo.Model {
             return TotalDuration() / Turns.Count;
         }
 
-        //In millisecs
-        public double CurrentReadingTime() {
+        //Index of the beginning of the last attempt
+        public int LastAttemptIndex() {
             if (Turns.Count < 1)
-                return 0.0;
+                return -1;
 
-            //Find find the LAST start of a lesson
             int start = Turns.Count - 1;
             while (start > 0 && Turns[start].TurnID != 0) {
                 start--;
             }
-            //Whoops - these turns are messed up
+
+            return start;
+        }
+
+        //Return true if the last attempt was completed
+        public bool LastCompleted() {
+            if (Turns.Count < 1)
+                return false;
+
+            int curr = Turns.Count - 1;
+
+            while (curr > 0 && Turns[curr].TurnID != 0) {
+                foreach (var trans in Turns[curr].Transitions) {
+                    foreach (var action in trans.Actions) {
+                        string agent = action.Agent;
+                        string act = action.Act;
+
+                        if (!String.IsNullOrWhiteSpace(agent) && !String.IsNullOrWhiteSpace(act)) {
+                            if (agent.Trim().ToLower() == "system" && act.Trim().ToLower() == "end") {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                curr--;
+            }
+
+            return false;
+        }
+
+        //In millisecs
+        public double CurrentReadingTime() {
+            int start = LastAttemptIndex();
             if (start < 0)
                 return 0.0;
 
             double currTime = 0.0;
             double readStart = -1.0;
             double totalRead = 0.0;
+
             for (int curr = start; curr < Turns.Count; ++curr) {
                 var turn = Turns[curr];
 
-                //TODO: we need to actually find start/stop places and add up durations
+                //Note that a turn has multiple transitions, so we need to be
+                //ready for reading to both start and stop
+                bool beginRead = false;
+                bool endRead = false;
 
+                foreach (var tran in turn.Transitions) {
+                    string ruleID = tran.RuleID;
+                    if (String.IsNullOrWhiteSpace(ruleID))
+                        continue;
+
+                    ruleID = ruleID.Trim().ToLower();
+                    if (ruleID == "read") {
+                        beginRead = true;
+                    }
+                    else if (ruleID.StartsWith("donereading")) {
+                        endRead = true;
+                    }
+                }
+
+                //Did they just start reading?
+                if (beginRead) {
+                    if (readStart >= 0.0) {
+                        //We just found a read start with no end - we'll assume as restart
+                        totalRead += (currTime - readStart);
+                    }
+                    readStart = currTime;
+                }
+
+                //Advance the clock - note our assumption that reading starts
+                //at the beginning of the turn duration and done-reading occurs
+                //at the end of the turn duration
                 currTime += turn.Duration;
+
+                //Did they just finish reading?
+                if (endRead) {
+                    if (readStart < 0.0) {
+                        //No matching read-start - not much we can do
+                        //TODO: log an error? At least add something for unit testing?
+                    }
+                    else {
+                        totalRead += (currTime - readStart);
+                    }
+                    readStart = -1.0;
+                }
             }
 
-            //If our data shows them starting to read and never stopping,
-            //then they're still reading, so grab what's left
+            //Found a start-read with no matching end-read - assume it
             if (readStart >= 0.0 && readStart < currTime) {
                 totalRead += (currTime - readStart);
             }
@@ -169,22 +242,33 @@ namespace CSALMongo.Model {
         /// </summary>
         /// <returns></returns>
         public string LessonPath() {
-            if (Turns.Count < 1)
-                return "";
-
-            //Find find the LAST start of a lesson
-            int start = Turns.Count - 1;
-            while (start > 0 && Turns[start].TurnID != 0) {
-                start--;
-            }
-            //Whoops - these turns are messed up
+            int start = LastAttemptIndex();
             if (start < 0)
                 return "";
 
+            string lastState = "M";
             string path = "";
+
             for (int curr = start; curr < Turns.Count; ++curr) {
                 var turn = Turns[curr];
-                //TODO: add to path if there was a change
+
+                foreach (var tran in turn.Transitions) {
+                    string ruleID = tran.RuleID;
+                    if (String.IsNullOrWhiteSpace(ruleID))
+                        continue;
+
+                    ruleID = ruleID.Trim().ToLower();
+                    string newState = null;
+
+                    if      (ruleID.EndsWith("easy"))   newState = "E";
+                    else if (ruleID.EndsWith("medium")) newState = "M";
+                    else if (ruleID.EndsWith("hard"))   newState = "H";
+
+                    if (newState != null && newState != lastState) {
+                        path += newState;
+                        lastState = newState;
+                    }
+                }
             }
 
             return path;

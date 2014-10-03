@@ -43,6 +43,10 @@ namespace CSALMongoWebAPI.Util {
         /// <param name="dur">Number of milliseconds to translate</param>
         /// <returns></returns>
         public static string HumanDuration(double dur) {
+            if (dur < 0.001) {
+                return "";
+            }
+
             dur /= 1000.0; //First xlate to secs
 
             if (dur < 60.0) {

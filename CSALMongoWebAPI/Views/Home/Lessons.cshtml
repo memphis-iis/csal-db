@@ -37,8 +37,8 @@
                             <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@lesson.ShortName</a></td>
                             <td>@lesson.StudentsAttempted.Count</td>
                             <td>@lesson.StudentsCompleted.Count</td>
-                            <td>@firstAttempt</td>
-                            <td>@lastAttempt</td>
+                            <td class="nw">@firstAttempt</td>
+                            <td class="nw">@lastAttempt</td>
                         </tr>
                     }
                 </tbody>

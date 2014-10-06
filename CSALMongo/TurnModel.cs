@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CSALMongo.TurnModel {
     public class ConvLog {
+        //Start-of-epoch to be used for our DBTimestamp
+        public const int EPOCH_YR = 2010;
+
         //MongoDB ID (_id)
         public string Id { get; set; }
 
@@ -14,6 +18,7 @@ namespace CSALMongo.TurnModel {
         public List<AssessmentLog> Assessments { set; get; }
         public string ErrorMessage { get; set; }
         public string WarningMessage { get; set; }
+        public double DBTimestamp { get; set; }
     }
 
     public class TransitionLog {

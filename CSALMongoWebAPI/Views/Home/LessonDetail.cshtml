@@ -4,51 +4,78 @@
     ViewBag.Title = Model.Lesson.ShortName + " (" + Model.Lesson.LessonID + ")";
 }
 
+@{
+    var studentsAssigned = 0;
+    if (Model.Lesson.Students != null) {
+        studentsAssigned = Model.Lesson.Students.Count;
+    }
+    var studentsAttempted = 0;
+    if (Model.Lesson.StudentsAttempted != null) {
+        studentsAttempted = Model.Lesson.StudentsAttempted.Count;
+    }
+
+    var studentsCompleted = 0;
+    if (Model.Lesson.StudentsCompleted != null) {
+        studentsCompleted = Model.Lesson.StudentsCompleted.Count;
+    }
+
+    int troubleFailing = 0;
+    int troubleNotCompleted = 0;
+    foreach (var lesson in Model.Turns) {
+        if (!(lesson.CorrectAnswerRate() > 0.67)) {
+            troubleFailing++;
+        }
+        if (!lesson.LastCompleted()) {
+            troubleNotCompleted++;
+        }
+    }
+}
+
 <!-- MAIN CONTENT -->
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
-            <h3>Summary Information</h3>
-
+        <div class="col-md-6">
             @if (Model.Lesson.LastTurnTime != null) {
                 <p>Last lesson activity was @Model.Lesson.LastTurnTime.ToString()</p>
             }
-            
-            @{
-                var studentsAssigned = 0;
-                if (Model.Lesson.Students != null) {
-                    studentsAssigned = Model.Lesson.Students.Count;
-                }
-                var studentsAttempted = 0;
-                if (Model.Lesson.StudentsAttempted != null) { 
-                    studentsAttempted = Model.Lesson.StudentsAttempted.Count;
-                }
-                
-                var studentsCompleted = 0;
-                if (Model.Lesson.StudentsCompleted != null) {
-                    studentsCompleted = Model.Lesson.StudentsCompleted.Count;
-                }
+
+            @if (Model.Lesson.AttemptTimes != null && Model.Lesson.AttemptTimes.Count > 0) {
+                <p>
+                    The first attempt was @Model.Lesson.AttemptTimes[0].
+                    The last attempt was @Model.Lesson.AttemptTimes[Model.Lesson.AttemptTimes.Count - 1].
+                </p>
             }
 
             @if (studentsAssigned > 0 || studentsAttempted > 0 || studentsCompleted > 0) {
-                <p>This lesson has been assigned to <strong>@studentsAssigned student(s)</strong>.
+                <p>
+                    This lesson has been assigned to <strong>@studentsAssigned student(s)</strong>.
                     <strong>@studentsAttempted</strong> have attempted the lesson, and
                     <strong>@studentsCompleted</strong> have completed it.
                 </p>
             }
-            
-            @if (Model.Lesson.AttemptTimes != null && Model.Lesson.AttemptTimes.Count > 0) {
-                <p>The first attempt was @Model.Lesson.AttemptTimes[0].
-                The last attempt was @Model.Lesson.AttemptTimes[Model.Lesson.AttemptTimes.Count - 1].
+        </div>
+        <div class="col-md-6">
+            @if (troubleFailing > 0 || troubleNotCompleted > 0) {
+                <p>
+                    Some students may be struggling.  <strong>@troubleFailing</strong> currently
+                    don't have a passing percentage and <strong>@troubleNotCompleted</strong>
+                    haven't completed their last attempt. <br />
+                    If you wish to view only these students, click:
+                    <button id="TroubleFilterCmd" type="button" class="btn btn-xs btn-primary">View Struggling Students</button>
                 </p>
             }
-            <br />
 
-            <table class="table table-striped apply-data-table">
+            <br />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table id="DetailTable" class="table table-striped apply-data-table">
                 <caption>Lesson Information</caption>
                 <thead>
                     <tr>
                         <th>Student</th>
+                        <th>Trb?</th>
                         <th>Last Activity</th>
                         <th>Times Attempted</th>
                         <th>Times Completed</th>
@@ -62,10 +89,16 @@
                     @foreach (var lesson in Model.Turns) {
                         double correctRate = lesson.CorrectAnswerRate();
                         string correctStyle = correctRate > 0.67 ? "label-success" : "label-danger";
-                        
+                        bool inTrouble = !(lesson.LastCompleted() && correctRate > 0.67);
+
                         <tr>
                             <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(lesson.UserID)" class="student-link">@lesson.UserID</a></td>
-                            <td>@lesson.LastTurnTime</td>
+                            <td>
+                                @if (inTrouble) {
+                                    <span class="glyphicon glyphicon-cloud"></span>
+                                }
+                            </td>
+                            <td class="nw">@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>
                                 @lesson.Completions
@@ -84,12 +117,14 @@
         </div>
     </div>
 </div> <!-- /container -->
-
 @section ScriptFinal {
     <script>
+        var viewOnlyTroubled = false;
+        var detailTable = null;
+
         $(document).ready(function () {
-            $('.apply-data-table').dataTable({
-                "aaSorting": [] //No default sort
+            detailTable = $('#DetailTable').dataTable({
+                "order": [[5, "asc"]]
             });
 
             $(".student-link").addClass("hover-restore");
@@ -99,6 +134,33 @@
                 var path = td.text();
                 var newPath = CSALCommon.lessonPathMarkup(path);
                 td.html("").append(newPath);
+            });
+
+            $.fn.dataTableExt.afnFiltering.push(
+                function (oSettings, aData, iDataIndex) {
+                    if (viewOnlyTroubled) {
+                        return CSALCommon.trimmedStr(aData[1]).length > 0;
+                    }
+                    else {
+                        //Always return true since no filter
+                        return true;
+                    }
+                }
+            );
+
+            $("#TroubleFilterCmd").click(function (evt) {
+                evt.preventDefault();
+                if (viewOnlyTroubled) {
+                    //Switch back to unfiltered
+                    $(this).removeClass("btn-danger").addClass("btn-primary").text("View Struggling Students");
+                    viewOnlyTroubled = false;
+                }
+                else {
+                    //Switch to filtered only
+                    $(this).removeClass("btn-primary").addClass("btn-danger").text("View All Students");
+                    viewOnlyTroubled = true;
+                }
+                detailTable.fnDraw();
             });
         });
     </script>

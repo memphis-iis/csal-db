@@ -113,6 +113,23 @@ namespace CSALMongo {
 
             string studentLessonID = userID + ":" + lessonID;
             var now = DateTime.Now;
+
+            //Note that we might receive a DBTimestamp in the post as an
+            //override, but if not we just calculate it ourselves
+            double dbTimestamp = -1.0;
+            BsonValue postedTimestamp;
+            if (doc.TryGetValue("DBTimestamp", out postedTimestamp)) {
+                if (postedTimestamp.IsDouble)
+                    dbTimestamp = postedTimestamp.AsDouble;
+            }
+
+            //If we DIDN'T get a timestamp, that xlate now to epoch-based timestamp
+            if (dbTimestamp <= 0.0) {
+                var epochStart = new DateTime(TurnModel.ConvLog.EPOCH_YR, 1, 1);
+                dbTimestamp = (now - epochStart).TotalMilliseconds;
+            }
+
+            doc["DBTimestamp"] = dbTimestamp;
             
             dynamic rawInfo = RawContents(doc);
             bool isAttempt = rawInfo.IsAttempt;

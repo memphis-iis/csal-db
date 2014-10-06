@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using System.Diagnostics;
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
@@ -169,11 +171,23 @@ namespace CSALMongo.Model {
 
         //In millisecs
         public double CurrentReadingTime() {
+            //Before we do anything, fix up any timestamps that are
+            //OBVIOUSLY out of whack
+            for (int i = 1; i < Turns.Count; ++i) {
+                var prev = Turns[i - 1];
+                var curr = Turns[i];
+
+                double minTime = prev.DBTimestamp + prev.Duration;
+                if (curr.DBTimestamp <= minTime) {
+                    curr.DBTimestamp = minTime + 200.0; //Add 200 ms for safety
+                }
+            }
+
             int start = LastAttemptIndex();
             if (start < 0)
                 return 0.0;
 
-            double currTime = 0.0;
+            double currTime = Turns[start].DBTimestamp;
             double readStart = -1.0;
             double totalRead = 0.0;
 
@@ -198,6 +212,8 @@ namespace CSALMongo.Model {
                         endRead = true;
                     }
                 }
+
+                currTime = turn.DBTimestamp;
 
                 //Did they just start reading?
                 if (beginRead) {

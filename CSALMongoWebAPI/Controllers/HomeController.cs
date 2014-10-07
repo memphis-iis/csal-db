@@ -17,14 +17,10 @@ using Newtonsoft.Json.Linq;
 
 //TODO: document proper posting from python script
 
-//TODO: use python scripts to export data, re-init db, rechange all loc/cls to Memphis-TestClass, and re-do posts
-
 //TODO: For any (lesson,student) tuple, we need list of questions with
 //      correct, correct 2 tries, incorrect. Use for the Andrew Graph,
 //      questions vexing many students, etc, etc.  See above for question
 //      location
-
-//TODO: On app deploy, check that we are still in our own app pool
 
 //TODO: logging of actions, esp login, queries, and errors?
 
@@ -336,6 +332,22 @@ namespace CSALMongoWebAPI.Controllers {
                 clazz.Lessons = new List<string>();
             if (clazz.Students == null)
                 clazz.Students = new List<string>();
+
+            //SPECIAL: if this is a memphis class with test in the name, we do some filtering
+            if (clazz.Location.ToLower().Contains("memphis") && clazz.ClassID.ToLower().Contains("test")) {
+                //No carl, test, or non-alpha students then...
+                //Sort by len and take top 10
+                var nonAlpha = new System.Text.RegularExpressions.Regex("[^A-Z,a-z]+");
+                clazz.Students = clazz.Students
+                    .Where( s => !(s.Contains("carl") || s.Contains("test") || nonAlpha.IsMatch(s)) )
+                    .OrderByDescending(s => s.Length)
+                    .Take(10)
+                    .ToList();
+
+                //only lessons that match lessonN where N is a number
+                var lessonMatch = new System.Text.RegularExpressions.Regex("lesson[0-9]+");
+                clazz.Lessons = clazz.Lessons.Where(l => lessonMatch.IsMatch(l)).ToList();
+            }
 
             //Sort info in the class for display purposes
             //Students are easy to sort, but we need a special sort for lessons

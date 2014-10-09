@@ -15,11 +15,7 @@ using CSALMongo.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: Lesson path not getting correctly updated in hidden rows via data table
-
 //TODO: on class matrix, ditch lesson grid, add class avg to matrix, spark up the student listing
-
-//TODO: on ALL, only short name (not lesson ID)
 
 //TODO: check all date columns for nw
 

@@ -32,7 +32,7 @@
     </div>
 
     <div class="row">        
-        <div class="col-md-6">
+        <div class="col-md-12">
             <h3>Students</h3>
             <table class="table table-condensed table-striped">
                 <thead>
@@ -62,44 +62,6 @@
                 </tbody>
             </table>
         </div>
-
-        <div class="col-md-6">
-            <h3>Lessons</h3>
-            <table class="table table-condensed table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th class="nw">Class Avg</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var lessonID in Model.Class.Lessons) {
-                        string lessonName;
-                        if (!Model.LessonNames.TryGetValue(lessonID, out lessonName)) {
-                            lessonName = lessonID;
-                        }
-
-                        string correctDisp = "";
-                        string correctStyle = "";
-
-                        Tuple<int, int> tots = Model.LessonCounts[lessonID];
-                        if (tots.Item1 > 0 || tots.Item2 > 0) {
-                            double all = tots.Item1 + tots.Item2;
-                            double avg = (double)tots.Item1 / all;
-                            correctDisp = String.Format("{0:P0}", avg);
-                            correctStyle = avg > 0.67 ? "label-success" : "label-danger";
-                        }
-                        
-                        <tr>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonID</a></td>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
-                            <td><span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
     </div>
 
     <div class="row">
@@ -119,16 +81,12 @@
                 @foreach (var lessonID in Model.Class.Lessons) {
                     string lessonName;
                     if (!Model.LessonNames.TryGetValue(lessonID, out lessonName)) {
-                        lessonName = null;
+                        lessonName = lessonID;
                     }
                     
                     <tr>
                         <th>
-                            <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonID</a>
-                            @if (lessonName != null) {
-                                <br/>
-                                <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a>
-                            }
+                            <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a>
                         </th>
                         
                         @foreach (var userID in Model.Class.Students) {

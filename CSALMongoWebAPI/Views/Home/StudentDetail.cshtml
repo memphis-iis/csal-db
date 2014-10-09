@@ -24,7 +24,6 @@
                 <caption>Lesson Information</caption>
                 <thead>
                     <tr>
-                        <th>Lesson ID</th>
                         <th>Lesson Name</th>
                         <th>Last Activity</th>
                         <th>Times Attempted</th>
@@ -47,7 +46,6 @@
                         string correctStyle = correctRate > 0.67 ? "label-success" : "label-danger";
                         
                         <tr>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonID</a></td>
                             <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
                             <td>@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>

@@ -12,7 +12,6 @@
                 <caption>All Lessons</caption>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Number of students attempted</th>
                         <th>Number of students completed</th>
@@ -45,10 +44,14 @@
                                 correctStyle = avg > 0.67 ? "label-success" : "label-danger";
                             }
                         }
+
+                        var name = lesson.ShortName;
+                        if (String.IsNullOrWhiteSpace(name)) {
+                            name = lesson.LessonID;
+                        }
                         
                         <tr>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@lesson.LessonID</a></td>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@lesson.ShortName</a></td>
+                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@name</a></td>
                             <td>@lesson.StudentsAttempted.Count</td>
                             <td>@lesson.StudentsCompleted.Count</td>
                             <td><span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span></td>

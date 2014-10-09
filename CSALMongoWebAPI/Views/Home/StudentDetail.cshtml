@@ -72,18 +72,19 @@
 @section ScriptFinal {
     <script>
         $(document).ready(function () {
-            $('.apply-data-table').dataTable({
-                "aaSorting": [] //No default sort
-            });
-
-            $(".lesson-link").addClass("hover-restore");
-
+            //Do this before setting up the data table
             $(".pathCell").each(function (idx, ele) {
                 var td = $(ele);
                 var path = td.text();
                 var newPath = CSALCommon.lessonPathMarkup(path);
                 td.html("").append(newPath);
             });
+
+            $('.apply-data-table').dataTable({
+                "aaSorting": [] //No default sort
+            });
+
+            $(".lesson-link").addClass("hover-restore");
         });
     </script>
 }

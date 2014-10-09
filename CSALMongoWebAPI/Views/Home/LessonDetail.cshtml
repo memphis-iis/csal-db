@@ -123,18 +123,19 @@
         var detailTable = null;
 
         $(document).ready(function () {
-            detailTable = $('#DetailTable').dataTable({
-                "order": [[5, "asc"]]
-            });
-
-            $(".student-link").addClass("hover-restore");
-
+            //Do this before setting up the data table
             $(".pathCell").each(function (idx, ele) {
                 var td = $(ele);
                 var path = td.text();
                 var newPath = CSALCommon.lessonPathMarkup(path);
                 td.html("").append(newPath);
             });
+
+            detailTable = $('#DetailTable').dataTable({
+                "order": [[5, "asc"]]
+            });
+
+            $(".student-link").addClass("hover-restore");
 
             $.fn.dataTableExt.afnFiltering.push(
                 function (oSettings, aData, iDataIndex) {

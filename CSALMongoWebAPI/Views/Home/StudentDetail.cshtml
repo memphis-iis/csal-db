@@ -46,8 +46,8 @@
                         string correctStyle = correctRate > 0.67 ? "label-success" : "label-danger";
                         
                         <tr>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
-                            <td>@lesson.LastTurnTime</td>
+                            <td class="nw"><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
+                            <td class="nw">@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>
                                 @lesson.Completions
@@ -56,9 +56,9 @@
                                 }
                             </td>
                             <td><span class="label @correctStyle" style="font-weight:normal;">@String.Format("{0:P0}", correctRate)</span></td>
-                            <td>@RenderHelp.HumanDuration(lesson.TotalDuration())</td>
-                            <td>@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
-                            <td class="pathCell">@lesson.LessonPath()</td>
+                            <td class="nw">@RenderHelp.HumanDuration(lesson.TotalDuration())</td>
+                            <td class="nw">@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
+                            <td class="pathCell nw">@lesson.LessonPath()</td>
                         </tr>                        
                     }
                 </tbody>

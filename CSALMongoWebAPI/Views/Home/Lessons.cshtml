@@ -51,7 +51,7 @@
                         }
                         
                         <tr>
-                            <td><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@name</a></td>
+                            <td class="nw"><a href="~/home/lessondetails/@RenderHelp.URIEncode(lesson.LessonID)" class="lesson-link">@name</a></td>
                             <td>@lesson.StudentsAttempted.Count</td>
                             <td>@lesson.StudentsCompleted.Count</td>
                             <td><span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span></td>

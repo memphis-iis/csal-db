@@ -85,7 +85,7 @@
                     }
                     
                     <tr>
-                        <th>
+                        <th class="nw">
                             <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a>
                         </th>
                         
@@ -104,7 +104,7 @@
                                 showCompleted = turns.LastCompleted();
                             }
 
-                            <td>
+                            <td class="nw">
                                 <span class="@correctStyle" style="font-weight:normal;">@correctRateDisp</span>
                                 @if (showCompleted) {
                                     <span class="glyphicon glyphicon-ok"></span>

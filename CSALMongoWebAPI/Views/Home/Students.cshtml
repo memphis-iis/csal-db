@@ -20,7 +20,7 @@
                     @foreach (var student in Model) {
                         <tr>
                             <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(student.UserID)" class="student-link">@student.UserID</a></td>
-                            <td>@student.LastTurnTime</td>
+                            <td class="nw">@student.LastTurnTime</td>
                         </tr>
                     }
                 </tbody>

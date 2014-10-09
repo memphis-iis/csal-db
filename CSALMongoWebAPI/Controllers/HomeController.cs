@@ -17,8 +17,6 @@ using Newtonsoft.Json.Linq;
 
 //TODO: on class matrix, ditch lesson grid, add class avg to matrix, spark up the student listing
 
-//TODO: check all date columns for nw
-
 //TODO: total time on lesson shouldn't use duration
 
 //TODO: document proper posting from python script

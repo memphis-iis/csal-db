@@ -66,13 +66,21 @@
 
     <div class="row">
         <div class="col-md-12">
+            <style>
+                .matrixCell {
+                    min-width: 32px;
+                    width: auto;
+                }
+            </style>
+
             <table class="table table-condensed" id="classMatrix">
                 <caption>Performance Information</caption>
                 
                 <tr>
-                    <th>&nbsp;</th>
+                    <th class="nw matrixCell"><i>Lesson</i></th>
+                    <th class="nw matrixCell"><i>Class Avg</i></th>
                     @foreach (var userID in Model.Class.Students) {
-                        <th>
+                        <th class="nw matrixCell">
                             <a href="~/home/studentdetails/@RenderHelp.URIEncode(userID)" class="student-link">@userID</a>
                         </th>
                     }
@@ -83,15 +91,30 @@
                     if (!Model.LessonNames.TryGetValue(lessonID, out lessonName)) {
                         lessonName = lessonID;
                     }
+
+                    string correctDisp = "";
+                    string correctStyle = "";
+
+                    Tuple<int, int> tots = Model.LessonCounts[lessonID];
+                    if (tots.Item1 > 0 || tots.Item2 > 0) {
+                        double all = tots.Item1 + tots.Item2;
+                        double avg = (double)tots.Item1 / all;
+                        correctDisp = String.Format("{0:P0}", avg);
+                        correctStyle = avg > 0.67 ? "label-success" : "label-danger";
+                    }
                     
                     <tr>
                         <th class="nw">
                             <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a>
                         </th>
+
+                        <th class="nw">
+                            <span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span>
+                        </th>
                         
                         @foreach (var userID in Model.Class.Students) {
                             string correctRateDisp = "";
-                            string correctStyle = "";
+                            string correctRateStyle = "";
                             bool showCompleted = false;
                                                 
                             var key = new Tuple<string, string>(lessonID, userID);
@@ -100,12 +123,12 @@
                             if (Model.LUTurns.TryGetValue(key, out turns)) {
                                 double correctRate = turns.CorrectAnswerRate();
                                 correctRateDisp = String.Format("{0:P0}", correctRate);
-                                correctStyle = correctRate > 0.67 ? "label label-success" : "label label-danger";
+                                correctRateStyle = correctRate > 0.67 ? "label label-success" : "label label-danger";
                                 showCompleted = turns.LastCompleted();
                             }
 
                             <td class="nw">
-                                <span class="@correctStyle" style="font-weight:normal;">@correctRateDisp</span>
+                                <span class="@correctRateStyle" style="font-weight:normal;">@correctRateDisp</span>
                                 @if (showCompleted) {
                                     <span class="glyphicon glyphicon-ok"></span>
                                 }

@@ -15,7 +15,8 @@ using CSALMongo.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: on class matrix, ditch lesson grid, add class avg to matrix, spark up the student listing
+//TODO: on class matrix, spark up the student listing
+//TODO: on class matrix, any resp rate should have a tooltip
 
 //TODO: total time on lesson shouldn't use duration
 

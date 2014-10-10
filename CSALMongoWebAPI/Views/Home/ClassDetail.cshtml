@@ -34,11 +34,12 @@
     <div class="row">        
         <div class="col-md-12">
             <h3>Students</h3>
-            <table class="table table-condensed table-striped">
+            <table class="table table-condensed">
                 <thead>
                     <tr>
                         <th>SubjID</th>
                         <th class="nw">Lesson Avg</th>
+                        <th class="nw">Lesson Performance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,10 +54,32 @@
                             correctDisp = String.Format("{0:P0}", avg);
                             correctStyle = avg > 0.67 ? "label-success" : "label-danger";
                         }
+
+                        var scores = new List<string>();
+                        foreach (string lessonID in Model.Class.Lessons) {
+                            var lukey = new Tuple<string, string>(lessonID, userID);
+                            string score = "0.0";
+                            StudentLessonActs turns;
+                            if (Model.LUTurns.TryGetValue(lukey, out turns)) {
+                                if (turns.CorrectAnswers + turns.IncorrectAnswers > 0) {
+                                    //We have a rate - we center it at 0.67 and scale it for display
+                                    double rate = turns.CorrectAnswerRate();
+                                    if (rate > 0.67) {
+                                        rate = ((rate - 0.67) / 0.33) * 100.0;
+                                    }
+                                    else {
+                                        rate = -(rate / 0.67) * 100.0;
+                                    }
+                                    score = rate.ToString();
+                                }
+                            }
+                            scores.Add(score);
+                        }
                         
                         <tr>
                             <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(userID)" class="student-link">@userID</a></td>
                             <td><span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span></td>
+                            <td><span class="studentSparkLine"> @String.Join(",", scores)</span></td>
                         </tr>
                     }
                 </tbody>
@@ -73,9 +96,11 @@
                 }
             </style>
 
+            <hr/>
+
+            <h3>Lesson Breakdown</h3>
+
             <table class="table table-condensed" id="classMatrix">
-                <caption>Performance Information</caption>
-                
                 <tr>
                     <th class="nw matrixCell"><i>Lesson</i></th>
                     <th class="nw matrixCell"><i>Class Avg</i></th>
@@ -127,7 +152,7 @@
                                 showCompleted = turns.LastCompleted();
                             }
 
-                            <td class="nw">
+                            <td class="nw border1">
                                 <span class="@correctRateStyle" style="font-weight:normal;">@correctRateDisp</span>
                                 @if (showCompleted) {
                                     <span class="glyphicon glyphicon-ok"></span>
@@ -142,12 +167,25 @@
 </div> <!-- /container -->
 
 @section ScriptFinal {
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js" type="text/javascript"></script>
 <script>
     $(document).ready(function () {
         $(".student-link").addClass("hover-restore");
         $(".lesson-link").addClass("hover-restore");
-        $("#classMatrix th").addClass("nw").addClass("border1");
-        $("#classMatrix td").addClass("nw").addClass("border1");
+
+        $(".studentSparkLine").sparkline("html", {
+            type: "bar",
+            height: "38px",
+            chartRangeMin: -101.0,
+            chartRangeMax: 101.0,
+            barColor: "#93c54b",
+            negBarColor: "#d9534f",
+            zeroColor: "#000000",
+            barWidth: 20,
+            barSpacing: 4,
+            zeroAxis: true,
+            disableTooltips: true
+        });
     });
 </script>
 }

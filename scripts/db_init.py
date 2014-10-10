@@ -9,14 +9,14 @@ endpoint to target.  Some examples:
 
     To target the local dev workstation:
     ./db_init.py http://localhost:62702/api
-    
+
     To target the "prod" server:
     ./db_init.py http://autotutor.x-in-y.com/csaldb/api
-    
+
 NOTE: classes, lessons, and students are read first and then updated with
 current data so untouched fields will remain the same for already-populated
-objects    
-    
+objects
+
 NOTE: that we assume that all students are in all lessons and all lessons
 are in all classes.  AS A RESULT, you should probably run this script once
 per class and modify the data between classes.  Of course, A FAR BETTER
@@ -77,18 +77,18 @@ STUDENTS = [
 ]
 
 def do_get(url):
-    #Actual post
+    #Actual get (read)
     req = urllib2.Request(url)
     resptxt = urllib2.urlopen(req).read()
     if not resptxt:
         return None #Nothing found
     return json.loads(resptxt)
 
-def do_post(url, data):   
-    #Actual post
+def do_post(url, data):
+    #Actual post (write)
     req = urllib2.Request(
-        url, 
-        json.dumps(data), 
+        url,
+        json.dumps(data),
         {'Content-Type': 'application/json'}
     )
     resptxt = urllib2.urlopen(req).read()
@@ -103,7 +103,7 @@ def list_merge(lst1, lst2):
 def one_class(base, cls, lessons, students):
     loc, clsid, teacher, meet = cls
     url = "%s/classes/%s" % (base, clsid)
-    
+
     data = do_get(url)
     if data:
         print "Update Class %s" % clsid
@@ -121,13 +121,13 @@ def one_class(base, cls, lessons, students):
     data["MeetingTime"] = meet
     data["Students"] = list_merge(data["Students"], students)
     data["Lessons"] = list_merge(data["Lessons"], lessons)
-    
+
     do_post(url, data)
 
 def one_lesson(base, lesson, students):
     lid, shortname = lesson
     url = "%s/lessons/%s" % (base, lid)
-    
+
     data = do_get(url)
     if data:
         print "Update Lesson %s" % lid
@@ -146,13 +146,13 @@ def one_lesson(base, lesson, students):
 
     data["ShortName"] = shortname
     data["Students"] = list_merge(data["Students"], students)
-    
+
     do_post(url, data)
-    
+
 def one_student(base, student):
     sid, first, last = student
     url = "%s/students/%s" % (base, sid)
-    
+
     data = do_get(url)
     if data:
         print "Update Student %s" % sid
@@ -166,30 +166,30 @@ def one_student(base, student):
 
     data["FirstName"] = first
     data["LastName"] = last
-    
+
     do_post(url, data)
 
 def main():
     args = sys.argv[1:]
-    
+
     if len(args) != 1:
         return usage()
-    
+
     base = args[0]
     print "Using API base: %s" % base
-    
+
     global CLASSES, LESSONS, STUDENTS
-    
+
     for s in STUDENTS:
         one_student(base, s)
-    
+
     ss = [s[0] for s in STUDENTS]
-    
+
     for l in LESSONS:
         one_lesson(base, l, ss)
-    
+
     ll = [l[0] for l in LESSONS]
-    
+
     for c in CLASSES:
         one_class(base, c, ll, ss)
 

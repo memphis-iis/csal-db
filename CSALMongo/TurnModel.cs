@@ -19,6 +19,29 @@ namespace CSALMongo.TurnModel {
         public string ErrorMessage { get; set; }
         public string WarningMessage { get; set; }
         public double DBTimestamp { get; set; }
+
+        /// <summary>
+        /// The list of all actions in this conv log - and insure every member and property are non-null
+        /// </summary>
+        /// <returns></returns>
+        public List<ActionLog> AllValidActions() {
+            var ret = new List<ActionLog>();
+
+            if (Transitions != null && Transitions.Count > 0) {
+                foreach (var tran in Transitions) {
+                    if (tran.Actions != null && tran.Actions.Count > 0) {
+                        foreach (var act in tran.Actions) {
+                            if (act.Act == null) act.Act = "";
+                            if (act.Agent == null) act.Agent = "";
+                            if (act.Data == null) act.Data = "";
+                            ret.Add(act);
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
     }
 
     public class TransitionLog {

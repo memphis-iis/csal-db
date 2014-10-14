@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Dynamic;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Routing;
 
 namespace CSALMongoWebAPI.Util {
     /// <summary>
@@ -63,6 +65,19 @@ namespace CSALMongoWebAPI.Util {
             }
 
             return String.Format("{0:N0} {1}", Math.Floor(dur), units);
+        }
+
+        /// <summary>
+        /// Used for changing anonymous/dynamic objects into expando objects for MVC Razor
+        /// </summary>
+        /// <param name="anonymousObject"></param>
+        /// <returns></returns>
+        public static ExpandoObject ToExpando(object anonymousObject) {
+            IDictionary<string, object> anonymousDictionary = new RouteValueDictionary(anonymousObject);
+            IDictionary<string, object> expando = new ExpandoObject();
+            foreach (var item in anonymousDictionary)
+                expando.Add(item);
+            return (ExpandoObject)expando;
         }
     }
 }

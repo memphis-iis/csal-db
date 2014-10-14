@@ -1,0 +1,63 @@
+﻿@using CSALMongo.Model
+@using CSALMongoWebAPI.Util
+
+@{
+    ViewBag.Title = Model.UserID + " in " + Model.LessonName;
+}
+
+
+<style>
+    .logEntry {
+        border-bottom: 1px solid #777;
+        padding: 6px;
+    }
+    .logEntry .label {
+        font-weight: normal;
+        font-size: 90%;
+    }
+    .logEntry .answer {
+    }
+</style>
+
+
+<!-- MAIN CONTENT -->
+<div class="container-fluid">
+    <div class="row">        
+        <div class="col-md-12">
+            @foreach (var dl in Model.DetailLog) {
+                <div class="logEntry">
+                    @if (dl.Tag == "Attempt") {
+                        <span class="label label-primary">@dl.Descrip</span>
+                    }
+                    else if (dl.Tag == "Answer") {
+                        if (dl.Descrip == "CORRECT") {
+                            <span class="label label-success">@dl.Descrip</span>
+                        }
+                        else {
+                            <span class="label label-danger">@dl.Descrip</span>
+                        }
+                        <div class="answer">@dl.Extra</div>
+                    }
+                    else if (dl.Tag == "PathChange") {
+                        <span class="label label-primary">PATH CHANGED @dl.Descrip</span>
+                    }
+                    else if (dl.Tag == "Completion") {
+                        <span class="label label-primary"><span class="glyphicon glyphicon-ok"></span> @dl.Descrip</span>
+                    }
+                    else {
+                        @dl.Descrip
+                        <span>???</span>
+                        @dl.Extra
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div> <!-- /container -->
+
+@section ScriptFinal {
+<script>
+    $(document).ready(function () {
+    });
+</script>
+}

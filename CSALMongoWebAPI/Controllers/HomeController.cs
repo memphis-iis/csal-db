@@ -7,6 +7,7 @@ using System.Dynamic;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 using System.Diagnostics;
 
@@ -430,6 +431,126 @@ namespace CSALMongoWebAPI.Controllers {
                 }
             }
             return allowedLessons;
+        }
+
+        public ActionResult StudentLessonDrill(string id, string id2) {
+            if (NeedLogin()) {
+                return LoginRedir();
+            }
+
+            string lessonID = id;
+            string userID = id2;
+
+            if (!IsAdmin()) {
+                if (!AllowedLessons(CurrentUserEmail()).Contains(lessonID)) {
+                    return RedirectToAction("Lessons");
+                }
+            }
+
+            var lesson = LessonsCtrl.Get(lessonID);
+            if (lesson == null) {
+                return RedirectToAction("Lessons");
+            }
+
+            var student = StudentsCtrl.Get(userID);
+            if (student == null) {
+                return RedirectToAction("Students");
+            }
+
+            var turns = StudentsCtrl.DBConn().FindTurns(lessonID, userID);
+            var detailLog = new List<dynamic>();
+
+            if (turns == null || turns.Count < 1 || turns[0].Turns == null || turns[0].Turns.Count < 1) {
+                detailLog.Add(new { Descrip="No information", Tag="", Extra="" });
+            }
+            else {
+                var details = turns[0];
+                string lastQuestion = "???";
+                string lastDiff = "M";
+
+                foreach (var turn in details.Turns) {
+                    if (turn.TurnID == 0) {
+                        detailLog.Add(new { Descrip = "Start of Lesson Attempt", Tag = "Attempt", Extra = "" });
+                    }
+
+                    bool completion = false;
+
+                    foreach (var act in turn.AllValidActions()) {
+                        if (String.Equals(act.Agent, "System", IC)) {
+                            if (String.Equals(act.Act, "Display", IC) && !String.IsNullOrWhiteSpace(act.Data)) {
+                                lastQuestion = act.Data;
+                            }
+
+                            if (String.Equals(act.Act, "End", IC)) {
+                                completion = true;
+                            }
+                        }
+                    }
+
+                    string evt = null;
+                    bool correct = false;
+                    bool incorrect = false;
+
+                    if (turn.Input != null) {
+                        evt = turn.Input.Event;
+                        if (evt != null) {
+                            evt = evt.Trim().ToLowerInvariant();
+                            if (evt == "correct") {
+                                correct = true;
+                            }
+                            else if (evt.StartsWith("incorrect")) {
+                                incorrect = true;
+                            }
+                        }
+                    }
+
+                    if (correct) {
+                        detailLog.Add(new { Descrip = "CORRECT", Tag = "Answer", Extra = lastQuestion });
+                    }
+                    else if (incorrect) {
+                        detailLog.Add(new { Descrip = "MISS", Tag = "Answer", Extra = lastQuestion });
+                    }
+
+                    if (turn.Transitions != null && turn.Transitions.Count > 0) {
+                        foreach (var tran in turn.Transitions) {
+                            string ruleID = tran.RuleID;
+                            if (String.IsNullOrWhiteSpace(ruleID))
+                                continue;
+                            ruleID = ruleID.Trim().ToLowerInvariant();
+
+                            //lastDiff
+                            string newState = null;
+
+                            if (ruleID.EndsWith("easy")) newState = "E";
+                            else if (ruleID.EndsWith("medium")) newState = "M";
+                            else if (ruleID.EndsWith("hard")) newState = "H";
+
+                            if (newState != null && newState != lastDiff) {
+                                detailLog.Add(new { Descrip = lastDiff + " to " + newState, Tag = "PathChange", Extra = "" });
+                                lastDiff = newState;
+                            }
+                        }
+                    }
+
+                    if (completion) {
+                        detailLog.Add(new { Descrip = "Completed Lesson", Tag = "Completion", Extra = "" });
+                    }
+                }
+            }
+            
+            
+
+            var modelObj = new ExpandoObject();
+            var modelDict = (IDictionary<string, object>)modelObj;
+            modelDict["ID"] = id;
+            modelDict["ID2"] = id2;
+            modelDict["LessonID"] = lessonID;
+            modelDict["LessonName"] = lesson.ShortName;
+            modelDict["UserID"] = userID;
+            //Can't use our anonymous objects, so use expando's
+            modelDict["DetailLog"] = detailLog.Select(x => Util.RenderHelp.ToExpando(x)).ToList();
+
+            return View("StudentLessonDrill", modelObj);
         }
 
         public ActionResult Lessons() {

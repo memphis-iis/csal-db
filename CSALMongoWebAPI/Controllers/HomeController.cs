@@ -16,18 +16,13 @@ using CSALMongo.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: some kind of drill down
-
 //TODO: on class matrix, any resp rate should have a tooltip
 
 //TODO: total time on lesson shouldn't use duration
 
-//TODO: document proper posting from python script
+//TODO: incorporate latest meeting notes into TODO's
 
-//TODO: For any (lesson,student) tuple, we need list of questions with
-//      correct, correct 2 tries, incorrect. Use for the Andrew Graph,
-//      questions vexing many students, etc, etc.  See above for question
-//      location
+//TODO: document proper posting from python script
 
 //TODO: logging of actions, esp login, queries, and errors?
 

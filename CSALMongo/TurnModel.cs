@@ -20,6 +20,10 @@ namespace CSALMongo.TurnModel {
         public string WarningMessage { get; set; }
         public double DBTimestamp { get; set; }
 
+        public DateTime DBDateTime() {
+            return new DateTime(EPOCH_YR, 1, 1).AddSeconds(DBTimestamp);
+        }
+
         /// <summary>
         /// The list of all actions in this conv log - and insure every member and property are non-null
         /// </summary>

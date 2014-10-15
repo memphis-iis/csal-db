@@ -1,0 +1,89 @@
+﻿@using CSALMongo.Model
+@using CSALMongoWebAPI.Util
+
+@{
+    ViewBag.Title = Model.UserID + " in " + Model.LessonName;
+}
+
+
+<style>
+    .scrollable {
+        overflow: scroll;
+    }
+</style>
+
+<!-- MAIN CONTENT -->
+<div class="container-fluid">
+    <div class="row">        
+        <div class="col-md-4">
+            <div class="scrollable">
+                <h3>All Turns</h3>
+                @{int index = 0;}
+                <table class="table table-condensed">
+                    <tr>
+                        <th>Turn ID</th>
+                        <th>Event</th>
+                        <th>DB Recv</th>
+                    </tr>
+                    @foreach (var turn in Model.Details.Turns) {
+                        string evt = "???";
+                        if (turn.Input != null && !String.IsNullOrWhiteSpace(turn.Input.Event)) {
+                            evt = turn.Input.Event;
+                        }
+
+                        <tr>
+                            <td class="nw">
+                                <button type="button" class="btn btn-primary btn-sm turn-click" data-turnindex="@index" style="width:6em;">
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                    @turn.TurnID
+                                </button>
+                            </td>
+                            <td class="nw">@evt</td>
+                            <td class="nw">@turn.DBDateTime()</td>
+                        </tr>
+
+                        index++;
+                    }
+                </table>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="scrollable">
+                <h3>Turn Details</h3>
+                <div id="turn-details"></div>
+            </div>
+        </div>
+    </div>
+</div> <!-- /container -->
+
+@section ScriptFinal {
+<script>
+    var turnDetails = @Html.Raw(Json.Encode(Model.Details.Turns))
+</script>
+
+<script>
+    function fixScrollableHeight() {
+        var window_height = $(window).height(),
+        content_height = window_height - 200;
+        $(".scrollable").height(content_height);
+    }
+
+    $(document).ready(function () {
+        fixScrollableHeight();
+
+        $(".turn-click").click(function(evt){
+            evt.preventDefault();
+
+            var index = $(this).data("turnindex");
+            $("#turn-details").html("").append(
+                $("<pre></pre>").html(JSON.stringify(turnDetails[index], null, '  '))
+            );
+        });
+    });
+
+    $(window).resize(function() {
+        fixScrollableHeight();
+    });
+</script>
+}

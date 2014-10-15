@@ -16,13 +16,24 @@ using CSALMongo.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: on class matrix, any resp rate should have a tooltip
+//TODO: on class matrix and drilldown, any resp rate should have a tooltip and all graph nodes
+//TODO: need links for drilldown
+//TODO: need link/selection for dev view
+
+//TODO: which reading assignment did they use:
+//      - need /api/reading endpoint - post will accept userID, targetURL, and timestamp
+//      - add given info to student object (so update turn posting and check db_init.py)
+//      - update student detail screen
+
+//TODO: all metrics are last attempt - verify code, change UI/titles to make clear
 
 //TODO: total time on lesson shouldn't use duration
 
-//TODO: incorporate latest meeting notes into TODO's
-
-//TODO: document proper posting from python script
+//TODO: documentation:
+//      - document proper posting from python script
+//      - intro docs with use cases and some diagrams for the various levels/projects in the solutiuon
+//      - finished xmldoc compiled and added to docs dir
+//      - readme for doc generation in doc dir
 
 //TODO: logging of actions, esp login, queries, and errors?
 
@@ -546,6 +557,47 @@ namespace CSALMongoWebAPI.Controllers {
             modelDict["DetailLog"] = detailLog.Select(x => Util.RenderHelp.ToExpando(x)).ToList();
 
             return View("StudentLessonDrill", modelObj);
+        }
+
+        public ActionResult StudentLessonDevView(string id, string id2) {
+            if (NeedLogin()) {
+                return LoginRedir();
+            }
+
+            string lessonID = id;
+            string userID = id2;
+
+            if (!IsAdmin()) {
+                if (!AllowedLessons(CurrentUserEmail()).Contains(lessonID)) {
+                    return RedirectToAction("Lessons");
+                }
+            }
+
+            var lesson = LessonsCtrl.Get(lessonID);
+            if (lesson == null) {
+                return RedirectToAction("Lessons");
+            }
+
+            var student = StudentsCtrl.Get(userID);
+            if (student == null) {
+                return RedirectToAction("Students");
+            }
+
+            var turns = StudentsCtrl.DBConn().FindTurns(lessonID, userID);
+            if (turns == null || turns.Count < 1) {
+                return RedirectToAction("Students");
+            }
+
+            var modelObj = new ExpandoObject();
+            var modelDict = (IDictionary<string, object>)modelObj;
+            modelDict["ID"] = id;
+            modelDict["ID2"] = id2;
+            modelDict["LessonID"] = lessonID;
+            modelDict["LessonName"] = lesson.ShortName;
+            modelDict["UserID"] = userID;
+            modelDict["Details"] = turns[0];
+
+            return View("StudentLessonDevView", modelObj);
         }
 
         public ActionResult Lessons() {

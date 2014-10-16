@@ -16,7 +16,7 @@
 <div class="container-fluid">
     <div class="row">        
         <div class="col-md-4">
-            <div class="scrollable">
+            <div id="scrollable-selection" class="scrollable">
                 <h3>All Turns</h3>
                 @{int index = 0;}
                 <table class="table table-condensed">
@@ -33,7 +33,7 @@
 
                         <tr>
                             <td class="nw">
-                                <button type="button" class="btn btn-primary btn-sm turn-click" data-turnindex="@index" style="width:6em;">
+                                <button type="button" class="btn btn-default btn-sm turn-click" data-turnindex="@index" style="width:6em;">
                                     <span class="glyphicon glyphicon-eye-open"></span>
                                     @turn.TurnID
                                 </button>
@@ -50,7 +50,19 @@
         
         <div class="col-md-8">
             <div class="scrollable">
-                <h3>Turn Details</h3>
+                <div>
+                    <h3>
+                        Turn Details
+                        <button type="button" id="nav-prev" class="btn btn-primary btn-sm nav-button" data-turnindex="" style="width:6em;">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                            Prev
+                        </button>
+                        <button type="button" id="nav-next" class="btn btn-primary btn-sm nav-button" data-turnindex="" style="width:6em;">
+                            Next
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </button>
+                    </h3>
+                </div>
                 <div id="turn-details"></div>
             </div>
         </div>
@@ -63,10 +75,79 @@
 </script>
 
 <script>
+    var TURN_COUNT = @Model.Details.Turns.Count
+</script>    
+
+<script>
     function fixScrollableHeight() {
         var window_height = $(window).height(),
         content_height = window_height - 200;
         $(".scrollable").height(content_height);
+    }
+
+    function getInt(s, def) {
+        var i;
+        try {
+            i = parseInt(s);
+            if (isNaN(i))
+                i = def;
+        }
+        catch(e) {
+            i = def;
+        }
+
+        return i;
+    }
+
+    function detailSelect(newIndex) {
+        newIndex = getInt(newIndex, -1);
+
+        $(".nav-button")
+            .prop("disabled", true)
+            .addClass("disabled")
+            .data("turnindex", 0);
+
+        var setNavButton = function (selector, navindex) {
+            $(selector)
+                .prop("disabled", false)
+                .removeClass("disabled")
+                .data("turnindex", navindex);
+        }
+
+        var prevIndex = newIndex - 1;
+        if (prevIndex >= 0) {
+            setNavButton("#nav-prev", prevIndex);
+        }
+
+        var nextIndex = newIndex + 1;
+        if (nextIndex < TURN_COUNT) {
+            setNavButton("#nav-next", nextIndex);
+        }
+
+        $(".turn-click").each(function (idx, ele) {
+            var index = getInt($(ele).data("turnindex"), -2);
+
+            if (index === newIndex) {
+                $(ele)
+                    .addClass("btn-success")
+                    .addClass("active")
+                    .removeClass("btn-default")
+                    .scrollintoview();
+            }
+            else {
+                $(ele)
+                    .removeClass("btn-success")
+                    .removeClass("active")
+                    .addClass("btn-default");
+            }
+        });
+
+        var data = $("<pre></pre>");
+        if (newIndex >= 0) {
+            data.html(JSON.stringify(turnDetails[newIndex], null, '  '));
+        }
+
+        $("#turn-details").html("").append(data);
     }
 
     $(document).ready(function () {
@@ -74,16 +155,19 @@
 
         $(".turn-click").click(function(evt){
             evt.preventDefault();
-
-            var index = $(this).data("turnindex");
-            $("#turn-details").html("").append(
-                $("<pre></pre>").html(JSON.stringify(turnDetails[index], null, '  '))
-            );
+            detailSelect($(this).data("turnindex"));
         });
+
+        $(".nav-button").click(function(evt){
+            evt.preventDefault();
+            detailSelect($(this).data("turnindex"));
+        });
+
+        detailSelect(0);
     });
 
     $(window).resize(function() {
-        fixScrollableHeight();
+        fixScrollableHeight($("#scrollable-selection"));
     });
 </script>
 }

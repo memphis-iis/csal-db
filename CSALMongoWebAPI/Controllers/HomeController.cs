@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 
 //TODO: on class matrix and drilldown, any resp rate should have a tooltip and all graph nodes
 //TODO: need links for drilldown
+//TODO: drilldown should include datetime
 //TODO: need link/selection for dev view
 
 //TODO: which reading assignment did they use:
@@ -28,6 +29,8 @@ using Newtonsoft.Json.Linq;
 //TODO: all metrics are last attempt - verify code, change UI/titles to make clear
 
 //TODO: total time on lesson shouldn't use duration
+
+//TODO: coverage
 
 //TODO: documentation:
 //      - document proper posting from python script
@@ -373,7 +376,7 @@ namespace CSALMongoWebAPI.Controllers {
             //Make dictionary of lesson:user 
             var lookup = new Dictionary<Tuple<string, string>, StudentLessonActs>();
             if (lessons.Count > 0 && students.Count > 0) {
-                foreach (var turns in LessonsCtrl.DBConn().FindTurns(null, null)) {
+                foreach (var turns in LessonsCtrl.DBConn().FindTurnsForStudents(students)) {
                     if (!students.Contains(turns.UserID) || !lessons.Contains(turns.LessonID)) {
                         continue; //Nope
                     }
@@ -444,8 +447,8 @@ namespace CSALMongoWebAPI.Controllers {
                 return LoginRedir();
             }
 
-            string lessonID = id;
-            string userID = id2;
+            string lessonID = Util.RenderHelp.URIDecode(id);
+            string userID = Util.RenderHelp.URIDecode(id2);
 
             if (!IsAdmin()) {
                 if (!AllowedLessons(CurrentUserEmail()).Contains(lessonID)) {
@@ -543,8 +546,6 @@ namespace CSALMongoWebAPI.Controllers {
                     }
                 }
             }
-            
-            
 
             var modelObj = new ExpandoObject();
             var modelDict = (IDictionary<string, object>)modelObj;
@@ -559,33 +560,58 @@ namespace CSALMongoWebAPI.Controllers {
             return View("StudentLessonDrill", modelObj);
         }
 
+        public ActionResult StudentLessonDevSelect() {
+            if (NeedLogin()) {
+                return LoginRedir();
+            }
+            if (!IsAdmin()) {
+                return RedirectToAction("Lessons");
+            }
+
+            var turns = new List<ExpandoObject>();
+            
+            foreach (var turn in LessonsCtrl.DBConn().FindTurnSummary()) {
+                turns.Add(new ExpandoObject());
+                var turnDict = (IDictionary<string, object>)turns.Last();
+                turnDict["LessonID"] = turn.Item1;
+                turnDict["UserID"] = turn.Item2;
+                turnDict["TurnCount"] = turn.Item3;
+            }
+
+            var modelObj = new ExpandoObject();
+            var modelDict = (IDictionary<string, object>)modelObj;
+            modelDict["Turns"] = turns;
+
+            return View("StudentLessonDevSelect", modelObj);
+        }
+
         public ActionResult StudentLessonDevView(string id, string id2) {
             if (NeedLogin()) {
                 return LoginRedir();
             }
 
-            string lessonID = id;
-            string userID = id2;
+            string lessonID = Util.RenderHelp.URIDecode(id);
+            string userID = Util.RenderHelp.URIDecode(id2);
 
             if (!IsAdmin()) {
                 if (!AllowedLessons(CurrentUserEmail()).Contains(lessonID)) {
-                    return RedirectToAction("Lessons");
+                    return RedirectToAction("StudentLessonDevSelect");
                 }
             }
 
             var lesson = LessonsCtrl.Get(lessonID);
             if (lesson == null) {
-                return RedirectToAction("Lessons");
+                return RedirectToAction("StudentLessonDevSelect");
             }
 
             var student = StudentsCtrl.Get(userID);
             if (student == null) {
-                return RedirectToAction("Students");
+                return RedirectToAction("StudentLessonDevSelect");
             }
 
             var turns = StudentsCtrl.DBConn().FindTurns(lessonID, userID);
             if (turns == null || turns.Count < 1) {
-                return RedirectToAction("Students");
+                return RedirectToAction("StudentLessonDevSelect");
             }
 
             var modelObj = new ExpandoObject();

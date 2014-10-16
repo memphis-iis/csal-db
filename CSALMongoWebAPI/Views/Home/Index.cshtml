@@ -9,12 +9,29 @@
 
             <p>Please use one of the links at the top of the page to choose
             a view.</p>
+
+            @{
+                var isAdmin = false;
+                object checkAdmin = HttpContext.Current.Session["IsAdmin"];
+                if (checkAdmin != null) {
+                    isAdmin = (bool)checkAdmin;
+                }
+            }
+
+            @if (isAdmin) {
+                <p>
+                    See actual turn data by selecting a Lesson/User 
+                    <a href="~/home/StudentLessonDevSelect">here</a>
+                </p>
+            }
         </div>
         <div class="col-md-6">
             &nbsp;
         </div>
     </div>
 </div> <!-- /container -->
+
+
 
 @section ScriptFinal {
 <script>

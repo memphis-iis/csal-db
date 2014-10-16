@@ -467,21 +467,16 @@ namespace CSALMongo {
                 }
             }
 
-            var students = new List<Model.Student>();
             if (studentKeys.Count < 1)
-                return students;
+                return new List<Model.Student>();
 
             var studentsFound =
                 from std in mongoDatabase.GetCollection(STUDENT_COLLECTION).AsQueryable<Model.Student>()
                 where studentKeys.Contains(std.Id)
                 select std;
 
-            foreach (var student in studentsFound) {
-                students.Add(student);
-            }
-
-            students.Sort();
-            return students;
+            //Order after as enum since MongoDB driver doesn't really support orderby
+            return studentsFound.AsEnumerable().OrderBy(x => x).ToList();
         }
 
         /// <summary>
@@ -549,6 +544,64 @@ namespace CSALMongo {
 
             found.Sort();
             return found;
+        }
+
+        /// <summary>
+        /// Return all StudentLessonActs instances that match any of the students given
+        /// </summary>
+        /// <param name="studentIDs">Non-null enumerable list of user (student) ID's</param>
+        /// <returns>List of StudentLessonActs instances</returns>
+        public List<Model.StudentLessonActs> FindTurnsForStudents(IEnumerable<string> studentIDs) {
+            var students = new HashSet<string>(studentIDs);
+            if (students.Count < 1)
+                return new List<Model.StudentLessonActs>();
+
+            var turnsFound =
+                from act in mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION).AsQueryable<Model.StudentLessonActs>()
+                where students.Contains(act.UserID)
+                select act;
+
+            //Order after as enum since MongoDB driver doesn't really support orderby
+            return turnsFound.AsEnumerable().OrderBy(x => x).ToList();
+        }
+
+        /// <summary>
+        /// Really only for dev view - return a tuple for each StudentLessonActs
+        /// instance defined as (LessonID, UserID, TurnCount)
+        /// </summary>
+        /// <returns>List of tuples</returns>
+        public List<Tuple<string, string, int>> FindTurnSummary() {
+            var collect = mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION);
+            var results = collect.FindAllAs<BsonDocument>()
+                .SetFields(Fields
+                    .Include("LessonID")
+                    .Include("UserID")
+                    .Include("TurnCount"));
+
+            var ret = new List<Tuple<string, string, int>>();
+
+            foreach(var one in results) {
+                BsonValue lessonID;
+                BsonValue userID;
+                BsonValue turnCount;
+
+                if (!one.TryGetValue("LessonID", out lessonID) || !lessonID.IsString)
+                    lessonID = new BsonString("???");
+
+                if (!one.TryGetValue("UserID", out userID) || !userID.IsString)
+                    userID = new BsonString("???");
+
+                if (!one.TryGetValue("TurnCount", out turnCount) || !turnCount.IsNumeric)
+                    turnCount = new BsonInt32(0);
+
+                ret.Add(new Tuple<string, string, int>(
+                    lessonID.AsString, 
+                    userID.AsString, 
+                    turnCount.AsInt32));
+            }
+
+            ret.Sort();
+            return ret;
         }
 
         /// <summary>

@@ -11,7 +11,7 @@
             @{
                 var completedCount = 0;
                 foreach (var lesson in Model.Turns) {
-                    if (lesson.Attempts > 0 && lesson.Completions >= lesson.Attempts) {
+                    if (lesson.LastCompleted()) {
                         completedCount++;
                     }
                 }

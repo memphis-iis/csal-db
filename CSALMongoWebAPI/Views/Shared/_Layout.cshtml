@@ -40,6 +40,12 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
                 @Html.ActionLink("CSAL Teachers' View", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
 
@@ -52,7 +58,7 @@
                 string classActive = action.Contains("class") ? "active" : "";
                 string materialsActive = action.Contains("materials") ? "active" : "";
             }
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse" id="main-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li class="@lessonActive">@Html.ActionLink("Lessons", "Lessons", "Home", new { area = "" }, null)</li>
                     <li class="@classActive">@Html.ActionLink("Classes", "Classes", "Home", new { area = "" }, null)</li>
@@ -97,7 +103,8 @@
     <script src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js" type="text/javascript"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="~/Views/Home/CSALCommon.js" type="text/javascript"></script>
-
+    <script src="~/Views/Home/jquery.scrollintoview.min.js" type="text/javascript"></script>
+    
     <!-- Progress Dialog for CSALCommon -->
     <div class="well well-lg" style="display:none; border:solid 2px #000; margin-top: 6px; position:fixed; top:10%; left:5%; width:auto;" id="progressDialog">
         <img class="pull-left" style="vertical-align:middle;" src="~/Views/Home/ajax-loader.gif">

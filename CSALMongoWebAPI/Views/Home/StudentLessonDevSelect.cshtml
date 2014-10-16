@@ -1,0 +1,53 @@
+﻿@using CSALMongo.Model
+@using CSALMongoWebAPI.Util
+
+@{
+    ViewBag.Title = "Select Turns To View";
+}
+
+
+<!-- MAIN CONTENT -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-condensed table-striped apply-data-table">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Lesson</th>
+                        <th>Student</th>
+                        <th>Turns</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var turn in Model.Turns) {
+                        var lesUrl = RenderHelp.URIEncode(turn.LessonID);
+                        var usrUrl = RenderHelp.URIEncode(turn.UserID);
+
+                        <tr>
+                            <td class="nw">
+                                <a href="~/home/studentlessondevview/@lesUrl/@usrUrl" class="btn btn-primary btn-sm det-link">
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                </a>
+                            </td>
+                            <td class="nw">@turn.LessonID</td>
+                            <td class="nw">@turn.UserID</td>
+                            <td class="nw">@turn.TurnCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> <!-- /container -->
+
+@section ScriptFinal {
+<script>
+    $(document).ready(function () {
+        $('.apply-data-table').dataTable({
+            "aaSorting": [] //No default sort
+        });
+        $(".det-link").addClass("hover-restore");
+    });
+</script>
+}

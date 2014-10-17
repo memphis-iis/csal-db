@@ -12,13 +12,13 @@ using System.Web.Routing;
 using System.Diagnostics;
 
 using CSALMongo.Model;
+using CSALMongo.TurnModel;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 //TODO: on class matrix and drilldown, any resp rate should have a tooltip and all graph nodes
 //TODO: need links for drilldown
-//TODO: drilldown should include datetime
 //TODO: need link/selection for dev view
 
 //TODO: which reading assignment did they use:
@@ -467,10 +467,10 @@ namespace CSALMongoWebAPI.Controllers {
             }
 
             var turns = StudentsCtrl.DBConn().FindTurns(lessonID, userID);
-            var detailLog = new List<dynamic>();
+            var detailLog = new List<ExpandoObject>();
 
             if (turns == null || turns.Count < 1 || turns[0].Turns == null || turns[0].Turns.Count < 1) {
-                detailLog.Add(new { Descrip="No information", Tag="", Extra="" });
+                detailLog.Add(DetailLogEntry("No information"));
             }
             else {
                 var details = turns[0];
@@ -479,7 +479,7 @@ namespace CSALMongoWebAPI.Controllers {
 
                 foreach (var turn in details.Turns) {
                     if (turn.TurnID == 0) {
-                        detailLog.Add(new { Descrip = "Start of Lesson Attempt", Tag = "Attempt", Extra = "" });
+                        detailLog.Add(DetailLogEntry("Start of Lesson Attempt", "Attempt", entry:turn));
                     }
 
                     bool completion = false;
@@ -514,10 +514,11 @@ namespace CSALMongoWebAPI.Controllers {
                     }
 
                     if (correct) {
-                        detailLog.Add(new { Descrip = "CORRECT", Tag = "Answer", Extra = lastQuestion });
+                        detailLog.Add(DetailLogEntry("CORRECT", "Answer", lastQuestion, turn));
+                        
                     }
                     else if (incorrect) {
-                        detailLog.Add(new { Descrip = "MISS", Tag = "Answer", Extra = lastQuestion });
+                        detailLog.Add(DetailLogEntry("MISS", "Answer", lastQuestion, turn));
                     }
 
                     if (turn.Transitions != null && turn.Transitions.Count > 0) {
@@ -535,14 +536,14 @@ namespace CSALMongoWebAPI.Controllers {
                             else if (ruleID.EndsWith("hard")) newState = "H";
 
                             if (newState != null && newState != lastDiff) {
-                                detailLog.Add(new { Descrip = lastDiff + " to " + newState, Tag = "PathChange", Extra = "" });
+                                detailLog.Add(DetailLogEntry(lastDiff + " to " + newState, "PathChange", entry:turn));
                                 lastDiff = newState;
                             }
                         }
                     }
 
                     if (completion) {
-                        detailLog.Add(new { Descrip = "Completed Lesson", Tag = "Completion", Extra = "" });
+                        detailLog.Add(DetailLogEntry("Completed Lesson", "Completion", entry:turn));
                     }
                 }
             }
@@ -554,10 +555,23 @@ namespace CSALMongoWebAPI.Controllers {
             modelDict["LessonID"] = lessonID;
             modelDict["LessonName"] = lesson.ShortName;
             modelDict["UserID"] = userID;
-            //Can't use our anonymous objects, so use expando's
-            modelDict["DetailLog"] = detailLog.Select(x => Util.RenderHelp.ToExpando(x)).ToList();
+            modelDict["DetailLog"] = detailLog;
 
             return View("StudentLessonDrill", modelObj);
+        }
+
+        private ExpandoObject DetailLogEntry(string descrip, string tag = "", string extra = "", ConvLog entry = null) {
+            string ts = "";
+            if (entry != null && entry.DBTimestamp > 0.0) {
+                ts = entry.DBDateTime().ToString();
+            }
+            
+            return Util.RenderHelp.ToExpando(new { 
+                Descrip = descrip, 
+                Tag = tag, 
+                Extra = extra,
+                Timestamp = ts
+            });
         }
 
         public ActionResult StudentLessonDevSelect() {

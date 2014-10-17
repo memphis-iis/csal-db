@@ -25,6 +25,9 @@
     <div class="row">        
         <div class="col-md-12">
             @foreach (var dl in Model.DetailLog) {
+                bool showExtra = false;
+                string extraClass = "";
+                
                 <div class="logEntry">
                     @if (dl.Tag == "Attempt") {
                         <span class="label label-primary">@dl.Descrip</span>
@@ -36,7 +39,8 @@
                         else {
                             <span class="label label-danger">@dl.Descrip</span>
                         }
-                        <div class="answer">@dl.Extra</div>
+                        showExtra = true;
+                        extraClass = "answer";
                     }
                     else if (dl.Tag == "PathChange") {
                         <span class="label label-primary">PATH CHANGED @dl.Descrip</span>
@@ -47,7 +51,13 @@
                     else {
                         @dl.Descrip
                         <span>???</span>
-                        @dl.Extra
+                        showExtra = true;
+                    }
+
+                    @dl.Timestamp
+
+                    @if (showExtra) {
+                        <div class="@extraClass">@dl.Extra</div>
                     }
                 </div>
             }

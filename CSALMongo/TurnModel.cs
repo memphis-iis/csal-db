@@ -21,7 +21,7 @@ namespace CSALMongo.TurnModel {
         public double DBTimestamp { get; set; }
 
         public DateTime DBDateTime() {
-            return new DateTime(EPOCH_YR, 1, 1).AddSeconds(DBTimestamp);
+            return new DateTime(EPOCH_YR, 1, 1).AddMilliseconds(DBTimestamp);
         }
 
         /// <summary>

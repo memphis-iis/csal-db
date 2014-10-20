@@ -111,24 +111,6 @@ namespace CSALMongo.Model {
         public int CorrectAnswers { get; set; }
         public int IncorrectAnswers { get; set; }
 
-        //In millisecs
-        public double TotalDuration() {
-            double tot = 0.0;
-            if (Turns != null) {
-                foreach (var turn in Turns) {
-                    tot += turn.Duration;
-                }
-            }
-            return tot;
-        }
-
-        //In millisecs
-        public double MeanDuration() {
-            if (Turns == null || Turns.Count < 1)
-                return 0.0;
-            return TotalDuration() / Turns.Count;
-        }
-
         //Index of the beginning of the last attempt
         public int LastAttemptIndex() {
             if (Turns.Count < 1)
@@ -169,10 +151,11 @@ namespace CSALMongo.Model {
             return false;
         }
 
-        //In millisecs
-        public double CurrentReadingTime() {
-            //Before we do anything, fix up any timestamps that are
-            //OBVIOUSLY out of whack
+        //Because things can hit the server out of order (or in case of test
+        //data, simultaneously), we insure that the DB timestamps are correct
+        //by using the Duration field.  Note that this is a hack to approximate
+        //time in the event we didn't receive the turns with correct ordering/spacing
+        protected void FixupTimestamps() {
             for (int i = 1; i < Turns.Count; ++i) {
                 var prev = Turns[i - 1];
                 var curr = Turns[i];
@@ -182,6 +165,13 @@ namespace CSALMongo.Model {
                     curr.DBTimestamp = minTime + 200.0; //Add 200 ms for safety
                 }
             }
+        }
+
+        //In millisecs
+        public double CurrentReadingTime() {
+            //Before we do anything, fix up any timestamps that are
+            //OBVIOUSLY out of whack
+            FixupTimestamps();
 
             int start = LastAttemptIndex();
             if (start < 0)
@@ -248,6 +238,26 @@ namespace CSALMongo.Model {
             }
 
             return totalRead;
+        }
+
+        public double CurrentTotalTime() {
+            //Before we do anything, fix up any timestamps that are
+            //OBVIOUSLY out of whack
+            FixupTimestamps();
+
+            int last = Turns.Count - 1;
+            int start = LastAttemptIndex();
+            if (start < 0 || start > last) {
+                return 0.0;
+            }
+            else if (start == last) {
+                return Turns[start].Duration;
+            }
+
+            double startTime = Turns[start].DBTimestamp;
+            double endTime = Turns[last].DBTimestamp;
+
+            return (endTime - startTime) + Turns[last].Duration;
         }
 
         /// <summary>

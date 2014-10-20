@@ -28,8 +28,6 @@ using Newtonsoft.Json.Linq;
 
 //TODO: all metrics are last attempt - verify code, change UI/titles to make clear
 
-//TODO: total time on lesson shouldn't use duration
-
 //TODO: coverage
 
 //TODO: documentation:

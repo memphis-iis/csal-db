@@ -80,7 +80,7 @@
                         <th>Times Attempted</th>
                         <th>Times Completed</th>
                         <th>Correct Response Rate</th>
-                        <th>Total time spent on the lesson</th>
+                        <th>Total time on current attempt</th>
                         <th>Reading time</th>
                         <th>Lesson Path</th>
                     </tr>
@@ -107,7 +107,7 @@
                                 }
                             </td>
                             <td><span class="label @correctStyle" style="font-weight:normal;">@String.Format("{0:P0}", correctRate)</span></td>
-                            <td>@RenderHelp.HumanDuration(lesson.TotalDuration())</td>
+                            <td>@RenderHelp.HumanDuration(lesson.CurrentTotalTime())</td>
                             <td>@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
                             <td class="pathCell">@lesson.LessonPath()</td>
                         </tr>

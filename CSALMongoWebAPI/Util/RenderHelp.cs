@@ -39,8 +39,7 @@ namespace CSALMongoWebAPI.Util {
 
         /// <summary>
         /// Create a human-readable version of the given number of milliseconds.
-        /// For instance, the TotalDuration and MeanDuration methods from the
-        /// CSAL Mongo model
+        /// For instance, the CurrentTotalTime method from the CSAL Mongo model
         /// </summary>
         /// <param name="dur">Number of milliseconds to translate</param>
         /// <returns></returns>

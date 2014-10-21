@@ -170,6 +170,7 @@
     <Content Include="Global.asax" />
     <Content Include="Views\Home\ajax-loader.gif" />
     <Content Include="Views\Home\CSALCommon.js" />
+    <Content Include="Views\Home\jquery.scrollintoview.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

@@ -45,14 +45,12 @@
                 <tbody>
                     @foreach (var userID in Model.Class.Students) {
                         string correctDisp = "";
-                        string correctStyle = "";
                         
                         Tuple<int, int> tots = Model.StudentCounts[userID];
                         if (tots.Item1 > 0 || tots.Item2 > 0) {
                             double all = tots.Item1 + tots.Item2;
                             double avg = (double)tots.Item1 / all;
-                            correctDisp = String.Format("{0:P0}", avg);
-                            correctStyle = avg > 0.67 ? "label-success" : "label-danger";
+                            correctDisp = avg.ToString();
                         }
 
                         var scores = new List<string>();
@@ -78,7 +76,7 @@
                         
                         <tr>
                             <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(userID)" class="student-link">@userID</a></td>
-                            <td><span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span></td>
+                            <td class="correct-cell">@correctDisp</td>
                             <td><span class="studentSparkLine"> @String.Join(",", scores)</span></td>
                         </tr>
                     }
@@ -118,45 +116,39 @@
                     }
 
                     string correctDisp = "";
-                    string correctStyle = "";
 
                     Tuple<int, int> tots = Model.LessonCounts[lessonID];
                     if (tots.Item1 > 0 || tots.Item2 > 0) {
                         double all = tots.Item1 + tots.Item2;
                         double avg = (double)tots.Item1 / all;
-                        correctDisp = String.Format("{0:P0}", avg);
-                        correctStyle = avg > 0.67 ? "label-success" : "label-danger";
+                        correctDisp = avg.ToString();
                     }
+                    
+                    var lessonUrl = RenderHelp.URIEncode(lessonID);
                     
                     <tr>
                         <th class="nw">
-                            <a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a>
+                            <a href="~/home/lessondetails/@lessonUrl" class="lesson-link">@lessonName</a>
                         </th>
 
-                        <th class="nw">
-                            <span class="label @correctStyle" style="font-weight:normal;">@correctDisp</span>
-                        </th>
+                        <th class="correct-cell nw">@correctDisp</th>
                         
                         @foreach (var userID in Model.Class.Students) {
+                            var userUrl = RenderHelp.URIEncode(userID);
+                            
                             string correctRateDisp = "";
-                            string correctRateStyle = "";
-                            bool showCompleted = false;
+                            string showCompleted = "";
                                                 
                             var key = new Tuple<string, string>(lessonID, userID);
                             StudentLessonActs turns = null;
 
                             if (Model.LUTurns.TryGetValue(key, out turns)) {
-                                double correctRate = turns.CorrectAnswerRate();
-                                correctRateDisp = String.Format("{0:P0}", correctRate);
-                                correctRateStyle = correctRate > 0.67 ? "label label-success" : "label label-danger";
-                                showCompleted = turns.LastCompleted();
+                                correctRateDisp = turns.CorrectAnswerRate().ToString();
+                                showCompleted = turns.LastCompleted() ? "yes" : "";
                             }
 
-                            <td class="nw border1">
-                                <span class="@correctRateStyle" style="font-weight:normal;">@correctRateDisp</span>
-                                @if (showCompleted) {
-                                    <span class="glyphicon glyphicon-ok"></span>
-                                }
+                            <td class="nw border1 correct-cell det-link"  data-completed="@showCompleted" data-user="@userUrl" data-lesson="@lessonUrl">
+                                @correctRateDisp
                             </td>
                         }
                     </tr>
@@ -185,6 +177,24 @@
             barSpacing: 4,
             zeroAxis: true,
             disableTooltips: true
+        });
+
+        $(".correct-cell").each(function (idx, ele) {
+            var td = $(ele);
+            var correct = td.text();
+            var newCorrect = CSALCommon.correctRateMarkup(correct);
+            var target = td.html("").append(newCorrect);
+
+            var completed = td.data("completed");
+            if (completed && completed === "yes") {
+                target.append($("<span></span>").addClass("glyphicon glyphicon-ok"));
+            }
+        });
+
+        $(".det-link").addClass("hover-restore").click(function (evt) {
+            evt.preventDefault();
+            var t = $(this);
+            showTurnDetail(t.data("lesson"), t.data("user"));
         });
     });
 </script>

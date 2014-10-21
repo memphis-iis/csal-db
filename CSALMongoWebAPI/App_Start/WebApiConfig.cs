@@ -8,8 +8,8 @@ namespace CSALMongoWebAPI {
         public static void Register(HttpConfiguration config) {
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                routeTemplate: "api/{controller}/{id}/{id2}",
+                defaults: new { id = RouteParameter.Optional, id2 = RouteParameter.Optional }
             );
 
             // Uncomment the following line of code to enable query support for actions with an IQueryable or IQueryable<T> return type.

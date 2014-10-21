@@ -124,14 +124,16 @@ namespace CSALMongo.Model {
             return start;
         }
 
-        //Return true if the last attempt was completed
-        public bool LastCompleted() {
-            if (Turns.Count < 1)
+        public bool SequenceCompleted(int start, int end = -1) {
+            if (start < 0)
                 return false;
 
-            int curr = Turns.Count - 1;
+            if (end < 0)
+                end = Turns.Count - 1;
+            if (end < start)
+                return false;
 
-            while (curr > 0 && Turns[curr].TurnID != 0) {
+            for (int curr = end; end >= start; --end) {
                 foreach (var trans in Turns[curr].Transitions) {
                     foreach (var action in trans.Actions) {
                         string agent = action.Agent;
@@ -144,18 +146,21 @@ namespace CSALMongo.Model {
                         }
                     }
                 }
-
-                curr--;
             }
 
             return false;
+        }
+
+        //Return true if the last attempt was completed
+        public bool LastCompleted() {
+            return SequenceCompleted(LastAttemptIndex());
         }
 
         //Because things can hit the server out of order (or in case of test
         //data, simultaneously), we insure that the DB timestamps are correct
         //by using the Duration field.  Note that this is a hack to approximate
         //time in the event we didn't receive the turns with correct ordering/spacing
-        protected void FixupTimestamps() {
+        public void FixupTimestamps() {
             for (int i = 1; i < Turns.Count; ++i) {
                 var prev = Turns[i - 1];
                 var curr = Turns[i];
@@ -167,21 +172,24 @@ namespace CSALMongo.Model {
             }
         }
 
-        //In millisecs
-        public double CurrentReadingTime() {
+        public double ReadingTime(int start, int end = -1) {
             //Before we do anything, fix up any timestamps that are
             //OBVIOUSLY out of whack
             FixupTimestamps();
 
-            int start = LastAttemptIndex();
             if (start < 0)
+                return 0.0;
+
+            if (end < 0)
+                end = Turns.Count - 1;
+            if (end < start)
                 return 0.0;
 
             double currTime = Turns[start].DBTimestamp;
             double readStart = -1.0;
             double totalRead = 0.0;
 
-            for (int curr = start; curr < Turns.Count; ++curr) {
+            for (int curr = start; curr <= end; ++curr) {
                 var turn = Turns[curr];
 
                 //Note that a turn has multiple transitions, so we need to be
@@ -240,13 +248,19 @@ namespace CSALMongo.Model {
             return totalRead;
         }
 
-        public double CurrentTotalTime() {
+        //In millisecs
+        public double CurrentReadingTime() {
+            return ReadingTime(LastAttemptIndex());
+        }
+
+        public double TotalTime(int start, int last = -1) {
             //Before we do anything, fix up any timestamps that are
             //OBVIOUSLY out of whack
             FixupTimestamps();
 
-            int last = Turns.Count - 1;
-            int start = LastAttemptIndex();
+            if (last < 0)
+                last = Turns.Count - 1;
+
             if (start < 0 || start > last) {
                 return 0.0;
             }
@@ -260,22 +274,23 @@ namespace CSALMongo.Model {
             return (endTime - startTime) + Turns[last].Duration;
         }
 
-        /// <summary>
-        /// Return a string summarizing the student's latest path through the
-        /// lesson.  If they stayed in medium the whole time, return empty
-        /// string.  If their path was (Start/Medium)=>Hard=>Medium=>Easy return
-        /// HME
-        /// </summary>
-        /// <returns></returns>
-        public string LessonPath() {
-            int start = LastAttemptIndex();
-            if (start < 0)
+        public double CurrentTotalTime() {
+            return TotalTime(LastAttemptIndex());
+        }
+
+        public string LessonPath(int start, int end = -1) {
+            if (start < 0 || start > end)
+                return "";
+
+            if (end < 0)
+                end = Turns.Count - 1;
+            if (end < start)
                 return "";
 
             string lastState = "M";
             string path = "";
 
-            for (int curr = start; curr < Turns.Count; ++curr) {
+            for (int curr = start; curr <= end; ++curr) {
                 var turn = Turns[curr];
 
                 foreach (var tran in turn.Transitions) {
@@ -286,9 +301,9 @@ namespace CSALMongo.Model {
                     ruleID = ruleID.Trim().ToLower();
                     string newState = null;
 
-                    if      (ruleID.EndsWith("easy"))   newState = "E";
+                    if (ruleID.EndsWith("easy")) newState = "E";
                     else if (ruleID.EndsWith("medium")) newState = "M";
-                    else if (ruleID.EndsWith("hard"))   newState = "H";
+                    else if (ruleID.EndsWith("hard")) newState = "H";
 
                     if (newState != null && newState != lastState) {
                         path += newState;
@@ -300,6 +315,17 @@ namespace CSALMongo.Model {
             return path;
         }
 
+        /// <summary>
+        /// Return a string summarizing the student's latest path through the
+        /// lesson.  If they stayed in medium the whole time, return empty
+        /// string.  If their path was (Start/Medium)=>Hard=>Medium=>Easy return
+        /// HME
+        /// </summary>
+        /// <returns></returns>
+        public string CurrentLessonPath() {
+            return LessonPath(LastAttemptIndex());
+        }
+
         //Returns rate where 0 <= rate <= 1
         public double CorrectAnswerRate() {
             if (CorrectAnswers < 1)
@@ -307,6 +333,42 @@ namespace CSALMongo.Model {
 
             double tot = (double)(CorrectAnswers + IncorrectAnswers);
             return (double)CorrectAnswers / tot;
+        }
+
+        public double AdhocCorrectAnswerRate(int start, int end, double noAnswers = 0.0) {
+            if (start < 0)
+                return noAnswers;
+
+            if (end < 0)
+                end = Turns.Count - 1;
+            if (end < start)
+                return noAnswers;
+
+            int correct = 0;
+            int incorrect = 0;
+
+            for (int i = start; i <= end; ++i) {
+                var turn = Turns[i];
+                if (turn.Input != null && !String.IsNullOrWhiteSpace(turn.Input.Event)) {
+                    string evt = turn.Input.Event.ToLower().Trim();
+                    if (evt == "correct") {
+                        correct++;
+                    }
+                    else if (evt.StartsWith("incorrect")) {
+                        incorrect++;
+                    }
+                }
+            }
+
+            if (correct < 1) {
+                if (incorrect < 1)
+                    return noAnswers;
+                else
+                    return 0.0;
+            }
+            
+            double tot = (double)(correct + incorrect);
+            return (double)correct / tot;
         }
 
         int IComparable<StudentLessonActs>.CompareTo(StudentLessonActs other) {

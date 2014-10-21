@@ -16,7 +16,7 @@
     <link href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css" rel="stylesheet">
 
     <style type="text/css">
-        a.hover-restore:hover {
+        .hover-restore:hover {
             cursor: pointer;
         }
 
@@ -105,7 +105,7 @@
     <script src="~/Views/Home/CSALCommon.js" type="text/javascript"></script>
     <script src="~/Views/Home/jquery.scrollintoview.min.js" type="text/javascript"></script>
     
-    <!-- Progress Dialog for CSALCommon -->
+    <!-- PROGRESS DIALOG for CSALCommon -->
     <div class="well well-lg" style="display:none; border:solid 2px #000; margin-top: 6px; position:fixed; top:10%; left:5%; width:auto;" id="progressDialog">
         <img class="pull-left" style="vertical-align:middle;" src="~/Views/Home/ajax-loader.gif">
         &nbsp;&nbsp;&nbsp;
@@ -117,6 +117,134 @@
         CSALCommon.progressDialogTextSelector = "#progressDialogText";
     </script>
 
+    <!-- TURN DETAIL DISPLAY (USED LOTS OF PLACES) -->
+    <div class="modal fade" id="turnDetailDlg" tabindex="-1" role="dialog" aria-labelledby="turnDetailHdrLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="turnDetailHdrLabel">
+                        Details for <span class="dispUserID"></span> in <span class="dispLessonID"></span>
+                    </h4>
+                </div>
+                <div class="modal-body" id="turnDetailDlgContent">
+                    <table id="turnDetailDlgDetails" class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th class="nw">Start</th>
+                                <th class="nw">Last</th>
+                                <th class="nw">Correct</th>
+                                <th class="nw">Reading Time</th>
+                                <th class="nw">Total Time</th>
+                                <th class="nw">Lesson Path</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary turn-detail-action" data-user="" data-lesson="" id="turnDetailDlgViewUser">User</button>
+                    <button type="button" class="btn btn-primary turn-detail-action" data-user="" data-lesson="" id="turnDetailDlgViewLesson">Lesson</button>
+                    <button type="button" class="btn btn-primary turn-detail-action" data-user="" data-lesson="" id="turnDetailDlgViewTranscript">User-Lesson Details</button>
+                    @if ((bool)Session["IsAdmin"]) {
+                        <button type="button" class="btn btn-success turn-detail-action" data-user="" data-lesson="" id="turnDetailDlgViewDebug">Debug View</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#turnDetailDlg').modal('hide');
+
+        $("#turnDetailDlgViewUser").click(function (evt) {
+            evt.preventDefault();
+            $('#turnDetailDlg').modal('hide');
+            var url = '@Url.Content("~/home/studentdetails/$user")'
+                .replace('$user', $(this).data("user"));
+            window.location.href = url;
+        });
+
+        $("#turnDetailDlgViewLesson").click(function (evt) {
+            evt.preventDefault();
+            $('#turnDetailDlg').modal('hide');
+            var url = '@Url.Content("~/home/lessondetails/$lesson")'
+                .replace('$lesson', $(this).data("lesson"));
+            window.location.href = url;
+        });
+
+        $("#turnDetailDlgViewTranscript").click(function (evt) {
+            evt.preventDefault();
+            $('#turnDetailDlg').modal('hide');
+            var url = '@Url.Content("~/home/studentlessondrill/$lesson/$user")'
+                .replace('$lesson', $(this).data("lesson"))
+                .replace('$user', $(this).data("user"));
+            window.location.href = url;
+        });
+
+        $("#turnDetailDlgViewDebug").click(function (evt) {
+            evt.preventDefault();
+            $('#turnDetailDlg').modal('hide');
+            var url = '@Url.Content("~/home/studentlessondevview/$lesson/$user")'
+                .replace('$lesson', $(this).data("lesson"))
+                .replace('$user', $(this).data("user"));
+            window.location.href = url;
+        });
+
+        function showTurnDetail(lessonID, userID) {
+            var url = '@Url.Content("~/api/turnrollup/$lesson/$user")'
+                .replace('$lesson', lessonID)
+                .replace('$user', userID);
+
+            $(".turn-detail-action")
+                .data("lesson", lessonID)
+                .data("user", userID);
+
+            //Our quick client-side version of the RenderHelp function
+            var du = function (s) { return decodeURI(decodeURI(s)); }
+
+            $(".dispLessonID").text(du(lessonID));
+            $(".dispUserID").text(du(userID));
+
+            CSALCommon.doServerGet(url, "Getting Turn Detail", function (data) {
+                var table = $("#turnDetailDlgDetails > tbody").html("");
+
+                var addRow = function (item) {
+                    var row = $("<tr></tr>");
+                    var addCell = function (d) {
+                        var target = $("<td></td>").addClass("nw");
+                        if (d instanceof jQuery) target.append(d);
+                        else                     target.html(d);
+                        row.append(target);
+                        return target;
+                    }
+
+                    var correctRate = CSALCommon.correctRateMarkup(item.CorrectAnswerRate);
+                    var completeDisp = $("<span></span>");
+                    if (item.Completed) {
+                        completeDisp.addClass("glyphicon glyphicon-ok");
+                    }
+
+                    addCell(item.StartTime);
+                    addCell(item.EndTime);
+                    addCell(correctRate).append(completeDisp);
+                    addCell(item.ReadingTime);
+                    addCell(item.TotalTime);
+                    addCell(CSALCommon.lessonPathMarkup(item.LessonPath));
+
+                    table.append(row);
+                }
+
+                $.each(data, function (idx, ele) {
+                    addRow(ele);
+                });
+
+                $('#turnDetailDlg').modal('show');
+            });
+        }
+    </script>
+
+    <!-- USER-DEFINED SCRIPTS SPECIFIC TO A VIEW -->
     @RenderSection("ScriptFinal", required: false)
 
 </body>

@@ -19,7 +19,6 @@ using Newtonsoft.Json.Linq;
 
 //TODO: on class matrix and drilldown, any resp rate should have a tooltip and all graph nodes
 //TODO: need links for drilldown
-//TODO: need link/selection for dev view
 
 //TODO: which reading assignment did they use:
 //      - need /api/reading endpoint - post will accept userID, targetURL, and timestamp
@@ -37,6 +36,9 @@ using Newtonsoft.Json.Linq;
 //      - readme for doc generation in doc dir
 
 //TODO: logging of actions, esp login, queries, and errors?
+
+//TODO: This controller class has really gotten too big - 
+//      should probably refactor out 2 other controllers: OAuth and Dev/Drill
 
 namespace CSALMongoWebAPI.Controllers {
     /// <summary>
@@ -290,6 +292,10 @@ namespace CSALMongoWebAPI.Controllers {
         public ActionResult Index() {
             if (NeedLogin()) {
                 return LoginRedir();
+            }
+            else if (!IsAdmin()) {
+                //Don't need login, but isn't an admin - just take them to the classes page
+                return RedirectToAction("Classes");
             }
             return View("Index");
         }

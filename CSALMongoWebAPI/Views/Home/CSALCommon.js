@@ -59,6 +59,20 @@ var CSALCommon = {
         }
     },
 
+    safeParseFloat: function(s, def) {
+        var f = def;
+        try {
+            f = parseFloat(CSALCommon.trimmedStr(s));
+            if (isNaN(f))
+                f = def;
+        }
+        catch (e) {
+            f = def;
+        }
+
+        return f;
+    },
+
     arrLen: function (a) {
         return (a && a.length) ? a.length : 0;
     },
@@ -132,5 +146,21 @@ var CSALCommon = {
         }
 
         return component;
+    },
+
+    correctRateMarkup: function (correctRate) {
+        //Given correctRate, which is either a float or a string convertable to a float,
+        //return a DOM element suitable for appending for display
+        var percent = CSALCommon.safeParseFloat(correctRate, -1.0);
+        if (percent < 0.0 || percent > 1.0) {
+            return $("<span></span>").text(correctRate); //Just punt
+        }
+
+        var correctStyle = percent > 0.67 ? "label-success" : "label-danger";
+        var disp = Math.round(percent * 100.0) + "%";
+
+        return $("<span class='label' style='font-weight:normal;'></span>")
+            .addClass(correctStyle)
+            .text(disp);
     }
 };

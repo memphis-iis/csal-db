@@ -88,11 +88,13 @@
                 <tbody>
                     @foreach (var lesson in Model.Turns) {
                         double correctRate = lesson.CorrectAnswerRate();
-                        string correctStyle = correctRate > 0.67 ? "label-success" : "label-danger";
                         bool inTrouble = !(lesson.LastCompleted() && correctRate > 0.67);
 
+                        var lessonUrl = RenderHelp.URIEncode(lesson.LessonID);
+                        var userUrl = RenderHelp.URIEncode(lesson.UserID);
+                        
                         <tr>
-                            <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(lesson.UserID)" class="student-link">@lesson.UserID</a></td>
+                            <td><a href="~/home/studentdetails/@userUrl" class="student-link">@lesson.UserID</a></td>
                             <td>
                                 @if (inTrouble) {
                                     <span class="glyphicon glyphicon-cloud"></span>
@@ -106,10 +108,12 @@
                                     <span class="glyphicon glyphicon-ok"></span>
                                 }
                             </td>
-                            <td><span class="label @correctStyle" style="font-weight:normal;">@String.Format("{0:P0}", correctRate)</span></td>
+                            <td class="correct-cell det-link" data-user="@userUrl" data-lesson="@lessonUrl">
+                                @correctRate
+                            </td>
                             <td>@RenderHelp.HumanDuration(lesson.CurrentTotalTime())</td>
                             <td>@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
-                            <td class="pathCell">@lesson.LessonPath()</td>
+                            <td class="path-cell">@lesson.CurrentLessonPath()</td>
                         </tr>
                     }
                 </tbody>
@@ -124,11 +128,24 @@
 
         $(document).ready(function () {
             //Do this before setting up the data table
-            $(".pathCell").each(function (idx, ele) {
+            $(".path-cell").each(function (idx, ele) {
                 var td = $(ele);
                 var path = td.text();
                 var newPath = CSALCommon.lessonPathMarkup(path);
                 td.html("").append(newPath);
+            });
+
+            $(".correct-cell").each(function (idx, ele) {
+                var td = $(ele);
+                var correct = td.text();
+                var newCorrect = CSALCommon.correctRateMarkup(correct);
+                td.html("").append(newCorrect);
+            });
+
+            $(".det-link").addClass("hover-restore").click(function (evt) {
+                evt.preventDefault();
+                var t = $(this);
+                showTurnDetail(t.data("lesson"), t.data("user"));
             });
 
             detailTable = $('#DetailTable').dataTable({

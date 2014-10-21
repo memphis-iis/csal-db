@@ -43,10 +43,12 @@
                         }
 
                         double correctRate = lesson.CorrectAnswerRate();
-                        string correctStyle = correctRate > 0.67 ? "label-success" : "label-danger";
+
+                        var lessonUrl = RenderHelp.URIEncode(lessonID);
+                        var userUrl = RenderHelp.URIEncode(lesson.UserID);
                         
                         <tr>
-                            <td class="nw"><a href="~/home/lessondetails/@RenderHelp.URIEncode(lessonID)" class="lesson-link">@lessonName</a></td>
+                            <td class="nw"><a href="~/home/lessondetails/@lessonUrl" class="lesson-link">@lessonName</a></td>
                             <td class="nw">@lesson.LastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>
@@ -55,10 +57,10 @@
                                     <span class="glyphicon glyphicon-ok"></span>
                                 }
                             </td>
-                            <td><span class="label @correctStyle" style="font-weight:normal;">@String.Format("{0:P0}", correctRate)</span></td>
+                            <td class="correct-cell det-link" data-user="@userUrl" data-lesson="@lessonUrl">@correctRate</td>
                             <td class="nw">@RenderHelp.HumanDuration(lesson.CurrentTotalTime())</td>
                             <td class="nw">@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
-                            <td class="pathCell nw">@lesson.LessonPath()</td>
+                            <td class="path-cell nw">@lesson.CurrentLessonPath()</td>
                         </tr>                        
                     }
                 </tbody>
@@ -71,11 +73,24 @@
     <script>
         $(document).ready(function () {
             //Do this before setting up the data table
-            $(".pathCell").each(function (idx, ele) {
+            $(".path-cell").each(function (idx, ele) {
                 var td = $(ele);
                 var path = td.text();
                 var newPath = CSALCommon.lessonPathMarkup(path);
                 td.html("").append(newPath);
+            });
+
+            $(".correct-cell").each(function (idx, ele) {
+                var td = $(ele);
+                var correct = td.text();
+                var newCorrect = CSALCommon.correctRateMarkup(correct);
+                td.html("").append(newCorrect);
+            });
+
+            $(".det-link").addClass("hover-restore").click(function (evt) {
+                evt.preventDefault();
+                var t = $(this);
+                showTurnDetail(t.data("lesson"), t.data("user"));
             });
 
             $('.apply-data-table').dataTable({

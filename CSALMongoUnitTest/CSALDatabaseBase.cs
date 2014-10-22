@@ -7,9 +7,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-//TODO: Insure documentation on all public namespaces, classes, and methods
-//     (ALSO top-level documentation directory with compiled help - tag version for that)
-
 namespace CSALMongoUnitTest {
     // Base test class with setup code to read sample instance and clear
     // previous DB contents.

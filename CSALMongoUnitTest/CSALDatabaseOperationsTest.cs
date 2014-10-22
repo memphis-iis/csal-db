@@ -41,6 +41,13 @@ namespace CSALMongoUnitTest {
         }
 
         [TestMethod]
+        public void TestIndexes() {
+            var db = new CSALDatabase(DB_URL);
+            db.InsureIndexes();
+            Assert.IsTrue(true); //If insuring indexes didn't fail, we're OK :)
+        }
+
+        [TestMethod]
         public void TestRawActSave() {
             var db = new CSALDatabase(DB_URL);
 

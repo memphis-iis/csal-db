@@ -34,8 +34,8 @@ using Newtonsoft.Json.Linq;
 //      - intro docs with use cases and some diagrams for the various levels/projects in the solutiuon
 //      - finished xmldoc compiled and added to docs dir
 //      - readme for doc generation in doc dir
-
-//TODO: logging of actions, esp login, queries, and errors?
+//TODO: Insure documentation on all public namespaces, classes, and methods
+//     (ALSO top-level documentation directory with compiled help - tag version for that)
 
 //TODO: This controller class has really gotten too big - 
 //      should probably refactor out 2 other controllers: OAuth and Dev/Drill

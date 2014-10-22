@@ -231,7 +231,7 @@ namespace CSALMongo.Model {
                 if (endRead) {
                     if (readStart < 0.0) {
                         //No matching read-start - not much we can do
-                        //TODO: log an error? At least add something for unit testing?
+                        Debug.WriteLine("Read-End with no matching start - time won't be counted");
                     }
                     else {
                         totalRead += (currTime - readStart);

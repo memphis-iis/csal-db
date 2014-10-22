@@ -67,6 +67,27 @@ namespace CSALMongo {
         }
 
         /// <summary>
+        /// This very hacky function manually insures all indexes that we want
+        /// in the MongoDB collections that we manage.  Should really only be
+        /// called once in a blue moon.  Currently called on app startup by our
+        /// web api app.
+        /// </summary>
+        public void InsureIndexes() {
+            mongoDatabase.GetCollection(STUDENT_COLLECTION).CreateIndex("UserID");
+            
+            mongoDatabase.GetCollection(LESSON_COLLECTION).CreateIndex("LessonID");
+            mongoDatabase.GetCollection(LESSON_COLLECTION).CreateIndex("Students");
+            
+            mongoDatabase.GetCollection(CLASS_COLLECTION).CreateIndex("ClassID");
+            mongoDatabase.GetCollection(CLASS_COLLECTION).CreateIndex("Location");
+            mongoDatabase.GetCollection(CLASS_COLLECTION).CreateIndex("Students");
+            mongoDatabase.GetCollection(CLASS_COLLECTION).CreateIndex("Lessons");
+
+            mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION).CreateIndex("LessonID");
+            mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION).CreateIndex("UserID");
+        }
+
+        /// <summary>
         /// Accept a raw JSON data record describing a single CSAL
         /// student/lesson interaction. The JSON record is expected to be in
         /// the format described in the document "CSAL Data".  Note that in

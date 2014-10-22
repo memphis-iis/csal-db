@@ -1,5 +1,6 @@
 ﻿@using CSALMongo.Model
 @using CSALMongoWebAPI.Util
+@using Newtonsoft.Json;
 
 @{
     ViewBag.Title = "Class " + Model.Class.ClassID;
@@ -62,7 +63,7 @@
                                 if (turns.CorrectAnswers + turns.IncorrectAnswers > 0) {
                                     //We have a rate - we center it at 0.67 and scale it for display
                                     double rate = turns.CorrectAnswerRate();
-                                    if (rate > 0.67) {
+                                    if (rate >= 0.67) {
                                         rate = ((rate - 0.67) / 0.33) * 100.0;
                                     }
                                     else {
@@ -158,9 +159,80 @@
     </div>
 </div> <!-- /container -->
 
+<!-- Style fixing for jQuery sparklines with Bootstrap 3 -->
+<style>
+    .jqstooltip {
+        -webkit-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+    }
+</style>
+
 @section ScriptFinal {
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js" type="text/javascript"></script>
+
 <script>
+    @{
+        var LessonNames = new List<String>();
+        foreach (var lid in Model.Class.Lessons) {
+            string lessonName;
+            if (!Model.LessonNames.TryGetValue(lid, out lessonName)) {
+                lessonName = lid;
+            }
+            LessonNames.Add(lessonName);
+        }
+    }
+    var LESSON_LIST = @Html.Raw(Json.Encode(LessonNames))
+</script>
+
+<script>
+    function sparkTipFormatter(sparkline, options, fields) {
+        var num = 0.0;
+
+        var field = null;
+        if (fields && !!fields.length && fields.length > 0) {
+            field = fields[0];
+        }
+        if (field != null && field["isNull"] === false) {
+            num = CSALCommon.safeParseFloat(field["value"], 0.0);
+        }
+
+        var lessonName = "";
+        try {
+            var lessonIdx = CSALCommon.safeParseInt(field["offset"], -1);
+            if (lessonIdx >= 0 && lessonIdx < LESSON_LIST.length) {
+                lessonName = LESSON_LIST[lessonIdx];
+            }
+        }
+        catch(e) {
+            lessonName = "";
+            console.log("Bad lesson name - error is:" + e);
+        }
+        if (lessonName != "") {
+            lessonName = "[" + lessonName + "] ";
+        }
+
+        if (isNaN(num) || Math.abs(num - 0.0) < 0.000001) {
+            return lessonName + "Nothing to score";
+        }
+
+        var comment = "";
+        if (num > 0.0) {
+            //MUST REVERSE ((rate - 0.67) / 0.33) * 100.0;
+            num = ((num / 100.0) * 0.33) + 0.67;
+            comment = "Passing";
+        }
+        else {
+            //MUST REVERSE ((rate - 0.67) / 0.67) * 100.0;
+            num = ((num / 100.0) * 0.67) + 0.67;
+            comment = "Having Trouble";
+        }
+
+        var txt = lessonName + CSALCommon.trimmedStr(Math.round(num * 100.0)) + "% (" + comment + ")";
+
+        return $("<div></div>").addClass("jqstooltip").html(txt).html();
+    }
+
     $(document).ready(function () {
         $(".student-link").addClass("hover-restore");
         $(".lesson-link").addClass("hover-restore");
@@ -176,7 +248,8 @@
             barWidth: 20,
             barSpacing: 4,
             zeroAxis: true,
-            disableTooltips: true
+            disableTooltips: false,
+            tooltipFormatter: sparkTipFormatter
         });
 
         $(".correct-cell").each(function (idx, ele) {

@@ -17,8 +17,6 @@ using CSALMongo.TurnModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: on class matrix and drilldown, any resp rate should have a tooltip and all graph nodes
-
 //TODO: which reading assignment did they use:
 //      - need /api/reading endpoint - post will accept userID, targetURL, and timestamp
 //      - add given info to student object (so update turn posting and check db_init.py)

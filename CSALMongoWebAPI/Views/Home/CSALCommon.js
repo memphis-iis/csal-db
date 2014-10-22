@@ -59,6 +59,20 @@ var CSALCommon = {
         }
     },
 
+    safeParseInt: function (s, def) {
+        var i = def;
+        try {
+            i = parseInt(CSALCommon.trimmedStr(s));
+            if (isNaN(i))
+                i = def;
+        }
+        catch (e) {
+            i = def;
+        }
+
+        return i;
+    },
+
     safeParseFloat: function(s, def) {
         var f = def;
         try {

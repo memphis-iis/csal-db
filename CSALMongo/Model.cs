@@ -91,6 +91,7 @@ namespace CSALMongo.Model {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Boolean? AutoCreated { get; set; }
+        public List<string> ReadingURLs { get; set; }
 
         int IComparable<Student>.CompareTo(Student other) {
             return String.Compare(UserID, other.UserID, true);

@@ -84,6 +84,35 @@ namespace CSALMongo {
         }
 
         /// <summary>
+        /// Like our "main" function SaveRawStudentLessonAct, it should be a
+        /// JSON object with two fields: UserID and TargetURL.
+        /// </summary>
+        /// <param name="jsonDataRecord">Proper JSON data record formatted as above</param>
+        public void SaveStudentReadingTarget(string jsonDataRecord) {
+            var doc = BsonDocument.Parse(jsonDataRecord);
+
+            string userID = doc.GetValue("UserID", "").AsString;
+            string targetURL = doc.GetValue("TargetURL", "").AsString;
+
+            if (String.IsNullOrWhiteSpace(userID)) {
+                throw new CSALDatabaseException("No user ID specified for SaveStudentReadingTarget");
+            }
+
+            if (String.IsNullOrWhiteSpace(targetURL)) {
+                return; //Nothing to do
+            }
+
+            //TODO: are they passing the "full" user ID or just the subject-ID for a student (see SaveRawStudentLessonAct)
+            userID = userID.Trim().ToLower();
+
+            DoUpsert(STUDENT_COLLECTION, userID, Update
+                .SetOnInsert("AutoCreated", true)
+                .SetOnInsert("LastTurnTime", null)
+                .SetOnInsert("TurnCount", 0)
+                .AddToSet("ReadingURLs", targetURL));
+        }
+
+        /// <summary>
         /// Accept a raw JSON data record describing a single CSAL
         /// student/lesson interaction. The JSON record is expected to be in
         /// the format described in the document "CSAL Data".  Note that in
@@ -186,9 +215,10 @@ namespace CSALMongo {
             //Upsert stats on student and lesson - which has the intended
             //side-effect of insuring that they exist
             DoUpsert(STUDENT_COLLECTION, userID, Update
+                .SetOnInsert("ReadingURLs", new BsonArray())
+                .SetOnInsert("AutoCreated", true)
                 .Set("LastTurnTime", now)
-                .Inc("TurnCount", 1)
-                .SetOnInsert("AutoCreated", true));
+                .Inc("TurnCount", 1));
 
             //Try and upsert stats on the class - but we don't always get a class ID
             if (!String.IsNullOrWhiteSpace(classID)) {

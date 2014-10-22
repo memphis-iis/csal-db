@@ -18,9 +18,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 //TODO: which reading assignment did they use:
-//      - need /api/reading endpoint - post will accept userID, targetURL, and timestamp
-//      - add given info to student object (so update turn posting and check db_init.py)
-//      - update student detail screen
+//      - need /api/reading endpoint - post will accept userID, targetURL then call SaveStudentReadingTarget
+//      - update check db_init.py
+//      - update student detail screen (remember list could be null)
 
 //TODO: all metrics are last attempt - verify code, change UI/titles to make clear
 

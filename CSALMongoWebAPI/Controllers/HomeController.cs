@@ -18,7 +18,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 //TODO: on class matrix and drilldown, any resp rate should have a tooltip and all graph nodes
-//TODO: need links for drilldown
 
 //TODO: which reading assignment did they use:
 //      - need /api/reading endpoint - post will accept userID, targetURL, and timestamp
@@ -140,7 +139,10 @@ namespace CSALMongoWebAPI.Controllers {
         }
 
         protected ActionResult ErrorView(string errorMsg) {
-            //TODO: should really log error message and current URL
+            //Manually log to Elmah since there won't be an unhandled exception
+            Elmah.ErrorLog.GetDefault(HttpContext.ApplicationInstance.Context)
+                .Log(new Elmah.Error(new Exception("ERROR VIEW: " + errorMsg)));
+            
             var modelObj = new ExpandoObject();
             var modelDict = (IDictionary<string, object>)modelObj;
             modelDict["ErrorMessage"] = errorMsg;
@@ -160,7 +162,10 @@ namespace CSALMongoWebAPI.Controllers {
             var settings = ClassesCtrl.AppSettings;
 
             var callback = Url.Action("oauth2callback", "home", null, Request.Url.Scheme);
-            var redir = ""; //TODO: get this somehow (and use it in redirects below)
+            
+            var redir = Request.QueryString.Get("redir");
+            if (String.IsNullOrWhiteSpace(redir))
+                redir = "";
 
             //Note that a login consists of a correct redirection to 
             var url = new UriBuilder("https://accounts.google.com/o/oauth2/auth");

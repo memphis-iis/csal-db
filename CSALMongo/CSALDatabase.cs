@@ -9,10 +9,6 @@ using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
-//TODO: startup logic - DB InsureIndexes
-
-//TODO: unit tests for correct/incorrect, reading time, path, lesson tots, +coverage
-
 namespace CSALMongo {
     /// <summary>
     /// Exception thrown when CSAL Database-specific exceptions occur

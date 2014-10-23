@@ -83,6 +83,8 @@ namespace CSALMongo {
             mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION).CreateIndex("UserID");
         }
 
+        //TODO: this needs to be an actual object with dt and url
+
         /// <summary>
         /// Like our "main" function SaveRawStudentLessonAct, it should be a
         /// JSON object with two fields: UserID and TargetURL.

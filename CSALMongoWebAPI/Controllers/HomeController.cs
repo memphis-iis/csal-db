@@ -17,7 +17,10 @@ using CSALMongo.TurnModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+//TODO: lesson log - need to reblind student name
+
 //TODO: which reading assignment did they use:
+//      - reader URL's - keep track of datetime and switch from set-to-push
 //      - need /api/reading endpoint - post will accept userID, targetURL then call SaveStudentReadingTarget
 //      - update check db_init.py
 //      - update student detail screen (remember list could be null)
@@ -31,6 +34,8 @@ using Newtonsoft.Json.Linq;
 //      - intro docs with use cases and some diagrams for the various levels/projects in the solutiuon
 //      - finished xmldoc compiled and added to docs dir
 //      - readme for doc generation in doc dir
+//      - api namespace
+//      - gui namespace
 //TODO: Insure documentation on all public namespaces, classes, and methods
 //     (ALSO top-level documentation directory with compiled help - tag version for that)
 

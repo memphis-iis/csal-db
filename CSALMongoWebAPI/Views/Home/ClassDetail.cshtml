@@ -32,6 +32,78 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-12">
+            <style>
+                .matrixCell {
+                    min-width: 32px;
+                    width: auto;
+                }
+            </style>
+
+            <hr />
+
+            <h3>Lesson Breakdown</h3>
+
+            <table class="table table-condensed" id="classMatrix">
+                <tr>
+                    <th class="nw matrixCell"><i>Lesson</i></th>
+                    <th class="nw matrixCell"><i>Class Avg</i></th>
+                    @foreach (var userID in Model.Class.Students) {
+                        <th class="nw matrixCell">
+                            <a href="~/home/studentdetails/@RenderHelp.URIEncode(userID)" class="student-link">@userID</a>
+                        </th>
+                    }
+                </tr>
+
+                @foreach (var lessonID in Model.Class.Lessons) {
+                    string lessonName;
+                    if (!Model.LessonNames.TryGetValue(lessonID, out lessonName)) {
+                        lessonName = lessonID;
+                    }
+
+                    string correctDisp = "";
+
+                    Tuple<int, int> tots = Model.LessonCounts[lessonID];
+                    if (tots.Item1 > 0 || tots.Item2 > 0) {
+                        double all = tots.Item1 + tots.Item2;
+                        double avg = (double)tots.Item1 / all;
+                        correctDisp = avg.ToString();
+                    }
+
+                    var lessonUrl = RenderHelp.URIEncode(lessonID);
+
+                    <tr>
+                        <th class="nw">
+                            <a href="~/home/lessondetails/@lessonUrl" class="lesson-link">@lessonName</a>
+                        </th>
+
+                        <th class="correct-cell nw">@correctDisp</th>
+
+                        @foreach (var userID in Model.Class.Students) {
+                            var userUrl = RenderHelp.URIEncode(userID);
+
+                            string correctRateDisp = "";
+                            string showCompleted = "";
+
+                            var key = new Tuple<string, string>(lessonID, userID);
+                            StudentLessonActs turns = null;
+
+                            if (Model.LUTurns.TryGetValue(key, out turns)) {
+                                correctRateDisp = turns.CorrectAnswerRate().ToString();
+                                showCompleted = turns.LastCompleted() ? "yes" : "";
+                            }
+
+                            <td class="nw border1 correct-cell det-link" data-completed="@showCompleted" data-user="@userUrl" data-lesson="@lessonUrl">
+                                @correctRateDisp
+                            </td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+
     <div class="row">        
         <div class="col-md-12">
             <h3>Students</h3>
@@ -82,78 +154,6 @@
                         </tr>
                     }
                 </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <style>
-                .matrixCell {
-                    min-width: 32px;
-                    width: auto;
-                }
-            </style>
-
-            <hr/>
-
-            <h3>Lesson Breakdown</h3>
-
-            <table class="table table-condensed" id="classMatrix">
-                <tr>
-                    <th class="nw matrixCell"><i>Lesson</i></th>
-                    <th class="nw matrixCell"><i>Class Avg</i></th>
-                    @foreach (var userID in Model.Class.Students) {
-                        <th class="nw matrixCell">
-                            <a href="~/home/studentdetails/@RenderHelp.URIEncode(userID)" class="student-link">@userID</a>
-                        </th>
-                    }
-                </tr>
-
-                @foreach (var lessonID in Model.Class.Lessons) {
-                    string lessonName;
-                    if (!Model.LessonNames.TryGetValue(lessonID, out lessonName)) {
-                        lessonName = lessonID;
-                    }
-
-                    string correctDisp = "";
-
-                    Tuple<int, int> tots = Model.LessonCounts[lessonID];
-                    if (tots.Item1 > 0 || tots.Item2 > 0) {
-                        double all = tots.Item1 + tots.Item2;
-                        double avg = (double)tots.Item1 / all;
-                        correctDisp = avg.ToString();
-                    }
-                    
-                    var lessonUrl = RenderHelp.URIEncode(lessonID);
-                    
-                    <tr>
-                        <th class="nw">
-                            <a href="~/home/lessondetails/@lessonUrl" class="lesson-link">@lessonName</a>
-                        </th>
-
-                        <th class="correct-cell nw">@correctDisp</th>
-                        
-                        @foreach (var userID in Model.Class.Students) {
-                            var userUrl = RenderHelp.URIEncode(userID);
-                            
-                            string correctRateDisp = "";
-                            string showCompleted = "";
-                                                
-                            var key = new Tuple<string, string>(lessonID, userID);
-                            StudentLessonActs turns = null;
-
-                            if (Model.LUTurns.TryGetValue(key, out turns)) {
-                                correctRateDisp = turns.CorrectAnswerRate().ToString();
-                                showCompleted = turns.LastCompleted() ? "yes" : "";
-                            }
-
-                            <td class="nw border1 correct-cell det-link"  data-completed="@showCompleted" data-user="@userUrl" data-lesson="@lessonUrl">
-                                @correctRateDisp
-                            </td>
-                        }
-                    </tr>
-                }
             </table>
         </div>
     </div>

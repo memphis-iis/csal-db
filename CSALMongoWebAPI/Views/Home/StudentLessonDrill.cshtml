@@ -27,7 +27,7 @@
             @foreach (var dl in Model.DetailLog) {
                 bool showExtra = false;
                 string extraClass = "";
-                
+
                 <div class="logEntry">
                     @if (dl.Tag == "Attempt") {
                         <span class="label label-primary">@dl.Descrip</span>
@@ -68,6 +68,7 @@
 @section ScriptFinal {
 <script>
     $(document).ready(function () {
+        //Nothing
     });
 </script>
 }

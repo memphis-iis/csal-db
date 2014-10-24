@@ -59,6 +59,15 @@ var CSALCommon = {
         }
     },
 
+    //For string s, replace all occurrences of fnd with rep - note that we use
+    //a global regex, so any regex characters in fnd must be escaped (so you
+    //cannot use regex's for this operation)
+    replaceAll: function(s, fnd, rep) {
+        fnd = ("" + fnd).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        fndEx = new RegExp(fnd, 'gi');
+        return ("" + s).replace(fndEx, "" + rep);
+    },
+
     safeParseInt: function (s, def) {
         var i = def;
         try {

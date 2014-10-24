@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Net;
 using System.Linq;
 using System.Dynamic;
@@ -477,11 +478,13 @@ namespace CSALMongoWebAPI.Controllers {
                 return RedirectToAction("Students");
             }
 
+
+
             var turns = StudentsCtrl.DBConn().FindTurns(lessonID, userID);
             var detailLog = new List<ExpandoObject>();
 
             if (turns == null || turns.Count < 1 || turns[0].Turns == null || turns[0].Turns.Count < 1) {
-                detailLog.Add(DetailLogEntry("No information"));
+                detailLog.Add(DetailLogEntry(student, "No information"));
             }
             else {
                 var details = turns[0];
@@ -490,7 +493,7 @@ namespace CSALMongoWebAPI.Controllers {
 
                 foreach (var turn in details.Turns) {
                     if (turn.TurnID == 0) {
-                        detailLog.Add(DetailLogEntry("Start of Lesson Attempt", "Attempt", entry:turn));
+                        detailLog.Add(DetailLogEntry(student, "Start of Lesson Attempt", "Attempt", entry: turn));
                     }
 
                     bool completion = false;
@@ -525,11 +528,11 @@ namespace CSALMongoWebAPI.Controllers {
                     }
 
                     if (correct) {
-                        detailLog.Add(DetailLogEntry("CORRECT", "Answer", lastQuestion, turn));
+                        detailLog.Add(DetailLogEntry(student, "CORRECT", "Answer", lastQuestion, turn));
                         
                     }
                     else if (incorrect) {
-                        detailLog.Add(DetailLogEntry("MISS", "Answer", lastQuestion, turn));
+                        detailLog.Add(DetailLogEntry(student, "MISS", "Answer", lastQuestion, turn));
                     }
 
                     if (turn.Transitions != null && turn.Transitions.Count > 0) {
@@ -547,14 +550,14 @@ namespace CSALMongoWebAPI.Controllers {
                             else if (ruleID.EndsWith("hard")) newState = "H";
 
                             if (newState != null && newState != lastDiff) {
-                                detailLog.Add(DetailLogEntry(lastDiff + " to " + newState, "PathChange", entry:turn));
+                                detailLog.Add(DetailLogEntry(student, lastDiff + " to " + newState, "PathChange", entry: turn));
                                 lastDiff = newState;
                             }
                         }
                     }
 
                     if (completion) {
-                        detailLog.Add(DetailLogEntry("Completed Lesson", "Completion", entry:turn));
+                        detailLog.Add(DetailLogEntry(student, "Completed Lesson", "Completion", entry: turn));
                     }
                 }
             }
@@ -567,20 +570,26 @@ namespace CSALMongoWebAPI.Controllers {
             modelDict["LessonName"] = lesson.ShortName;
             modelDict["UserID"] = userID;
             modelDict["DetailLog"] = detailLog;
+            modelDict["BlindTarget"] = student.FirstName;
 
             return View("StudentLessonDrill", modelObj);
         }
 
-        private ExpandoObject DetailLogEntry(string descrip, string tag = "", string extra = "", ConvLog entry = null) {
+        private ExpandoObject DetailLogEntry(Student student, string descrip, string tag = "", string extra = "", ConvLog entry = null) {
             string ts = "";
             if (entry != null && entry.DBTimestamp > 0.0) {
                 ts = entry.DBDateTime().ToString();
             }
-            
-            return Util.RenderHelp.ToExpando(new { 
-                Descrip = descrip, 
-                Tag = tag, 
-                Extra = extra,
+
+            var replacer = new Regex(Regex.Escape(student.FirstName), RegexOptions.IgnoreCase);
+            Func<string, string> filter = s => {
+                return replacer.Replace(s, "Student-Name");
+            };
+
+            return Util.RenderHelp.ToExpando(new {
+                Descrip = filter(descrip),
+                Tag = filter(tag),
+                Extra = filter(extra),
                 Timestamp = ts
             });
         }

@@ -83,8 +83,6 @@ namespace CSALMongo {
             mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION).CreateIndex("UserID");
         }
 
-        //TODO: this needs to be an actual object with dt and url
-
         /// <summary>
         /// Like our "main" function SaveRawStudentLessonAct, it should be a
         /// JSON object with two fields: UserID and TargetURL.
@@ -104,14 +102,22 @@ namespace CSALMongo {
                 return; //Nothing to do
             }
 
-            //TODO: are they passing the "full" user ID or just the subject-ID for a student (see SaveRawStudentLessonAct)
-            userID = userID.Trim().ToLower();
+            var visit = new Model.MediaVisit { 
+                TargetURL = targetURL, 
+                VisitTime = DateTime.Now 
+            }.ToBsonDocument();
+            
+            //Note that we set the LastTurnTime to now on insert EVEN THOUGH
+            //this isn't a turn (note we set TurnCount to 0).  This is because
+            //we're not allowed to the field to null and we don't want to NOT
+            //set it.
 
+            userID = userID.Trim().ToLower();
             DoUpsert(STUDENT_COLLECTION, userID, Update
                 .SetOnInsert("AutoCreated", true)
-                .SetOnInsert("LastTurnTime", null)
+                .SetOnInsert("LastTurnTime", DateTime.Now)
                 .SetOnInsert("TurnCount", 0)
-                .AddToSet("ReadingURLs", targetURL));
+                .Push("ReadingURLs", visit));
         }
 
         /// <summary>
@@ -219,6 +225,7 @@ namespace CSALMongo {
             DoUpsert(STUDENT_COLLECTION, userID, Update
                 .SetOnInsert("ReadingURLs", new BsonArray())
                 .SetOnInsert("AutoCreated", true)
+                .Set("UserID", userID)
                 .Set("LastTurnTime", now)
                 .Inc("TurnCount", 1));
 
@@ -226,6 +233,7 @@ namespace CSALMongo {
             if (!String.IsNullOrWhiteSpace(classID)) {
                 DoUpsert(CLASS_COLLECTION, classID, Update
                     .Set("Location", locationID)
+                    .Set("ClassID", classID)
                     .AddToSet("Lessons", lessonID)
                     .AddToSet("Students", userID)
                     .SetOnInsert("MeetingTime", "")
@@ -236,6 +244,7 @@ namespace CSALMongo {
             //inserting and don't have any values for them
             var lessonUpdate = Update
                 .Set("LastTurnTime", now)
+                .Set("LessonID", lessonID)
                 .AddToSet("Students", userID)
                 .Inc("TurnCount", 1)
                 .SetOnInsert("AutoCreated", true)

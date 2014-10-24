@@ -48,6 +48,70 @@ namespace CSALMongoUnitTest {
         }
 
         [TestMethod]
+        public void TestSaveReadingTargetExisting() {
+            var db = new CSALDatabase(DB_URL);
+            db.SaveRawStudentLessonAct(Properties.Resources.SampleRawAct);
+            var students = db.FindStudents();
+            Assert.AreEqual(1, students.Count);
+            Assert.IsNotNull(students[0].ReadingURLs);
+
+            DateTime preWrite = DateTime.Now.AddSeconds(-1);
+
+            db.SaveStudentReadingTarget("{UserID:'" + SAMPLE_RAW_USER + "', TargetURL:'http://test/a'}");
+            students = db.FindStudents();
+            Assert.AreEqual(1, students.Count);
+            var student = students[0];
+
+            Assert.AreEqual(1, student.TurnCount);
+            Assert.AreEqual(SAMPLE_RAW_USER.ToLowerInvariant(), student.UserID);
+
+            Assert.AreEqual(1, student.ReadingURLs.Count);
+            var visit = student.ReadingURLs[0];
+
+            Assert.AreEqual(visit.TargetURL, "http://test/a");
+            Assert.IsTrue(preWrite < visit.VisitTime);
+        }
+
+        [TestMethod]
+        public void TestSaveReadingTargetMissing() {
+            var db = new CSALDatabase(DB_URL);
+            var students = db.FindStudents();
+            Assert.AreEqual(0, students.Count);
+
+            DateTime preWrite = DateTime.Now.AddSeconds(-1);
+
+            db.SaveStudentReadingTarget("{UserID:'" + SAMPLE_RAW_USER + "', TargetURL:'http://test/a'}");
+            students = db.FindStudents();
+            Assert.AreEqual(1, students.Count);
+            var student = students[0];
+
+            Assert.AreEqual(0, student.TurnCount);
+            Assert.AreEqual(SAMPLE_RAW_USER.ToLowerInvariant(), student.UserID);
+
+            Assert.AreEqual(1, student.ReadingURLs.Count);
+            var visit = student.ReadingURLs[0];
+
+            Assert.AreEqual(visit.TargetURL, "http://test/a");
+            Assert.IsTrue(preWrite < visit.VisitTime);
+
+            db.SaveStudentReadingTarget("{UserID:'" + SAMPLE_RAW_USER + "', TargetURL:'http://test/b'}");
+            students = db.FindStudents();
+            Assert.AreEqual(1, students.Count);
+            student = students[0];
+
+            Assert.AreEqual(0, student.TurnCount);
+            Assert.AreEqual(SAMPLE_RAW_USER.ToLowerInvariant(), student.UserID);
+
+            Assert.AreEqual(2, student.ReadingURLs.Count);
+
+            Assert.AreEqual(student.ReadingURLs[0].TargetURL, "http://test/a");
+            Assert.AreEqual(student.ReadingURLs[1].TargetURL, "http://test/b");
+            
+            Assert.IsTrue(preWrite < student.ReadingURLs[0].VisitTime);
+            Assert.IsTrue(preWrite < student.ReadingURLs[1].VisitTime);
+        }
+
+        [TestMethod]
         public void TestRawActSave() {
             var db = new CSALDatabase(DB_URL);
 

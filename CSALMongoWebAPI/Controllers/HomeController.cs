@@ -20,7 +20,6 @@ using Newtonsoft.Json.Linq;
 //TODO: lesson log - need to reblind student name
 
 //TODO: which reading assignment did they use:
-//      - reader URL's - keep track of datetime and switch from set-to-push
 //      - need /api/reading endpoint - post will accept userID, targetURL then call SaveStudentReadingTarget
 //      - update check db_init.py
 //      - update student detail screen (remember list could be null)

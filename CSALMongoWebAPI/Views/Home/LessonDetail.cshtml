@@ -1,10 +1,13 @@
-﻿@using CSALMongoWebAPI.Util
+﻿@using System.Linq;
+@using CSALMongoWebAPI.Util
 
 @{
     ViewBag.Title = Model.Lesson.ShortName + " (" + Model.Lesson.LessonID + ")";
 }
 
 @{
+    List<DateTime> attemptTimes = Model.Lesson.AttemptTimes;
+    
     var studentsAssigned = 0;
     if (Model.Lesson.Students != null) {
         studentsAssigned = Model.Lesson.Students.Count;
@@ -34,44 +37,43 @@
 <!-- MAIN CONTENT -->
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-6">
-            @if (Model.Lesson.LastTurnTime != null) {
-                <p>Last lesson activity was @Model.Lesson.LastTurnTime.ToString()</p>
-            }
-
-            @if (Model.Lesson.AttemptTimes != null && Model.Lesson.AttemptTimes.Count > 0) {
-                <p>
-                    The first attempt was @Model.Lesson.AttemptTimes[0].
-                    The last attempt was @Model.Lesson.AttemptTimes[Model.Lesson.AttemptTimes.Count - 1].
-                </p>
-            }
-
-            @if (studentsAssigned > 0 || studentsAttempted > 0 || studentsCompleted > 0) {
-                <p>
-                    This lesson has been assigned to <strong>@studentsAssigned student(s)</strong>.
-                    <strong>@studentsAttempted</strong> have attempted the lesson, and
-                    <strong>@studentsCompleted</strong> have completed it.
-                </p>
+        <div class="col-md-4">
+            @if (troubleFailing > 0 || troubleNotCompleted > 0) {
+                <table class="table table-bordered table-condensed">
+                    <tr><th class="nw">Less than passing</th><td>@troubleFailing</td></tr>
+                    <tr><th class="nw">Haven't completed</th><td>@troubleNotCompleted</td></tr>
+                </table>
+                <button id="TroubleFilterCmd" type="button" class="btn btn-xs btn-primary">View Struggling Students</button>
             }
         </div>
-        <div class="col-md-6">
-            @if (troubleFailing > 0 || troubleNotCompleted > 0) {
-                <p>
-                    Some students may be struggling.  <strong>@troubleFailing</strong> currently
-                    don't have a passing percentage and <strong>@troubleNotCompleted</strong>
-                    haven't completed their last attempt. <br />
-                    If you wish to view only these students, click:
-                    <button id="TroubleFilterCmd" type="button" class="btn btn-xs btn-primary">View Struggling Students</button>
-                </p>
-            }
 
-            <br />
+        <div class="col-md-4">
+            <table class="table table-bordered table-condensed">
+                @if (Model.Lesson.LastTurnTime != null) {
+                    <tr><th class="nw">Last Activity</th><td>@Model.Lesson.LastTurnTime</td></tr>
+                }
+                @if (attemptTimes != null && attemptTimes.Count > 0) {
+                    <tr><th class="nw">First Attempt</th><td>@attemptTimes[0]</td></tr>
+                    <tr><th class="nw">Last Attempt</th><td>@attemptTimes.Last()</td></tr>
+                }
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <table class="table table-bordered table-condensed">
+                <tr><th class="nw">Assigned</th><td>@studentsAssigned</td></tr>
+                <tr><th class="nw">Attempted</th><td>@studentsAttempted</td></tr>
+                <tr><th class="nw">Completed</th><td>@studentsCompleted</td></tr>
+            </table>
         </div>
     </div>
+
+    <hr />
+
     <div class="row">
         <div class="col-md-12">
+            <h3>Lesson Information</h3>
             <table id="DetailTable" class="table table-striped apply-data-table">
-                <caption>Lesson Information</caption>
                 <thead>
                     <tr>
                         <th>Student</th>
@@ -79,10 +81,10 @@
                         <th>Last Activity</th>
                         <th>Times Attempted</th>
                         <th>Times Completed</th>
-                        <th>Correct Response Rate</th>
-                        <th>Total time on current attempt</th>
-                        <th>Reading time</th>
-                        <th>Lesson Path</th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Score</span></th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Total time</span></th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Reading time</span></th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Lesson Path</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -147,6 +149,8 @@
                 var t = $(this);
                 showTurnDetail(t.data("lesson"), t.data("user"));
             });
+
+            $(".has-tooltip").tooltip();
 
             detailTable = $('#DetailTable').dataTable({
                 "order": [[5, "asc"]]

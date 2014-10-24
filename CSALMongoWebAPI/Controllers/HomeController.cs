@@ -19,8 +19,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 
-//TODO: all metrics are last attempt - verify code, change UI/titles to make clear
-
 //TODO: coverage
 
 //TODO: documentation:
@@ -30,8 +28,6 @@ using Newtonsoft.Json.Linq;
 //      - readme for doc generation in doc dir
 //      - api namespace
 //      - gui namespace
-//TODO: Insure documentation on all public namespaces, classes, and methods
-//     (ALSO top-level documentation directory with compiled help - tag version for that)
 
 //TODO: This controller class has really gotten too big - 
 //      should probably refactor out 2 other controllers: OAuth and Dev/Drill

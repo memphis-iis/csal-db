@@ -8,14 +8,18 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
+            <h3>All Lessons</h3>
             <table id="all-lessons" class="table table-striped apply-data-table">
-                <caption>All Lessons</caption>
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Number of students attempted</th>
                         <th>Number of students completed</th>
-                        <th>Class Avg</th>
+                        <th>
+                            <span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">
+                                Class Avg
+                            </span>
+                        </th>
                         <th>Date of first attempted</th>
                         <th>Date of last attempted</th>
                     </tr>
@@ -68,9 +72,12 @@
 @section ScriptFinal {
 <script>
     $(document).ready(function () {
+        $(".has-tooltip").tooltip();
+
         $('.apply-data-table').dataTable({
             "aaSorting": [] //No default sort
         });
+
         $(".lesson-link").addClass("hover-restore");
     });
 </script>

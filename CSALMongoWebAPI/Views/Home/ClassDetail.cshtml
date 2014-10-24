@@ -4,31 +4,35 @@
 
 @{
     ViewBag.Title = "Class " + Model.Class.ClassID;
+    var meetingTime = Model.Class.MeetingTime;
+    if (String.IsNullOrWhiteSpace(meetingTime)) {
+        meetingTime = "?";
+    }
 }
 
 
 <!-- MAIN CONTENT -->
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="pull-left">
-                <p>Location: @Model.Class.Location</p>
-                <p>Teacher: @Model.Class.TeacherName</p>
-            </div>
+    <div class="row">        
+        <div class="col-md-4">
+            <table class="table table-condensed table-bordered">
+                <tr><th>Meeting Time</th><td>@meetingTime</td></tr>
+                <tr><th>Students</th><td>@Model.Class.Students.Count</td></tr>
+                <tr><th>Lessons</th><td>@Model.Class.Lessons.Count</td></tr>
+            </table>
+        </div>
+        
+        <div class="col-md-4">
+            <table class="table table-condensed table-bordered">
+                <tr><th>Location</th><td>@Model.Class.Location</td></tr>
+                <tr><th>Teacher</th><td>@Model.Class.TeacherName</td></tr>
+            </table>
+        </div>
 
-            <div class="pull-left" style="margin-left: 32px;">
-                @if (!String.IsNullOrWhiteSpace(Model.Class.MeetingTime)) {
-                    <p>Meeting Time: @Model.Class.MeetingTime</p>
-                }
-
-                <p>
-                    This class has <strong>@Model.Class.Students.Count</strong> students
-                    and <strong>@Model.Class.Lessons.Count</strong> lessons
-                </p>
-            </div>
-
-            <div class="clearfix">
-            </div>
+        <div class="col-md-4">
+            <p>Please note that averages are based on the students'
+            <em>last</em> attempt on a lesson. You may examine all
+            attempts a student has made by clicking on a score.</p>
         </div>
     </div>
 

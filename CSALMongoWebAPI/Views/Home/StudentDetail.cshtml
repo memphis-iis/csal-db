@@ -29,10 +29,10 @@
                         <th>Last Activity</th>
                         <th>Times Attempted</th>
                         <th>Times Completed</th>
-                        <th>Correct response rate</th>
-                        <th>Total time on current attempt</th>
-                        <th>Reading time</th>
-                        <th>Lesson Path</th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Score</span></th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Total time</span></th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Reading time</span></th>
+                        <th><span class="has-tooltip" data-toggle="tooltip" data-placement="top" title="Based on each student's last attempt">Lesson Path</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -117,6 +117,8 @@
                 var t = $(this);
                 showTurnDetail(t.data("lesson"), t.data("user"));
             });
+
+            $(".has-tooltip").tooltip();
 
             $('.apply-data-table').dataTable({
                 "aaSorting": [] //No default sort

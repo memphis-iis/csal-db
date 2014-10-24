@@ -20,8 +20,9 @@
             Completed <strong>@completedCount</strong> of <strong>@Model.Turns.Count</strong> lessons attempted
             <br />
 
+            <h3>Lesson Information</h3>
+
             <table class="table table-striped">
-                <caption>Lesson Information</caption>
                 <thead>
                     <tr>
                         <th>Lesson Name</th>
@@ -62,6 +63,30 @@
                             <td class="nw">@RenderHelp.HumanDuration(lesson.CurrentReadingTime())</td>
                             <td class="path-cell nw">@lesson.CurrentLessonPath()</td>
                         </tr>                        
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <br/><br /><br />
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Readings Visited</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>When</th>
+                        <th>Where</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var visit in Model.Student.ReadingURLs) {
+                        <tr>
+                            <td class="nw">@visit.VisitTime</td>
+                            <td class="nw">@visit.TargetURL</td>
+                        </tr>
                     }
                 </tbody>
             </table>

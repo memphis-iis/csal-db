@@ -18,12 +18,6 @@ using CSALMongo.TurnModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-//TODO: lesson log - need to reblind student name
-
-//TODO: which reading assignment did they use:
-//      - need /api/reading endpoint - post will accept userID, targetURL then call SaveStudentReadingTarget
-//      - update check db_init.py
-//      - update student detail screen (remember list could be null)
 
 //TODO: all metrics are last attempt - verify code, change UI/titles to make clear
 
@@ -581,10 +575,16 @@ namespace CSALMongoWebAPI.Controllers {
                 ts = entry.DBDateTime().ToString();
             }
 
-            var replacer = new Regex(Regex.Escape(student.FirstName), RegexOptions.IgnoreCase);
-            Func<string, string> filter = s => {
-                return replacer.Replace(s, "Student-Name");
-            };
+            Func<string, string> filter;
+            if (String.IsNullOrWhiteSpace(student.FirstName)) {
+                filter = s => s ?? "";
+            }
+            else {
+                var replacer = new Regex(Regex.Escape(student.FirstName), RegexOptions.IgnoreCase);
+                filter = s => {
+                    return replacer.Replace(s, "Student-Name");
+                };
+            }            
 
             return Util.RenderHelp.ToExpando(new {
                 Descrip = filter(descrip),
@@ -763,6 +763,12 @@ namespace CSALMongoWebAPI.Controllers {
                 if (!AllowedStudents(CurrentUserEmail()).Contains(student.UserID)) {
                     return RedirectToAction("Students");
                 }
+            }
+
+            //Make it easy on the template and always have a reading
+            //list (even if it's empty)
+            if (student.ReadingURLs == null) {
+                student.ReadingURLs = new List<MediaVisit>();
             }
 
             var studentTurns = StudentsCtrl.DBConn().FindTurns(null, student.UserID);

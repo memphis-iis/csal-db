@@ -163,10 +163,13 @@ def one_student(base, student):
         data["UserID"] = sid
         data["TurnCount"] = 0
         data["AutoCreated"] = False
-        data["ReadingURLs"] = []
 
     data["FirstName"] = first
     data["LastName"] = last
+    
+    #Replace None's
+    if not data.get("ReadingURLs", []):
+        data["ReadingURLs"] = []
 
     do_post(url, data)
 

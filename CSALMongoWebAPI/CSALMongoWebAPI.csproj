@@ -160,6 +160,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LessonsController.cs" />
     <Compile Include="Controllers\MakerController.cs" />
+    <Compile Include="Controllers\StudentReadingController.cs" />
     <Compile Include="Controllers\StudentsAtLocationController.cs" />
     <Compile Include="Controllers\StudentsController.cs" />
     <Compile Include="Controllers\TurnController.cs" />

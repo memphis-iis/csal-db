@@ -12,7 +12,20 @@ using MongoDB.Bson.Serialization;
 // us via raw JSON.
 
 namespace CSALMongo.Model {
+    /// <summary>
+    /// Utility functions that make working with this model easier
+    /// </summary>
     public static class Utils {
+        /// <summary>
+        /// Given a chunk of JSON, parse it and return the specified type. Note
+        /// that this helper utilizes the BsonDocument functionality from the C#
+        /// MongoDB driver, NOT the JSON library used by ASP.NET (and our Web API).
+        /// Also note that the JSON is tranlated on the fly to handle things like 
+        /// the fields $id, Id, and _id.
+        /// </summary>
+        /// <typeparam name="TModel">The type to return</typeparam>
+        /// <param name="json">The JSON to parse</param>
+        /// <returns>The populated instance of the type TModel</returns>
         public static TModel ParseJson<TModel>(string json) {
             var doc = BsonDocument.Parse(json);
             //If they do a GET/modify/POST, then might have a field name $id
@@ -28,6 +41,12 @@ namespace CSALMongo.Model {
             return BsonSerializer.Deserialize<TModel>(doc);
         }
 
+        /// <summary>
+        /// Translation helper that returns a string-sortable version of a
+        /// lesson ID
+        /// </summary>
+        /// <param name="lessonID">Lesson ID to translate</param>
+        /// <returns>The string to use for sorting</returns>
         public static String LessonIDSort(string lessonID) {
             string ret = lessonID;
             if (String.IsNullOrWhiteSpace(ret))
@@ -41,16 +60,51 @@ namespace CSALMongo.Model {
         }
     }
 
+    /// <summary>
+    /// A class of students and lessons
+    /// </summary>
     public class Class: IComparable<Class> {
-        //MongoDB ID (_id)
+        /// <summary>
+        /// The MongoDB ID (_id)
+        /// </summary>
         public string Id { get; set; }
 
+        /// <summary>
+        /// The storage key for the class (note the interaction with Id)
+        /// </summary>
         public string ClassID { get { return Id; } set { Id = value; } }
+        
+        /// <summary>
+        /// Name of the teacher for this class. Note that this should be an
+        /// email AND that it controls access to the class data in the DB GUI
+        /// </summary>
         public string TeacherName { get; set; }
+
+        /// <summary>
+        /// Location of the class.  Note that this can be used to get a list
+        /// of student names across classes
+        /// </summary>
         public string Location { get; set; }
+        
+        /// <summary>
+        /// Convenience field mainly for display to teachers
+        /// </summary>
         public string MeetingTime { get; set; }
+
+        /// <summary>
+        /// List of students enrolled in this class
+        /// </summary>
         public List<string> Students { get; set; }
+        
+        /// <summary>
+        /// List of lessons in this class
+        /// </summary>
         public List<string> Lessons { get; set; }
+        
+        /// <summary>
+        /// If true, then this class was created automatically as the result
+        /// of posted turn data
+        /// </summary>
         public Boolean? AutoCreated { get; set; }
 
         int IComparable<Class>.CompareTo(Class other) {
@@ -58,19 +112,68 @@ namespace CSALMongo.Model {
         }
     }
 
+    /// <summary>
+    /// A lesson presented to a student in a class
+    /// </summary>
     public class Lesson : IComparable<Lesson> {
-        //MongoDB ID
+        /// <summary>
+        /// The MongoDB ID (_id)
+        /// </summary>
         public string Id { get; set; }
 
+        /// <summary>
+        /// The storage key for a lesson - note the interaction with Id
+        /// </summary>
         public string LessonID { get { return Id; } set { Id = value; } }
+
+        /// <summary>
+        /// Name displayed to user in the GUI
+        /// </summary>
         public string ShortName { get; set; }
+
+        /// <summary>
+        /// Last time a turn was saved to the database (in StudentLessonActs)
+        /// </summary>
         public DateTime? LastTurnTime { get; set; }
+
+        /// <summary>
+        /// Number of turns posted to the database
+        /// </summary>
         public int? TurnCount { get; set; }
+
+        /// <summary>
+        /// List of students (by ID) that have been assigned this lesson
+        /// </summary>
         public List<String> Students { get; set; }
+
+        /// <summary>
+        /// Each time a student attempts this lesson, the date/time is appended to this list
+        /// </summary>
         public List<DateTime> AttemptTimes { get; set; }
+
+        /// <summary>
+        /// List of students (by ID) that have attempted this lesson. Size
+        /// should always be less than or equal to size of Students
+        /// </summary>
         public List<String> StudentsAttempted { get; set; }
+
+        /// <summary>
+        /// List of students (by ID) that have completed this lesson. Size
+        /// should always be less than or equal to size of Students and StudentsAttempted
+        /// </summary>
         public List<String> StudentsCompleted { get; set; }
+        
+        /// <summary>
+        /// List of URL's seen for this lesson's ID.  Because the lesson ID is
+        /// sent as a URL and then extracted, there should be at least one URL
+        /// in this list if at least one Turn has been posted for the lesson.
+        /// </summary>
         public List<String> URLs { get; set; }
+
+        /// <summary>
+        /// If true, then this lesson was created automatically as the result
+        /// of posted turn data
+        /// </summary>
         public Boolean? AutoCreated { get; set; }
 
         int IComparable<Lesson>.CompareTo(Lesson other) {
@@ -81,16 +184,52 @@ namespace CSALMongo.Model {
         }
     }
 
+    /// <summary>
+    /// A student enrolled in a class and assigned lessons
+    /// </summary>
     public class Student : IComparable<Student> {
-        //MongoDB ID (_id)
+        /// <summary>
+        /// The MongoDB ID (_id)
+        /// </summary>
         public string Id { get; set; }
         
+        /// <summary>
+        /// The storage key for a student (AKA a subject ID) - note
+        /// the interaction with Id
+        /// </summary>
         public string UserID { get {return Id;} set {Id = value;} }
+
+        /// <summary>
+        /// The time the last turn was posted to the database for this student
+        /// </summary>
         public DateTime? LastTurnTime { get; set; }
+        
+        /// <summary>
+        /// Number of turns posted for this student
+        /// </summary>
         public int? TurnCount { get; set; }
+
+        /// <summary>
+        /// Student's first name - note the GUI only displays subject ID and
+        /// in some instances (the student/lesson drill down) actively hides
+        /// the first name
+        /// </summary>
         public string FirstName { get; set; }
+
+        /// <summary>
+        /// Student's last name
+        /// </summary>
         public string LastName { get; set; }
+        
+        /// <summary>
+        /// True if the student was created automatically when a turn was posted
+        /// </summary>
         public Boolean? AutoCreated { get; set; }
+
+        /// <summary>
+        /// List of MediaVisit instances posted to the database to maintain a
+        /// reading history for this student
+        /// </summary>
         public List<MediaVisit> ReadingURLs { get; set; }
 
         int IComparable<Student>.CompareTo(Student other) {
@@ -98,26 +237,79 @@ namespace CSALMongo.Model {
         }
     }
 
+    /// <summary>
+    /// Represents a visit to a resource - currently only used for Student.ReadingURLs
+    /// </summary>
     public class MediaVisit {
+        /// <summary>
+        /// URL visited
+        /// </summary>
         public string TargetURL { get; set; }
+        /// <summary>
+        /// Time of visit (generally per the DB server time)
+        /// </summary>
         public DateTime VisitTime { get; set; }
     }
 
+    /// <summary>
+    /// Collection of turns posted for a lesson/student combination
+    /// </summary>
     public class StudentLessonActs : IComparable<StudentLessonActs> {
-        //MongoDB ID (_id)
+        /// <summary>
+        /// The MongoDB ID (_id) - composed of Lesson ID and User ID
+        /// </summary>
         public string Id { get; set; }
 
+        /// <summary>
+        /// Lesson ID of turns posted
+        /// </summary>
         public string LessonID { get; set; }
+
+        /// <summary>
+        /// User ID for turns posted
+        /// </summary>
         public string UserID { get; set; }
+
+        /// <summary>
+        /// Date/time of last turn posted
+        /// </summary>
         public DateTime? LastTurnTime { get; set; }
+
+        /// <summary>
+        /// Number of turns posted
+        /// </summary>
         public int TurnCount { get; set; }
+
+        /// <summary>
+        /// Actual list of turns posted (see the CSALMonog.TurnModel
+        /// namespace for details)
+        /// </summary>
         public List<TurnModel.ConvLog> Turns { get; set; }
+        
+        /// <summary>
+        /// Number of attempts (lesson starts)
+        /// </summary>
         public int Attempts { get; set; }
+
+        /// <summary>
+        /// Number of lesson completions
+        /// </summary>
         public int Completions { get; set; }
+
+        /// <summary>
+        /// Number of correct answers for last (most recent) lesson attempt
+        /// </summary>
         public int CorrectAnswers { get; set; }
+
+        /// <summary>
+        /// Number of incorrect answers for last (most recent) lesson attempt
+        /// </summary>
         public int IncorrectAnswers { get; set; }
 
-        //Index of the beginning of the last attempt
+        /// <summary>
+        /// Index of the beginning of the last attempt
+        /// </summary>
+        /// <returns>Index that is the beginning of the last attempt at the lesson. -1 if this index doesn't exist</returns>
         public int LastAttemptIndex() {
             if (Turns.Count < 1)
                 return -1;
@@ -130,6 +322,13 @@ namespace CSALMongo.Model {
             return start;
         }
 
+        /// <summary>
+        /// Return true if the lesson described by turns between indexes start
+        /// and end is completed.
+        /// </summary>
+        /// <param name="start">Index where checking begins</param>
+        /// <param name="end">Last index checked - if less than 0, then index is assumed to be last in list</param>
+        /// <returns>True of the lesson specified has been completed</returns>
         public bool SequenceCompleted(int start, int end = -1) {
             if (start < 0)
                 return false;
@@ -157,15 +356,21 @@ namespace CSALMongo.Model {
             return false;
         }
 
-        //Return true if the last attempt was completed
+        /// <summary>
+        /// Return true if last lesson (as identified by LastAttemptIndex)
+        /// has been completed (as identified by SequenceCompleted)
+        /// </summary>
+        /// <returns></returns>
         public bool LastCompleted() {
             return SequenceCompleted(LastAttemptIndex());
         }
-
-        //Because things can hit the server out of order (or in case of test
-        //data, simultaneously), we insure that the DB timestamps are correct
-        //by using the Duration field.  Note that this is a hack to approximate
-        //time in the event we didn't receive the turns with correct ordering/spacing
+        
+        /// <summary>
+        /// Because things can hit the server out of order (or in case of test
+        /// data, simultaneously), we insure that the DB timestamps are correct
+        /// by using the Duration field.  Note that this is a hack to approximate
+        /// time in the event we didn't receive the turns with correct ordering/spacing
+        /// </summary>
         public void FixupTimestamps() {
             for (int i = 1; i < Turns.Count; ++i) {
                 var prev = Turns[i - 1];
@@ -178,6 +383,13 @@ namespace CSALMongo.Model {
             }
         }
 
+        /// <summary>
+        /// Return time spent reading (in ms) during lesson described by Turns stored
+        /// from index start to index end
+        /// </summary>
+        /// <param name="start">Index where checking begins</param>
+        /// <param name="end">Last index checked - if less than 0, then index is assumed to be last in list</param>
+        /// <returns>Reading time in milliseconds</returns>
         public double ReadingTime(int start, int end = -1) {
             //Before we do anything, fix up any timestamps that are
             //OBVIOUSLY out of whack
@@ -254,11 +466,22 @@ namespace CSALMongo.Model {
             return totalRead;
         }
 
-        //In millisecs
+        /// <summary>
+        /// Total time spent reading (as calculated by ReadingTime) on last
+        /// lesson (as identified by LastAttemptIndex) 
+        /// </summary>
+        /// <returns>Time spent reading in milliseconds</returns>
         public double CurrentReadingTime() {
             return ReadingTime(LastAttemptIndex());
         }
 
+        /// <summary>
+        /// Return total time spent (in ms) on the lesson described by Turns stored
+        /// from index start to index end
+        /// </summary>
+        /// <param name="start">Index where checking begins</param>
+        /// <param name="last">Last index checked - if less than 0, then index is assumed to be last in list</param>
+        /// <returns>Total time in milliseconds</returns>
         public double TotalTime(int start, int last = -1) {
             //Before we do anything, fix up any timestamps that are
             //OBVIOUSLY out of whack
@@ -280,10 +503,25 @@ namespace CSALMongo.Model {
             return (endTime - startTime) + Turns[last].Duration;
         }
 
+        /// <summary>
+        /// Total time spent on lesson (as calculated by TotalTime) on last
+        /// lesson (as identified by LastAttemptIndex) 
+        /// </summary>
+        /// <returns>Time spent in milliseconds</returns>
         public double CurrentTotalTime() {
             return TotalTime(LastAttemptIndex());
         }
 
+        /// <summary>
+        /// String representation of the path taken by the lesson attempt
+        /// recorded by Turns from index start to index end
+        /// </summary>
+        /// <param name="start">Index where checking begins</param>
+        /// <param name="end">Last index checked - if less than 0, then index
+        /// is assumed to be last in list</param>
+        /// <returns>A string representing the lesson path.  Each character in
+        /// the string is a path change: E=Easy, M=Medium, and H=Hard.  All
+        /// lessons are assumed to be begin in M</returns>
         public string LessonPath(int start, int end = -1) {
             if (start < 0 || start > end)
                 return "";
@@ -327,12 +565,16 @@ namespace CSALMongo.Model {
         /// string.  If their path was (Start/Medium)=>Hard=>Medium=>Easy return
         /// HME
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Path as specified</returns>
         public string CurrentLessonPath() {
             return LessonPath(LastAttemptIndex());
         }
 
-        //Returns rate where 0 <= rate <= 1
+        /// <summary>
+        /// Return the correct answer rate (from 0.0 to 1.0 inclusive) for the
+        /// last lesson
+        /// </summary>
+        /// <returns>correct answer rate (from 0.0 to 1.0 inclusive)</returns>
         public double CorrectAnswerRate() {
             if (CorrectAnswers < 1)
                 return 0.0;
@@ -341,6 +583,18 @@ namespace CSALMongo.Model {
             return (double)CorrectAnswers / tot;
         }
 
+        /// <summary>
+        ///  Return the correct answer rate (from 0.0 to 1.0 inclusive) for the
+        /// lesson recorded by the Turns from index start to index end
+        /// </summary>
+        /// <param name="start">Index where checking begins</param>
+        /// <param name="end">Last index checked - if less than 0, then index
+        /// is assumed to be last in list</param>
+        /// <param name="noAnswers">The value to return if there are no answers
+        /// for the given indexes</param>
+        /// <returns>The correct answer rate (0.0 to 1.0 inclusive) for the turns
+        /// from index start to index end.  If no answers are found in the given
+        /// range, then noAnswers is returned</returns>
         public double AdhocCorrectAnswerRate(int start, int end, double noAnswers = 0.0) {
             if (start < 0)
                 return noAnswers;

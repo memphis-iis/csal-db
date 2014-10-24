@@ -14,6 +14,10 @@ namespace CSALMongo {
     /// Exception thrown when CSAL Database-specific exceptions occur
     /// </summary>
     public class CSALDatabaseException : Exception {
+        /// <summary>
+        /// Delegate construction to base class
+        /// </summary>
+        /// <param name="msg">The exception message to propagate</param>
         public CSALDatabaseException(string msg): base(msg) {
             //Nothing currently
         }
@@ -35,10 +39,18 @@ namespace CSALMongo {
         //collection and start using the bulk update API.
         //***IF*** you do that, please remember that you'll need to handle
         //key collisions and document "typing"
-        public const string STUDENT_COLLECTION = "students";
-        public const string LESSON_COLLECTION = "lessons";
-        public const string STUDENT_ACT_COLLECTION = "studentActions";
+
+        /// <summary>MongoDB collection name for classes</summary>
         public const string CLASS_COLLECTION = "classes";
+
+        /// <summary>MongoDB collection name for students</summary>
+        public const string STUDENT_COLLECTION = "students";
+
+        /// <summary>MongoDB collection name for lessons</summary>
+        public const string LESSON_COLLECTION = "lessons";
+
+        /// <summary>MongoDB collection name for turns (actions) tracked for students/lessons</summary>
+        public const string STUDENT_ACT_COLLECTION = "studentActions";
 
         /// <summary>
         /// MongoDB URL specifying MongoDB database to target.  Note that you
@@ -279,7 +291,12 @@ namespace CSALMongo {
             DoUpsert(LESSON_COLLECTION, lessonID, lessonUpdate);
         }
 
-        //Given the BSON document, return what we can current figure out from these turns
+        /// <summary>
+        /// Given the BSON document, return what we can current figure
+        /// out from these turns
+        /// </summary>
+        /// <param name="doc">A BSON document as required by SaveRawStudentLessonAct</param>
+        /// <returns>A dynamic object with the properties IsAttempt, IsCompletion, CorrectAnswers, and IncorrectAnswers</returns>
         protected object RawContents(BsonDocument doc) {
             dynamic ret = new ExpandoObject();
 
@@ -483,6 +500,10 @@ namespace CSALMongo {
             return FindOne<Model.Lesson>(LESSON_COLLECTION, lessonID);
         }
 
+        /// <summary>
+        /// Given a single lesson, save it to the database
+        /// </summary>
+        /// <param name="lesson">The populated instance to save to the database</param>
         public void SaveLesson(Model.Lesson lesson) {
             if (lesson == null || String.IsNullOrEmpty(lesson.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing lesson or lesson ID");
@@ -546,6 +567,10 @@ namespace CSALMongo {
             return FindOne<Model.Student>(STUDENT_COLLECTION, userID);
         }
 
+        /// <summary>
+        /// Given a student instance, save to the database
+        /// </summary>
+        /// <param name="student">The populated student instance to save</param>
         public void SaveStudent(Model.Student student) {
             if (student == null || String.IsNullOrEmpty(student.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing student or User ID");
@@ -571,6 +596,10 @@ namespace CSALMongo {
             return FindOne<Model.Class>(CLASS_COLLECTION, classID);
         }
 
+        /// <summary>
+        /// Given a class (of students, not an ADT), save it to the database
+        /// </summary>
+        /// <param name="clazz">The populated instance to save to the database</param>
         public void SaveClass(Model.Class clazz) {
             if (clazz == null || String.IsNullOrEmpty(clazz.Id)) {
                 throw new CSALDatabaseException("Invalid save request: Missing Class or Class ID");

@@ -3,6 +3,15 @@ using System.Collections.Generic;
 
 namespace CSALMongo.TurnModel {
     /// <summary>
+    /// This namespace is for model classes as posted to CSALDatabase in JSON format
+    /// to record a user turn from ACE.
+    /// </summary>
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    class NamespaceDoc {
+        //Special class for namespace documentation
+    }
+
+    /// <summary>
     /// Top-level instance for turns posted to database - see CSALDatabase and Model for
     /// code interpreting these data structures
     /// </summary>
@@ -115,6 +124,7 @@ namespace CSALMongo.TurnModel {
         public double RegExMatch { get; set; }
         /// <summary>LSA match</summary>
         public double LSAMatch { get; set; }
+        /// <summary>Match</summary>
         public double Match { get; set; }
         /// <summary>Pass?</summary>
         public bool Pass { get; set; }

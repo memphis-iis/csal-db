@@ -7,11 +7,18 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
 
-// This namespace is for model classes used by CSALDatabase.  Note that the
-// data for a turn is modeled via TurnModel. ALSO note that turns are sent to
-// us via raw JSON.
-
 namespace CSALMongo.Model {
+    /// <summary>
+    /// This namespace is for model classes used by CSALDatabase.  Note that the
+    /// data for a turn is modeled via TurnModel. ALSO note that turns are sent to
+    /// us via raw JSON.
+    /// </summary>
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    class NamespaceDoc {
+        //Special class for namespace documentation
+    }
+
+
     /// <summary>
     /// Utility functions that make working with this model easier
     /// </summary>
@@ -281,7 +288,7 @@ namespace CSALMongo.Model {
         public int TurnCount { get; set; }
 
         /// <summary>
-        /// Actual list of turns posted (see the CSALMonog.TurnModel
+        /// Actual list of turns posted (see the CSALMongo.TurnModel
         /// namespace for details)
         /// </summary>
         public List<TurnModel.ConvLog> Turns { get; set; }
@@ -360,7 +367,7 @@ namespace CSALMongo.Model {
         /// Return true if last lesson (as identified by LastAttemptIndex)
         /// has been completed (as identified by SequenceCompleted)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if last attempt was completed</returns>
         public bool LastCompleted() {
             return SequenceCompleted(LastAttemptIndex());
         }

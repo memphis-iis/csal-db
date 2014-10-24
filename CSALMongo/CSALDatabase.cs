@@ -11,6 +11,14 @@ using MongoDB.Bson.Serialization;
 
 namespace CSALMongo {
     /// <summary>
+    /// The is the main namespace for the library developed for CSAL turn data storage
+    /// </summary>
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    class NamespaceDoc {
+        //Special class for namespace documentation
+    }
+
+    /// <summary>
     /// Exception thrown when CSAL Database-specific exceptions occur
     /// </summary>
     public class CSALDatabaseException : Exception {
@@ -397,7 +405,7 @@ namespace CSALMongo {
         /// <summary>
         /// Return all lessons in DB
         /// </summary>
-        /// <returns></returns>
+        /// <returns>All lessons</returns>
         public List<Model.Lesson> FindLessons() {
             return FindAll<Model.Lesson>(LESSON_COLLECTION);
         }
@@ -407,7 +415,7 @@ namespace CSALMongo {
         /// lessons represent human-created content, so this should be a fairly
         /// low-effort method
         /// </summary>
-        /// <returns></returns>
+        /// <returns>All lesson names</returns>
         public Dictionary<String, String> FindLessonNames() {
             var ret = new Dictionary<String, String>();
 
@@ -442,7 +450,7 @@ namespace CSALMongo {
         /// Return a dictionary of Lesson ID => (CorrectCount, IncorrectCount)
         /// for all lessons across all students enroller
         /// </summary>
-        /// <returns></returns>
+        /// <returns>See summary</returns>
         public Dictionary<String, Tuple<int, int>> FindLessonAnswerTots() {
             var collect = mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION);
             var results = collect.FindAllAs<BsonDocument>()
@@ -515,7 +523,7 @@ namespace CSALMongo {
         /// <summary>
         /// Return all students in DB
         /// </summary>
-        /// <returns></returns>
+        /// <returns>All students in database</returns>
         public List<Model.Student> FindStudents() {
             return FindAll<Model.Student>(STUDENT_COLLECTION);
         }
@@ -523,8 +531,8 @@ namespace CSALMongo {
         /// <summary>
         /// Return a list of students that are at the given location
         /// </summary>
-        /// <param name="location"></param>
-        /// <returns></returns>
+        /// <param name="location">Location - should match Model.Class.Location</param>
+        /// <returns>All students in classes with the given location</returns>
         public List<Model.Student> FindStudentsByLocation(string location) {
             var studentKeys = new HashSet<string>();
 
@@ -582,7 +590,7 @@ namespace CSALMongo {
         /// <summary>
         /// Return all classes in DB
         /// </summary>
-        /// <returns></returns>
+        /// <returns>All classes in database</returns>
         public List<Model.Class> FindClasses() {
             return FindAll<Model.Class>(CLASS_COLLECTION);
         }

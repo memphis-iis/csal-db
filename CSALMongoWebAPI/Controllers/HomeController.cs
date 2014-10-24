@@ -18,17 +18,6 @@ using CSALMongo.TurnModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-
-//TODO: coverage
-
-//TODO: documentation:
-//      - document proper posting from python script
-//      - intro docs with use cases and some diagrams for the various levels/projects in the solutiuon
-//      - finished xmldoc compiled and added to docs dir
-//      - readme for doc generation in doc dir
-//      - api namespace
-//      - gui namespace
-
 //TODO: This controller class has really gotten too big - 
 //      should probably refactor out 2 other controllers: OAuth and Dev/Drill
 

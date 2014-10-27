@@ -42,7 +42,7 @@ below.  The short version is that the data is stored in a MongoDB instance,
 there is a C\# library for accessing the database, and there is a Web API
 wrapping the DLL.  In addition, the Web API server provides a very simple
 ASP.NET MVC application for viewing the data.  Because of the dependence
-of the Web API on the "core" library, the only deployment information is below
+of the Web API on the ``core'' library, the only deployment information is below
 in \fullxref{subsec:deploy}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,6 +83,7 @@ configured for expected logging (via either use case
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Database}
+\label{sec:database}
 
 The main documentation for the JSON logging record is available in a Google
 doc.  Please see the documents ``CSAL Data'' at 
@@ -183,12 +184,57 @@ The ReST API is exposed via a .NET Web Api project (that also houses a GUI -
 see \fullxref{web:gui}).
 
 Since this is a ReST API, there is a URL namespace complete with expected verbs
-and payloads.  They are documented below.  It should be assumed that for local
+and payloads.  They are documented below. You may also see the Python script
+\url{../scripts/db_init.py} for an example
+of using ReST API.  Essentially, the rules are:
+
+\begin{itemize}
+    \item Lesson, Class, and Student ID's placed in a URL should be double-escaped
+          (see also RenderHelp in the Web API project)
+    \item When POST'ing, set the header ``Content-Type'' to ``application/json''
+\end{itemize}
+
+Here are the API endpoints. It should be assumed that for local
 workstation testing the url would begin with \url{http://localhost:62702}.  For
 the production URL, the proper prefix would be \url{http://autotutor.x-in-y.com/csaldb}.
 
 \begin{itemize}
-    \item TODO
+    \item GET /api/classes - returns all Classes in the database
+    \item GET /api/classes/\$id (where \$id is ClassID) - returns the specified Class
+    \item POST /api/classes/\$id (where \$id is ClassID) - the posted body should be
+          a JSON document matching Model.Class.
+          
+    \item GET /api/lessons - returns all Lessons in the database
+    \item GET /api/lessons/\$id (where \$id is LessonID) - return the specified Lesson
+    \item POST /api/lessons/\$id (where \$id is LessonID) - the posted body should be
+          a JSON document matching Model.Lesson.
+
+    \item GET /api/studentreading/\$id (where \$id is StudentID) - return list of
+          reading URL's and timestamps (in order they were POST'ed)
+    \item POST /api/studentreading - the posted body should be a JSON document with
+          two fields: UserID and TargetURL.  UserID is a StudentID.
+
+    \item GET /api/studentsatlocation/\$location (where location is a string matching
+          the location field of one or more classes).  Return a list of students (JSON
+          formatted to a match Model.Student) that are in classes matching the specified
+          location.
+
+    \item GET /api/students - returns all Students in the database
+    \item GET /api/students/\$id (where \$id is StudentID) - return the specified Student
+    \item POST /api/students/\$id (where \$id is StudentID) - the posted body should be
+          a JSON document matching Model.Student.
+    
+    \item GET /api/turn/\$lesson/\$user (where \$lesson is a LessonID and \$user is a
+          Student/Subject ID) - return a list of logged turns in their original JSON
+          format
+    \item POST /api/turn - the posted JSON body should match the format as described
+          in the documents linked in \fullxref{sec:database} or in the TurnModel.ConvLog.
+    
+    \item GET /api/turnrollup/\$lesson/\$user (where \$lesson is a LessonID and \$user is a
+          Student/Subject ID) - return a ``rolled up'' list of turns.  Each item in the list
+          represents an attempt as logged as part of the JSON API.
+    
+    \item GET/POST /api/maker - for testing and should probably not be used at this point
 \end{itemize}
 
 \subsection{User Interface}
@@ -204,12 +250,54 @@ workstation testing the url would begin with \url{http://localhost:62702}.  For
 the production URL, the proper prefix would be 
 \url{http://autotutor.x-in-y.com/csaldb}.
 
+Note that if a user access one of these endpoints (with the exception of those
+related to authentication) and is not logged in, a login/redirection will occur.
+In addition, a users' views will be filtered by classes that their login email
+matches (in the TeacherName field).  The one exception is administrators. Please
+see \fullxref{web:auth} for details.
+
+
 \begin{itemize}
-    \item TODO
+    \item /home/logout - clears the current user session and redirects to the index page
+    \item /home/login - starts the Google OAuth2 login process
+    \item /home/oauth2callback - the endpoint the Google OAuth2 servers will use for
+          redirection after user authentication
+    
+    \item /home/index - the default/index page
+    
+    \item /home/testing - shows the silly testing page, which should probably be removed
+    
+    \item /home/classes - shows the list of classes viewable by the current user
+    
+    \item /home/classdetails/\$id (where \$id is a ClassID) - display details for the
+          indicated class
+    
+    \item /home/studentlessondrill/\$lesson/\$user (where \$lesson is a LessonID and \$user is a
+          Student/Subject ID).  Construct and display a drill-down into a student's work on
+          a single lesson
+    
+    \item /home/studentlessondevselect (for administrators only) - allow the user to select 
+          a student/lesson combination for viewing a debug drill-down
+    
+    \item /home/studentlessondevview/\$lesson/\$user (where \$lesson is a LessonID and \$user is a
+          Student/Subject ID - for administrators only).  Construct and display a debug
+          drill-down into a student's work on a single lesson
+    
+    \item /home/lessons - shows the list of lessons viewable by the current user
+    
+    \item /home/lessondetails/\$id (where \$id is a LessonID) - display details for the
+          indicated lesson
+          
+    \item /home/students - shows the list of students viewable by the current user
+    
+    \item /home/studentdetails/\$id (where \$id is a StudentID) - display details for the
+          indicated student
+    
+    \item /home/materials - view the current hard-coded list of teaching materials
 \end{itemize}
 
 \subsection{Authentication}
-
+\label{web:auth}
 Authentication is handled via Google OAuth2.  Administrators are identified
 by email address in the web.config file.  Teachers are given access to class
 information if the address from their OAuth2 profile matches the teacher name

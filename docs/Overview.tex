@@ -6,11 +6,15 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{nameref}
+\usepackage{url}
 
 \usepackage[underline=true,rounded corners=false]{pgf-umlsd}
 
 \title{CSAL Database Project Introduction}
 \author{Craig Kelly}
+
+% Macro for section num AND section name references
+\newcommand{\fullxref}[1]{ \ref{#1} \nameref{#1} }
 
 \begin{document}
 
@@ -39,37 +43,134 @@ there is a C\# library for accessing the database, and there is a Web API
 wrapping the DLL.  In addition, the Web API server provides a very simple
 ASP.NET MVC application for viewing the data.  Because of the dependence
 of the Web API on the "core" library, the only deployment information is below
-in section \ref{subsec:deploy} \nameref{subsec:deploy}
+in \fullxref{subsec:deploy}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Use Cases}
 
-TODO: diagram of all of the below
+\subsection{Direct Logging}
+\label{use:directwrite}
 
-TODO: direct DLL use for storing JSON records of student interaction
+Services running on the same server as the database (i.e. ACE) want the
+ability to write JSON data log entries without POST'ing to an HTTP endpoint.
+Note that while the architecture of the project allows this use case (and it
+is currently used in production), a safe alternative would be to force all
+applications to write via the ReST API (see \fullxref{use:restwrite}).
 
-TODO: application reporting student interaction via the ReST API
+\subsection{Logging via ReST Endpoint}
+\label{use:restwrite}
 
-TODO: Teacher's viewing current status of students/lessons/classes
+Applications may post a JSON record representing an ACE turn to a public
+endpoint for persisting in the database. Note that this is the recommended
+way to save data to the database (contrast with \fullxref{use:directwrite})
 
-TODO: data admin (pre-population of the database for new locations)
+\subsection{Teacher Status Check}
+
+Teachers need to be able to see students' progress in the lesson.  There
+should be a way to see how the entire class is doing, how the class is doing
+on a lesson, how a student is doing across the lessons, and how a specified
+student is doing on a specific lesson.  Note that if this application grows,
+this Use Case should be broken out into small chunks
+
+\subsection{Data Administration}
+
+There must be a way for administrators (not teachers) to initialize and edit
+the database.  Specifically, class, lesson, and student data should be
+configured for expected logging (via either use case
+\fullxref{use:directwrite} or \fullxref{use:restwrite}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Database}
 
-TODO: "raw" JSON format and storage
+The main documentation for the JSON logging record is available in a Google
+doc.  Please see the documents ``CSAL Data'' at 
+\url{https://docs.google.com/document/d/19nJZMReWpTat_tjNeOvA7oa8rDD0KmQ5oKaHnn2HmwE}
+and ``AutoTutor Conversation Engine (ACE) Web API (CORS Version)'' at
+\url{https://docs.google.com/document/d/1ZRlj7e5u4PQSlggCD--yZ5EsB2KCZzt7P8MEI6HB9So}
 
-TODO: other entities and how inferred
+The various database entities are described below.  The JSON logging data
+described above is stored in the entity described in \fullxref{db:turns}. You
+may also see how the C\# classes for this data (both the JSON logging format
+and the database entities below) are structured by looking in the CSALMongo
+project or the CSALMongo.chm compiled documentation in this directory.
+
+
+The server is autotutor.x-in-y.com and the MongoDB database should be named
+csaldata.  There are four collections: classes, lessons, students, and
+studentActions.
+
+\subsection{Class}
+\label{db:class}
+
+There is one document in this collection per class.  It contains a list of the
+students in the class and the lessons used. Please see \fullxref{db:turns} for
+details on auto-creation and updating.
+
+\subsection{Student}
+\label{db:student}
+
+There is one document in this collection per student. Please see
+\fullxref{db:turns} for details on auto-creation and updating.
+
+\subsection{Lesson}
+\label{db:lesson}
+
+There is one document in this collection per lesson. Please see
+\fullxref{db:turns} for details on auto-creation and updating.
+
+\subsection{Student Actions}
+\label{db:turns}
+
+There is one document in this collection per student per lesson. Any time a
+JSON logging record is saved for a student in a lesson, it is appended to
+the Turns list in the corresponding document in this collection. Although it
+is preferred to have the class, lesson, and student documents matching this
+information pre-populated, a minimal version of each entity will be created
+if it is not present when the data is logged.  Auto-created entities will have
+a property named AutoCreated set to true.
+
+To help with queries, we also update the class, student, and lesson documents
+when we receive turn data like so:
+
+\begin{itemize}
+    \item \fullxref{db:class} - update the fields Students and Lessons
+    \item \fullxref{db:lesson} -  update the fields LastTurnTime, Students,
+          AttemptTimes, StudentsAttempted, StudentsCompleted, and URLs
+    \item \fullxref{db:student} -  update the fields LastTurnTime and TurnCount
+\end{itemize}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{CSALMongo DLL}
 
-TODO: overall design
+The ``base'' or ``core'' DLL contains the model classes for JSON logging
+format, the model classes for the database, the actual database interface
+class, and some supporting code.  The project is documented via XML documentation
+which has been compiled into the CSALMongo.chm in this directory.
 
-TODO: brief intro to test project
+There is also a unit test project named CSALMongoUnitTest. It uses the Unit
+Testing facilities availble with Visual Studio 2013. The tests are broken into
+five categories of testing:
+
+\begin{enumerate}
+    \item Model Testing for methods added the model classes for
+          parsing, information, etc.
+    
+    \item Database Operations Testing for actual database operations exposed
+          by the main class
+    
+    \item Database Utility Testing for helper or utility methods exposed by
+          the main database class
+    
+    \item Utility Testing for helper or utility functions \textbf{outside} the 
+          main database class.
+\end{enumerate}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -78,19 +179,63 @@ TODO: brief intro to test project
 
 \subsection{ReST API}
 
-TODO (include api namespace)
+The ReST API is exposed via a .NET Web Api project (that also houses a GUI - 
+see \fullxref{web:gui}).
+
+Since this is a ReST API, there is a URL namespace complete with expected verbs
+and payloads.  They are documented below.  It should be assumed that for local
+workstation testing the url would begin with \url{http://localhost:62702}.  For
+the production URL, the proper prefix would be \url{http://autotutor.x-in-y.com/csaldb}.
+
+\begin{itemize}
+    \item TODO
+\end{itemize}
 
 \subsection{User Interface}
+\label{web:gui}
+The User Interface is an ASP.NET MVC web application, served by the Home controller
+class, rendered via Razor.  It uses jQuery and Bootstrap for UI automation
+and styling.  Various jQuery UI plugins are also used (notably DataTables and
+Sparklines).
 
-TODO (include GUI url namespace)
+The application maintains a URL namespace similar to the ReST API, but under
+the Home directory.  As above, It should be assumed that for local
+workstation testing the url would begin with \url{http://localhost:62702}.  For
+the production URL, the proper prefix would be 
+\url{http://autotutor.x-in-y.com/csaldb}.
+
+\begin{itemize}
+    \item TODO
+\end{itemize}
+
+\subsection{Authentication}
+
+Authentication is handled via Google OAuth2.  Administrators are identified
+by email address in the web.config file.  Teachers are given access to class
+information if the address from their OAuth2 profile matches the teacher name
+for the class.
 
 \subsection{Logging}
 
-TODO
+This document generally refers to logging to identify ACE turn records
+sent in JSON format and stored in the MongoDB collection studentActions.
+However, the Web API and GUI must log records as well.  Currently this is
+fairly simple; in addition to default IIS logging, the Elmah library is
+used to log unhandled exceptions and any errors displayed via the custom
+user error page.  The Elmah log is only stored in-memory (and so is transient)
+and can be accessed at the main URL at
+\url{http://autotutor-x-in-y.com/csaldb/elmah}.
 
 \subsection{Deployment}
 \label{subsec:deploy}
-TODO
+
+The entire application should be deployed via Visual Studio packaging and IIS
+application import.  Please note that the application is already deployed to
+its own App Pool on the production server, so a new deployment should be an
+overwrite (not a new application).
+
+Any deployment should also be accompanied by an annotated tag in the Git
+repository.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -112,19 +257,9 @@ TODO
     \end{call}
 \end{sequencediagram}
 
-\subsection{Example of ReST API Call}
-
-TODO
-
 \begin{sequencediagram}
 \end{sequencediagram}
 
-\subsection{Example of Direct DLL Use}
-
-TODO
-
-\begin{sequencediagram}
-\end{sequencediagram}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

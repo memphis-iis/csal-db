@@ -1,4 +1,4 @@
-csal-db - CDAL Database Access and UI
+csal-db - CSAL Database Access and UI
 =======================================
 
  > IMPORTANT! All pull requests are welcome, but please work from the dev

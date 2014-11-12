@@ -47,10 +47,15 @@
 
                         var lessonUrl = RenderHelp.URIEncode(lessonID);
                         var userUrl = RenderHelp.URIEncode(lesson.UserID);
+
+                        var lastTurnTime = lesson.LastTurnTime;
+                        if (lastTurnTime != null) {
+                            lastTurnTime = lastTurnTime.ToLocalTime();
+                        }
                         
                         <tr>
                             <td class="nw"><a href="~/home/lessondetails/@lessonUrl" class="lesson-link">@lessonName</a></td>
-                            <td class="nw">@lesson.LastTurnTime</td>
+                            <td class="nw">@lastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>
                                 @lesson.Completions

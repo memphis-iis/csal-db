@@ -31,8 +31,8 @@
                         if (lesson.AttemptTimes != null) {
                             var cnt = lesson.AttemptTimes.Count;
                             if (cnt > 0) {
-                                firstAttempt = lesson.AttemptTimes[0].ToString();
-                                lastAttempt = lesson.AttemptTimes[cnt-1].ToString();
+                                firstAttempt = lesson.AttemptTimes[0].ToLocalTime().ToString();
+                                lastAttempt = lesson.AttemptTimes[cnt - 1].ToLocalTime().ToString();
                             }
                         }
 

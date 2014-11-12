@@ -74,6 +74,7 @@ LESSONS = [
 #Students are (id, first name, last name)
 STUDENTS = [
     ("craig", "Craig", "Kelly"),
+    ("whitney", "Whitney", "Baer"),
 ]
 
 def do_get(url):

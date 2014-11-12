@@ -185,6 +185,12 @@ namespace CSALMongo {
                 userID = String.Join("-", userFlds.Skip(2));
             }
 
+            //Trim all trailing dashes (and hidden whitespace) from the user name
+            userID = userID.TrimEnd('-', ' ', '\t', '\r', '\n');
+            if (String.IsNullOrWhiteSpace(userID)) {
+                throw new CSALDatabaseException("Invalid user ID specified for Student-Lesson Act");
+            }
+
             string studentLessonID = userID + ":" + lessonID;
             var now = DateTime.Now;
 

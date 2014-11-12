@@ -50,11 +50,11 @@
         <div class="col-md-4">
             <table class="table table-bordered table-condensed">
                 @if (Model.Lesson.LastTurnTime != null) {
-                    <tr><th class="nw">Last Activity</th><td>@Model.Lesson.LastTurnTime</td></tr>
+                    <tr><th class="nw">Last Activity</th><td>@Model.Lesson.LastTurnTime.ToLocalTime()</td></tr>
                 }
                 @if (attemptTimes != null && attemptTimes.Count > 0) {
-                    <tr><th class="nw">First Attempt</th><td>@attemptTimes[0]</td></tr>
-                    <tr><th class="nw">Last Attempt</th><td>@attemptTimes.Last()</td></tr>
+                    <tr><th class="nw">First Attempt</th><td>@attemptTimes[0].ToLocalTime()</td></tr>
+                    <tr><th class="nw">Last Attempt</th><td>@attemptTimes.Last().ToLocalTime()</td></tr>
                 }
             </table>
         </div>
@@ -94,6 +94,11 @@
 
                         var lessonUrl = RenderHelp.URIEncode(lesson.LessonID);
                         var userUrl = RenderHelp.URIEncode(lesson.UserID);
+
+                        var lastTurnTime = lesson.LastTurnTime;
+                        if (lastTurnTime != null) {
+                            lastTurnTime = lastTurnTime.ToLocalTime();
+                        }
                         
                         <tr>
                             <td><a href="~/home/studentdetails/@userUrl" class="student-link">@lesson.UserID</a></td>
@@ -102,7 +107,7 @@
                                     <span class="glyphicon glyphicon-cloud"></span>
                                 }
                             </td>
-                            <td class="nw">@lesson.LastTurnTime</td>
+                            <td class="nw">@lastTurnTime</td>
                             <td>@lesson.Attempts</td>
                             <td>
                                 @lesson.Completions

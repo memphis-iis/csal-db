@@ -18,9 +18,14 @@
                 </thead>
                 <tbody>
                     @foreach (var student in Model) {
+                        var lastTurnTime = student.LastTurnTime;
+                        if (lastTurnTime != null) {
+                            lastTurnTime = lastTurnTime.ToLocalTime();
+                        }
+                        
                         <tr>
                             <td><a href="~/home/studentdetails/@RenderHelp.URIEncode(student.UserID)" class="student-link">@student.UserID</a></td>
-                            <td class="nw">@student.LastTurnTime</td>
+                            <td class="nw">@lastTurnTime</td>
                         </tr>
                     }
                 </tbody>

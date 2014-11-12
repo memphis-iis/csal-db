@@ -140,6 +140,8 @@ namespace CSALMongo.Model {
 
         /// <summary>
         /// Last time a turn was saved to the database (in StudentLessonActs)
+        /// Note that this field might initially be populated with local time, but
+        /// will be stored in Mongo and retrieved as UTC
         /// </summary>
         public DateTime? LastTurnTime { get; set; }
 
@@ -155,6 +157,8 @@ namespace CSALMongo.Model {
 
         /// <summary>
         /// Each time a student attempts this lesson, the date/time is appended to this list
+        /// Note that this field might initially be populated with local time, but
+        /// will be stored in Mongo and retrieved as UTC
         /// </summary>
         public List<DateTime> AttemptTimes { get; set; }
 
@@ -208,6 +212,8 @@ namespace CSALMongo.Model {
 
         /// <summary>
         /// The time the last turn was posted to the database for this student
+        /// Note that this field might initially be populated with local time, but
+        /// will be stored in Mongo and retrieved as UTC
         /// </summary>
         public DateTime? LastTurnTime { get; set; }
         
@@ -254,6 +260,8 @@ namespace CSALMongo.Model {
         public string TargetURL { get; set; }
         /// <summary>
         /// Time of visit (generally per the DB server time)
+        /// Note that this field might initially be populated with local time, but
+        /// will be stored in Mongo and retrieved as UTC
         /// </summary>
         public DateTime VisitTime { get; set; }
     }
@@ -279,6 +287,8 @@ namespace CSALMongo.Model {
 
         /// <summary>
         /// Date/time of last turn posted
+        /// Note that this field might initially be populated with local time, but
+        /// will be stored in Mongo and retrieved as UTC
         /// </summary>
         public DateTime? LastTurnTime { get; set; }
 

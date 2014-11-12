@@ -10,16 +10,27 @@
 
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- optional Bootstrap theme just for now-->
     <link href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/sandstone/bootstrap.min.css" rel="stylesheet">
 
     <link href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css" rel="stylesheet">
 
+    <!-- Helpful CSS changes site-wide -->
     <style type="text/css">
+        /* Override the default color for hyperlinks so that it is visually
+           distinct (at least in the bootstrap theme we are using) from the
+           success/danger colors we use for student progress */
+        a {
+            color: #3955A1;
+        }
+
+        /* Useful class for making sure that the mouse pointer changes over
+           clickable things: use by adding the class hover-restore */
         .hover-restore:hover {
             cursor: pointer;
         }
 
+        /* Utility classes for stopping whitespace wrapper and adding a
+           1-pixel border (both can be pretty useful) */
         .nw {
             white-space: nowrap;
         }

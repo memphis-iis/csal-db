@@ -191,22 +191,34 @@ namespace CSALMongo {
                 throw new CSALDatabaseException("Invalid user ID specified for Student-Lesson Act");
             }
 
+            //Figure out key for Student Acts document
             string studentLessonID = userID + ":" + lessonID;
-            var now = DateTime.Now;
 
             //Note that we might receive a DBTimestamp in the post as an
             //override, but if not we just calculate it ourselves
+            //Note that if we get a timestamp, we use it to override "now"            
             double dbTimestamp = -1.0;
             BsonValue postedTimestamp;
             if (doc.TryGetValue("DBTimestamp", out postedTimestamp)) {
-                if (postedTimestamp.IsDouble)
+                if (postedTimestamp.IsDouble) {
                     dbTimestamp = postedTimestamp.AsDouble;
+                }
             }
 
-            //If we DIDN'T get a timestamp, that xlate now to epoch-based timestamp
+            //We'll need to know the start of our epoch regardless
+            var epochStart = new DateTime(TurnModel.ConvLog.EPOCH_YR, 1, 1);
+
+            //Figure out "now" and the db timestamp
+            DateTime now;
             if (dbTimestamp <= 0.0) {
-                var epochStart = new DateTime(TurnModel.ConvLog.EPOCH_YR, 1, 1);
+                //If we DIDN'T get a timestamp, then use the clock time "now"
+                //and xlate it to epoch-based timestamp
+                now = DateTime.Now;
                 dbTimestamp = (now - epochStart).TotalMilliseconds;
+            }
+            else {
+                //They already specified a timestamp - use that as "now"
+                now = epochStart.AddMilliseconds(dbTimestamp);
             }
 
             doc["DBTimestamp"] = dbTimestamp;

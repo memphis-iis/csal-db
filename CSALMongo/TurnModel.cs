@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using MongoDB.Bson;
+
 namespace CSALMongo.TurnModel {
     /// <summary>
     /// This namespace is for model classes as posted to CSALDatabase in JSON format
@@ -110,6 +112,10 @@ namespace CSALMongo.TurnModel {
         public string CurrentText { get; set; }
         /// <summary>Event</summary>
         public string Event { get; set; }
+        /// <summary>Presentation ID</summary>
+        public string PresentationID { get; set; }
+        /// <summary>Presentation History</summary>
+        public string PresentationHistory { get; set; }
     }
 
     /// <summary>Single instance of assessment</summary>

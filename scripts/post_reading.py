@@ -32,7 +32,7 @@ import urllib2
 
 ENDPOINT_SPECIALS = {
     "test": "http://localhost:62702/api/studentreading",
-    "prod": "http://autotutor.x-in-y.com/csaldb/api/studentreading"
+    "prod": "http://ace.autotutor.com/csaldb/api/studentreading"
 }
 def xlate_endpoint(e):
     return ENDPOINT_SPECIALS.get(e, e)

@@ -11,7 +11,7 @@ endpoint to target.  Some examples:
     ./db_init.py http://localhost:62702/api
 
     To target the "prod" server:
-    ./db_init.py http://autotutor.x-in-y.com/csaldb/api
+    ./db_init.py http://ace.autotutor.com/csaldb/api
 
 NOTE: classes, lessons, and students are read first and then updated with
 current data so untouched fields will remain the same for already-populated

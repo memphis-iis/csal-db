@@ -8,6 +8,7 @@ using MongoDB.Driver.Linq;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
 
 namespace CSALMongo {
     /// <summary>
@@ -101,6 +102,16 @@ namespace CSALMongo {
 
             mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION).CreateIndex("LessonID");
             mongoDatabase.GetCollection(STUDENT_ACT_COLLECTION).CreateIndex("UserID");
+        }
+
+        /// <summary>
+        /// Called only rarely like InsureIndexes above, this function is called
+        /// to set up our Mongo driver conventions correctly
+        /// </summary>
+        public void HandleConventions() {
+            var allConv = new ConventionPack();
+            allConv.Add(new IgnoreExtraElementsConvention(true));
+            ConventionRegistry.Register("Custom Conventions", allConv, (t) => true);
         }
 
         /// <summary>

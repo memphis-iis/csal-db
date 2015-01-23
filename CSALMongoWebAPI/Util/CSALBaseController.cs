@@ -16,8 +16,12 @@ namespace CSALMongoWebAPI.Util {
     public class CSALBaseController : ApiController {
         protected NameValueCollection appSettings = null;
 
+        protected static bool CONV_CHECK = false;
+        protected static object convLock = new object();
+
         protected static bool INDEX_CHECK = false;
         protected static object indexLock = new object();
+        
 
         /// <summary>
         /// Provide access to the web.config app settings.  Note this wrapper
@@ -38,12 +42,27 @@ namespace CSALMongoWebAPI.Util {
 
         [NonAction]
         public CSALDatabase DBConn() {
+            //Note that both our static checks need to do a check-lock-check
+            //to be safe
+
             var conn = new CSALDatabase(AppSettings["MongoURL"]);
 
+            //Check that conventions are set (one-time)
+            if (!CONV_CHECK) {
+                lock (convLock) {
+                    if (!CONV_CHECK) {
+                        //note that we set the check *after* to make sure
+                        //everyone blocks until it's done
+                        conn.HandleConventions();
+                        CONV_CHECK = true;
+                    }
+                }
+            }
+
+            //Check that indexes have been handled (one-time)
             if (!INDEX_CHECK) {
                 lock (indexLock) {
-                    //Note we need a second check after lock for race conditions
-                    //Also note that we set INDEX_CHECK *before* doing an insure so
+                    //note that we set INDEX_CHECK *before* doing an insure so
                     //other callers don't block while indexes are getting created
                     if (!INDEX_CHECK) {
                         INDEX_CHECK = true;
@@ -52,6 +71,7 @@ namespace CSALMongoWebAPI.Util {
                 }
             }
 
+            //Finally done
             return conn;
         }
     }

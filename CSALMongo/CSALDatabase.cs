@@ -337,7 +337,7 @@ namespace CSALMongo {
         protected object RawContents(BsonDocument doc) {
             dynamic ret = new ExpandoObject();
 
-            ret.IsAttempt = (doc.GetValue("TurnID", -1).AsInt32 == 0);
+            ret.IsAttempt = (doc.GetValue("TurnID", -1).AsInt32 == Model.StudentLessonActs.TURN_ID_START);
             ret.IsCompletion = false;
             ret.CorrectAnswers = 0;
             ret.IncorrectAnswers = 0;

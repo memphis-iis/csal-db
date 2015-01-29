@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -81,6 +82,35 @@ namespace CSALMongoUnitTest {
 
             Assert.AreEqual("TestClass2", clazz.Id);
             Assert.AreEqual("TestClass2", clazz.ClassID);
+        }
+
+        [TestMethod]
+        public void TestStudentLessonActTotalTime() {
+            var studentLesson = new CSALMongo.Model.StudentLessonActs();
+            studentLesson.Turns = new List<CSALMongo.TurnModel.ConvLog>();
+
+            double start_time = 160050031753.0; //Just a date chosen for testing
+            double hr_ms = 60.0 * 60.0 * 1000.0; //1 hour in millisecond
+
+            const int TURN_ID_START = CSALMongo.Model.StudentLessonActs.TURN_ID_START;
+
+            studentLesson.Turns.Add(new CSALMongo.TurnModel.ConvLog { TurnID = TURN_ID_START, DBTimestamp = start_time, Duration = 100.0 });
+
+            start_time += (2 * hr_ms);
+
+            studentLesson.Turns.Add(new CSALMongo.TurnModel.ConvLog { TurnID = TURN_ID_START, DBTimestamp = start_time, Duration = 100.0 });
+            studentLesson.Turns.Add(new CSALMongo.TurnModel.ConvLog { TurnID = 2, DBTimestamp = start_time + 101, Duration = 100.0 });
+
+            Assert.IsTrue(MsClose(301.0, studentLesson.TotalTime(0)));
+            Assert.IsTrue(MsClose(201.0, studentLesson.CurrentTotalTime()));
+        }
+
+        private bool MsClose(double msExp, double msAct) {
+            bool ret = Math.Abs(msExp - msAct) <= 0.0001;
+            if (!ret) {
+                Console.Error.WriteLine(String.Format("Double's aren't close: Exp={0:0.00000}, Act={1:0.00000}", msExp, msAct));
+            }
+            return ret;
         }
     }
 }

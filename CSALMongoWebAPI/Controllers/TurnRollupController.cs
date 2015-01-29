@@ -74,11 +74,11 @@ namespace CSALMongoWebAPI.Controllers {
             //this makes the loop below much simpler
             int start = 0;
             int list_start = 0;
-            if (turns[0].TurnID == 0)
+            if (turns[0].TurnID == StudentLessonActs.TURN_ID_START)
                 list_start = 1;
 
             for (int i = list_start; i < turns.Count; ++i) {
-                if (turns[i].TurnID == 0) {
+                if (turns[i].TurnID == StudentLessonActs.TURN_ID_START) {
                     ret.Add(RollupItem.CreateItem(parent, start, i - 1));
                     start = i;
                 }

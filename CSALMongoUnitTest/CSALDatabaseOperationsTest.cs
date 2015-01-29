@@ -155,7 +155,8 @@ namespace CSALMongoUnitTest {
         public void TestMinimalRawAct() {
             //Note our use of the "extended" user id
             var db = new CSALDatabase(DB_URL);
-            db.SaveRawStudentLessonAct("{'LessonID': 'lesson', 'UserID': 'memphis-semiotics-fozzy-bear', 'TurnID': 0}");
+            const int TURN_ID_START = CSALMongo.Model.StudentLessonActs.TURN_ID_START;
+            db.SaveRawStudentLessonAct("{'LessonID': 'lesson', 'UserID': 'memphis-semiotics-fozzy-bear', 'TurnID': " + TURN_ID_START.ToString() + "}");
 
             var lessons = db.FindLessons();
             Assert.AreEqual(1, lessons.Count);
@@ -196,16 +197,18 @@ namespace CSALMongoUnitTest {
             var turns = db.FindTurns(null, null);
             Assert.AreEqual(0, turns.Count);
 
+            const int TURN_ID_START = CSALMongo.Model.StudentLessonActs.TURN_ID_START;
+
             var attempted = new CSALMongo.TurnModel.ConvLog {
                 UserID = "memphis-semiotics-fozzy-bear",
                 LessonID = "lesson",
-                TurnID = 0
+                TurnID = TURN_ID_START
             };
 
             var completion = new CSALMongo.TurnModel.ConvLog {
                 UserID = "memphis-semiotics-fozzy-bear",
                 LessonID = "lesson",
-                TurnID = 1,
+                TurnID = TURN_ID_START + 1,
                 Transitions = new List<CSALMongo.TurnModel.TransitionLog> {
                     new CSALMongo.TurnModel.TransitionLog { 
                         StateID="TestEnding", 
@@ -242,7 +245,7 @@ namespace CSALMongoUnitTest {
             Assert.AreEqual(2, turns[0].Attempts);
             Assert.AreEqual(2, turns[0].Completions);
 
-            completion.TurnID = 0;
+            completion.TurnID = TURN_ID_START;
             db.SaveRawStudentLessonAct(completion.ToJson());
             turns = db.FindTurns(null, null);
             Assert.AreEqual(1, turns.Count);
@@ -258,9 +261,9 @@ namespace CSALMongoUnitTest {
             db.SaveRawStudentLessonAct(@"{
                 'UserID': 'memphis-semiotics-fozzy-bear',
                 'LessonID': 'lesson',
-                'TurnID': 0,
+                'TurnID': $TURN_ID_START,
                 'Transitions': 42
-            }");
+            }".Replace("$TURN_ID_START", TURN_ID_START.ToString()));
             var rawTurns = db.FindTurnsRaw(null, null);
             Assert.AreEqual(1, rawTurns.Count);
             Assert.AreEqual(4, rawTurns[0].GetValue("Attempts", -1).AsInt32);
@@ -270,7 +273,7 @@ namespace CSALMongoUnitTest {
             db.SaveRawStudentLessonAct(@"{
                 'UserID': 'memphis-semiotics-fozzy-bear',
                 'LessonID': 'lesson',
-                'TurnID': 1,
+                'TurnID': 10,
                 'Transitions': [42]
             }");
             rawTurns = db.FindTurnsRaw(null, null);
@@ -282,7 +285,7 @@ namespace CSALMongoUnitTest {
             db.SaveRawStudentLessonAct(@"{
                 'UserID': 'memphis-semiotics-fozzy-bear',
                 'LessonID': 'lesson',
-                'TurnID': 2,
+                'TurnID': 12,
                 'Transitions': [{'Actions': 42}]
             }");
             rawTurns = db.FindTurnsRaw(null, null);
@@ -294,7 +297,7 @@ namespace CSALMongoUnitTest {
             db.SaveRawStudentLessonAct(@"{
                 'UserID': 'memphis-semiotics-fozzy-bear',
                 'LessonID': 'lesson',
-                'TurnID': 2,
+                'TurnID': 12,
                 'Transitions': [{'Actions': [42]}]
             }");
             rawTurns = db.FindTurnsRaw(null, null);
@@ -306,7 +309,7 @@ namespace CSALMongoUnitTest {
             db.SaveRawStudentLessonAct(@"{
                 'UserID': 'memphis-semiotics-fozzy-bear',
                 'LessonID': 'lesson',
-                'TurnID': 3,
+                'TurnID': 13,
                 'Transitions': [{'Actions': [{'Agent':'system', 'Act':'end'}]}]
             }");
             rawTurns = db.FindTurnsRaw(null, null);
@@ -333,10 +336,12 @@ namespace CSALMongoUnitTest {
             var turns = db.FindTurns(null, null);
             Assert.AreEqual(0, turns.Count);
 
+            const int TURN_ID_START = CSALMongo.Model.StudentLessonActs.TURN_ID_START;
+
             var attempted = new CSALMongo.TurnModel.ConvLog {
                 UserID = "memphis-semiotics-fozzy-bear",
                 LessonID = "lesson",
-                TurnID = 0
+                TurnID = TURN_ID_START
             };
 
             db.SaveRawStudentLessonAct(attempted.ToJson());
@@ -377,10 +382,12 @@ namespace CSALMongoUnitTest {
 
             Assert.AreEqual(0, db.FindTurns(null, null).Count);
 
+            const int TURN_ID_START = CSALMongo.Model.StudentLessonActs.TURN_ID_START;
+
             var attempted = new CSALMongo.TurnModel.ConvLog {
                 UserID = "fozzy-bear",
                 LessonID = "lesson",
-                TurnID = 0
+                TurnID = TURN_ID_START
             };
 
             db.SaveRawStudentLessonAct(attempted.ToJson());
@@ -491,11 +498,13 @@ namespace CSALMongoUnitTest {
                 "http://elsewhere/bad/scripts/Lesson25/activity/doh"
             };
 
+            const int TURN_ID_START = CSALMongo.Model.StudentLessonActs.TURN_ID_START;
+
             foreach (var lessonId in idList) {
                 var attempted = new CSALMongo.TurnModel.ConvLog {
                     UserID = "memphis-semiotics-fozzy-bear",
                     LessonID = lessonId,
-                    TurnID = 0
+                    TurnID = TURN_ID_START
                 };
 
                 db.SaveRawStudentLessonAct(attempted.ToJson());

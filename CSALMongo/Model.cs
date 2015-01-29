@@ -271,6 +271,11 @@ namespace CSALMongo.Model {
     /// </summary>
     public class StudentLessonActs : IComparable<StudentLessonActs> {
         /// <summary>
+        /// The Turn ID signalling the start of an attempt
+        /// </summary>
+        public const int TURN_ID_START = 0;
+
+        /// <summary>
         /// The MongoDB ID (_id) - composed of Lesson ID and User ID
         /// </summary>
         public string Id { get; set; }
@@ -332,7 +337,7 @@ namespace CSALMongo.Model {
                 return -1;
 
             int start = Turns.Count - 1;
-            while (start > 0 && Turns[start].TurnID != 0) {
+            while (start > 0 && Turns[start].TurnID != TURN_ID_START) {
                 start--;
             }
 
@@ -517,7 +522,27 @@ namespace CSALMongo.Model {
             double startTime = Turns[start].DBTimestamp;
             double endTime = Turns[last].DBTimestamp;
 
-            return (endTime - startTime) + Turns[last].Duration;
+            double totalTime = (endTime - startTime) + Turns[last].Duration;
+
+            //With two or more turns, we might have multiple attempts. As a result,
+            //we need to subtract the elapsed time between the end of one attempt
+            //and the beginning of the next
+            for (int i = start + 1; i <= last; ++i) {
+                var prev = Turns[i - 1];
+                var curr = Turns[i];
+
+                if (curr.TurnID == TURN_ID_START) {
+                    var elap = curr.DBTimestamp - prev.DBTimestamp;
+                    if (elap > 0.0) {
+                        totalTime -= elap;
+                    }
+                    //If the previous turn had a duration, we should use that
+                    //as part of the time 
+                    totalTime += prev.Duration;
+                }
+            }
+            
+            return totalTime;
         }
 
         /// <summary>

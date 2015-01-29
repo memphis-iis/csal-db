@@ -471,7 +471,7 @@ namespace CSALMongoWebAPI.Controllers {
                 string lastDiff = "M";
 
                 foreach (var turn in details.Turns) {
-                    if (turn.TurnID == 0) {
+                    if (turn.TurnID == StudentLessonActs.TURN_ID_START) {
                         detailLog.Add(DetailLogEntry(student, "Start of Lesson Attempt", "Attempt", entry: turn));
                     }
 

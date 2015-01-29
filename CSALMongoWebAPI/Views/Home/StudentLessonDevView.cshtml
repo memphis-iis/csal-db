@@ -30,6 +30,11 @@
                         if (turn.Input != null && !String.IsNullOrWhiteSpace(turn.Input.Event)) {
                             evt = turn.Input.Event;
                         }
+                        else if (turn.TurnID <= 1 && turn.Transitions != null && turn.Transitions.Count > 0) {
+                            if (!String.IsNullOrWhiteSpace(turn.Transitions[0].StateID)) {
+                                evt = "State:"+turn.Transitions[0].StateID;
+                            }
+                        }
 
                         <tr>
                             <td class="nw">

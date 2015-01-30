@@ -30,9 +30,6 @@ namespace CSALMongoWebAPI.Controllers {
     /// JSON at /api/lessons.
     /// </summary>
     public class HomeController : Controller {
-        //The ignore-case comparison we use
-        protected const StringComparison IC = StringComparison.InvariantCultureIgnoreCase;
-
         protected ClassesController classesCtrl;
         protected LessonsController lessonsCtrl;
         protected StudentsController studentsCtrl;
@@ -310,7 +307,7 @@ namespace CSALMongoWebAPI.Controllers {
             bool admin = IsAdmin();
             string email = CurrentUserEmail();
             foreach (Class cls in ClassesCtrl.Get()) {
-                if (admin || String.Equals(email, cls.TeacherName, IC)) {
+                if (admin || cls.IsATeacher(email)) {
                     classes.Add(cls);
                 }
             }
@@ -328,7 +325,7 @@ namespace CSALMongoWebAPI.Controllers {
             }
 
             if (!IsAdmin()) {
-                if (!String.Equals(CurrentUserEmail(), clazz.TeacherName, IC)) {
+                if (!clazz.IsATeacher(CurrentUserEmail())) {
                     //Don't have rights to this class
                     return RedirectToAction("Classes");
                 }
@@ -426,7 +423,7 @@ namespace CSALMongoWebAPI.Controllers {
         private HashSet<string> AllowedLessons(string email) {
             var allowedLessons = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var cls in ClassesCtrl.Get()) {
-                if (String.Equals(email, cls.TeacherName, IC)) {
+                if (cls.IsATeacher(email)) {
                     allowedLessons.UnionWith(cls.Lessons);
                 }
             }
@@ -477,13 +474,16 @@ namespace CSALMongoWebAPI.Controllers {
 
                     bool completion = false;
 
+                    //The ignore-case comparison we use
+                    const StringComparison CMP = StringComparison.InvariantCultureIgnoreCase;
+
                     foreach (var act in turn.AllValidActions()) {
-                        if (String.Equals(act.Agent, "System", IC)) {
-                            if (String.Equals(act.Act, "Display", IC) && !String.IsNullOrWhiteSpace(act.Data)) {
+                        if (String.Equals(act.Agent, "System", CMP)) {
+                            if (String.Equals(act.Act, "Display", CMP) && !String.IsNullOrWhiteSpace(act.Data)) {
                                 lastQuestion = act.Data;
                             }
 
-                            if (String.Equals(act.Act, "End", IC)) {
+                            if (String.Equals(act.Act, "End", CMP)) {
                                 completion = true;
                             }
                         }
@@ -703,7 +703,7 @@ namespace CSALMongoWebAPI.Controllers {
         private HashSet<string> AllowedStudents(string email) {
             var allowedStudents = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var cls in ClassesCtrl.Get()) {
-                if (String.Equals(email, cls.TeacherName, IC)) {
+                if (cls.IsATeacher(email)) {
                     allowedStudents.UnionWith(cls.Students);
                 }
             }

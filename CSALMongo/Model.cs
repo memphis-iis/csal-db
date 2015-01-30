@@ -6,7 +6,6 @@ using System.Diagnostics;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
-
 namespace CSALMongo.Model {
     /// <summary>
     /// This namespace is for model classes used by CSALDatabase.  Note that the
@@ -83,9 +82,21 @@ namespace CSALMongo.Model {
         
         /// <summary>
         /// Name of the teacher for this class. Note that this should be an
-        /// email AND that it controls access to the class data in the DB GUI
+        /// email AND that it controls access to the class data in the DB GUI.
+        /// Also note that we check that the email is CONTAINED in this string,
+        /// so you may use a delimited string of emails
         /// </summary>
         public string TeacherName { get; set; }
+
+        public bool IsATeacher(string toTest) {
+            if (String.IsNullOrWhiteSpace(toTest) || String.IsNullOrWhiteSpace(TeacherName)) {
+                return false;
+            }
+
+            //We know we actually have real strings
+            const StringComparison CMP = StringComparison.InvariantCultureIgnoreCase;
+            return TeacherName.IndexOf(toTest, CMP) >= 0;
+        }
 
         /// <summary>
         /// Location of the class.  Note that this can be used to get a list

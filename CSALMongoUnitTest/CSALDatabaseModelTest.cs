@@ -85,6 +85,41 @@ namespace CSALMongoUnitTest {
         }
 
         [TestMethod]
+        public void TestClassIsATeacher() {
+            var clazz = new CSALMongo.Model.Class { ClassID = "TestClass", Location = "RightHere"};
+
+            //Default/null value for teacher means no teacher...
+            Assert.IsFalse(clazz.IsATeacher(null));
+            Assert.IsFalse(clazz.IsATeacher(""));
+            Assert.IsFalse(clazz.IsATeacher(" "));
+            Assert.IsFalse(clazz.IsATeacher("a"));
+
+            //And so does empty string
+            clazz.TeacherName = "";
+            Assert.IsFalse(clazz.IsATeacher(null));
+            Assert.IsFalse(clazz.IsATeacher(""));
+            Assert.IsFalse(clazz.IsATeacher(" "));
+            Assert.IsFalse(clazz.IsATeacher("a"));
+
+            //Check for single value
+            clazz.TeacherName = "teach1";
+            Assert.IsFalse(clazz.IsATeacher(null));
+            Assert.IsFalse(clazz.IsATeacher(""));
+            Assert.IsFalse(clazz.IsATeacher(" "));
+            Assert.IsFalse(clazz.IsATeacher("z"));
+            Assert.IsTrue(clazz.IsATeacher("teach1"));
+
+            //Check for two values
+            clazz.TeacherName = "teach1,teach2";
+            Assert.IsFalse(clazz.IsATeacher(null));
+            Assert.IsFalse(clazz.IsATeacher(""));
+            Assert.IsFalse(clazz.IsATeacher(" "));
+            Assert.IsFalse(clazz.IsATeacher("teach3"));
+            Assert.IsTrue(clazz.IsATeacher("teach1"));
+            Assert.IsTrue(clazz.IsATeacher("teach2"));
+        }
+
+        [TestMethod]
         public void TestStudentLessonActTotalTime() {
             var studentLesson = new CSALMongo.Model.StudentLessonActs();
             studentLesson.Turns = new List<CSALMongo.TurnModel.ConvLog>();

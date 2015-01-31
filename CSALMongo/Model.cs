@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using System.Diagnostics;
 
@@ -284,7 +285,7 @@ namespace CSALMongo.Model {
         /// <summary>
         /// The Turn ID signalling the start of an attempt
         /// </summary>
-        public const int TURN_ID_START = 0;
+        public const int TURN_ID_START = 1;
 
         /// <summary>
         /// The MongoDB ID (_id) - composed of Lesson ID and User ID
@@ -520,27 +521,33 @@ namespace CSALMongo.Model {
             //OBVIOUSLY out of whack
             FixupTimestamps();
 
+            //We IGNORE all turns with ID 0
+            var turnsToCheck = Turns;
+            if (Turns.Count > 0) {
+                turnsToCheck = turnsToCheck.Where(x => x.TurnID != 0).ToList();
+            }
+
             if (last < 0)
-                last = Turns.Count - 1;
+                last = turnsToCheck.Count - 1;
 
             if (start < 0 || start > last) {
                 return 0.0;
             }
             else if (start == last) {
-                return Turns[start].Duration;
+                return turnsToCheck[start].Duration;
             }
 
-            double startTime = Turns[start].DBTimestamp;
-            double endTime = Turns[last].DBTimestamp;
+            double startTime = turnsToCheck[start].DBTimestamp;
+            double endTime = turnsToCheck[last].DBTimestamp;
 
-            double totalTime = (endTime - startTime) + Turns[last].Duration;
+            double totalTime = (endTime - startTime) + turnsToCheck[last].Duration;
 
             //With two or more turns, we might have multiple attempts. As a result,
             //we need to subtract the elapsed time between the end of one attempt
             //and the beginning of the next
             for (int i = start + 1; i <= last; ++i) {
-                var prev = Turns[i - 1];
-                var curr = Turns[i];
+                var prev = turnsToCheck[i - 1];
+                var curr = turnsToCheck[i];
 
                 if (curr.TurnID == TURN_ID_START) {
                     var elap = curr.DBTimestamp - prev.DBTimestamp;

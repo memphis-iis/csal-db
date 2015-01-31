@@ -62,11 +62,16 @@ namespace CSALMongoWebAPI.Controllers {
             if (turns == null || turns.Count < 1)
                 return null;
 
+            //We just skip Turn ID 0 for our rollup
+            turns = turns.Where(x => x.TurnID != 0).ToList();
+            if (turns.Count < 1)
+                return null;
+
             if (turns.Count == 1) {
                 return new List<RollupItem> { RollupItem.CreateItem(parent, 0, 0) };
             }
 
-            //So now we know we have at least 2 turns
+            //So now we know we have at least 2 turns (that aren't ID 0)
             
             var ret = new List<RollupItem>();
             
